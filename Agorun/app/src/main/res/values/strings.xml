@@ -1,4 +1,23 @@
 <resources>
-    <string name="app_name">ProvaMaps</string>
-    <string name="title_activity_maps">TrackingMapsApp</string>
+    <string name="app_name">Agorun</string>
+    <string name="title_activity_maps">Agorun</string>
+    <string name="nameHint">Insert your name...</string>
+    <string name="surnameHint">Insert your surname...</string>
+    <string name="beginner">Beginner</string>
+    <string name="amateur">Amateur</string>
+    <string name="advanced">Advanced</string>
+    <string name="expert">Expert</string>
+    <string name="SelectCustom">select</string>
+    <string name="experienceChoice">Select your experience level:</string>
+    <string name="sexChoice">Select your sex...</string>
+    <string name="startHint">Select the starting addres</string>
+    <string name="destinationHint">Select your destination address</string>
+    <string name="difficultyLevel">Select the difficulty of the track</string>
+    <string name="shortTrack">Short: 0-5 km</string>
+    <string name="mediumTrack">Medium: 6-10 km</string>
+    <string name="longTrack">Long: 11-15 km</string>
+    <string name="championTrack">Champion: 16-20 km</string>
+    <string name="godTrack">God: 21+ km</string>
+    <string name="lengthChoice">Select the length range of the track</string>
 </resources>
+

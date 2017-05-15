@@ -19,8 +19,6 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
@@ -110,7 +108,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         actv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
+                Intent intent = new Intent(v.getContext(), AddActivity.class);
+                startActivity(intent);
+                /*try {
                     Intent intent =
                             new PlaceAutocomplete
                                     .IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)
@@ -120,29 +120,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Log.i("1", e.toString());
                 } catch (GooglePlayServicesNotAvailableException e) {
                     Log.i("2", e.toString());
-                }
+                }*/
             }
         });
 
-        /*TimerTask ts = new TimerTask() {
-            @Override
-            public void run() {
-                System.out.println("DENTRO TIMER TASK "+getI());
-                incI();
-            }
-        };
-        timer.schedule(ts, 1000);*/
-
-    }
-
-    int i = 0;
-
-    private void incI() {
-        i++;
-    }
-
-    private int getI() {
-        return i;
     }
 
     @Override
@@ -194,6 +175,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             // Update the map location.
 
             LatLng latlng=fromLocationToLatLng(location);
+            
 
             //System.out.println("Latitude: "+latlng.latitude+", Longitude: "+latlng.longitude);
 
@@ -204,8 +186,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latlng, 17));
             }
 
-            if(whereAmI!=null)
+            if(whereAmI!=null) {
                 whereAmI.remove();
+            }
 
             /*whereAmI=mMap.addMarker(new MarkerOptions().position(latlng).icon(BitmapDescriptorFactory.defaultMarker(
                     BitmapDescriptorFactory.HUE_AZURE)).flat(false).title("I'm here!"));*/
@@ -442,17 +425,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 */
-    private class MyLocationRegistered {
-        private volatile Location location;
-
-        public Location getPosition() {
-            return this.location;
-        }
-
-        public void setPosition(Location location) {
-            this.location = location;
-        }
-    }
 
     // Metodi per l'aggiunta di Markers nella mappa --> le posizioni di questi veranno get-tati dal DB.
     public void addMarkerToMap(LatLng latLng, String description) {

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="experience">
+        <item>@string/beginner</item>
+        <item>@string/amateur</item>
+        <item>@string/advanced</item>
+        <item>@string/expert</item>
+    </string-array>
+    <string-array name="trackLength">
+        <item>@string/shortTrack</item>
+        <item>@string/mediumTrack</item>
+        <item>@string/longTrack</item>
+        <item>@string/championTrack</item>
+        <item>@string/godTrack</item>
+    </string-array>
+</resources>
