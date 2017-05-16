@@ -108,8 +108,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         actv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+
                 Intent intent = new Intent(v.getContext(), AddActivity.class);
                 startActivity(intent);
+
                 /*try {
                     Intent intent =
                             new PlaceAutocomplete
@@ -124,6 +127,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
+    }
+
+    public List<LatLng> getListCoords() {
+        return this.listCoords;
+    }
+
+    public static MapsActivity getMapsData() {
+        return mact;
     }
 
     @Override
@@ -175,7 +186,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             // Update the map location.
 
             LatLng latlng=fromLocationToLatLng(location);
-            
+
 
             //System.out.println("Latitude: "+latlng.latitude+", Longitude: "+latlng.longitude);
 
@@ -274,7 +285,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onMapLongClick(LatLng latLng) {
-        mMap.addMarker(new MarkerOptions().position(latLng).title("Lat = "+latLng.latitude+", Long = "+latLng.longitude));
+        //mMap.addMarker(new MarkerOptions().position(latLng).title("Lat = "+latLng.latitude+", Long = "+latLng.longitude));
     }
 
     @Override
@@ -339,7 +350,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             updateWithNewLocation(l);
 
         } else {
-            System.out.println("NULLOOOO");
+            System.out.println("NULLO");
         }
 
         // Richiedo update di posizione continuamente

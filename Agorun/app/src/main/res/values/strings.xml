@@ -19,5 +19,6 @@
     <string name="championTrack">Champion: 16-20 km</string>
     <string name="godTrack">God: 21+ km</string>
     <string name="lengthChoice">Select the length range of the track</string>
+    <string name="createActivityText">Create</string>
 </resources>
 
