@@ -8,7 +8,7 @@ public class User {
 
     private String name;
     private String surname;
-    private String sex;
+    private char sex;
     private int age;
     private int weight;
     private String experience;
@@ -16,7 +16,7 @@ public class User {
 
     public User(String name,
                 String surname,
-                String sex,
+                char sex,
                 int age,
                 int weight,
                 String experience,
@@ -39,7 +39,7 @@ public class User {
         this.surname = surname;
     }
 
-    public void setSex(String sex) {
+    public void setSex(char sex) {
         this.sex = sex;
     }
 
@@ -67,7 +67,7 @@ public class User {
         return this.surname;
     }
 
-    public String getSex() {
+    public char getSex() {
         return this.sex;
     }
 
