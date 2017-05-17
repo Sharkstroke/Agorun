@@ -45,17 +45,23 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
-
+                    // Niente.
                 } else {
+                    // Controllo che il campo startAddress sia già stato compilato
                     if (startAddress != null && startAddress.getText().toString().trim().length() > 0) {
+
+                        // Elimino gli spazi tra le parole per passare gli indirizzi come url in modo corretto
                         String addressStartFixed = startAddress.getText().toString().replaceAll("\\s", "");
                         String addressDestinationFixed = destinationAddress.getText().toString().replaceAll("\\s", "");
+
+                        // Lancio l'url passandogli gli indirizzi e la API key.
                         String url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins=" + addressStartFixed + "&destinations=" + addressDestinationFixed + "&mode=driving&language=fr-FR&avoid=tolls&key=AIzaSyCW_gvTeNeb_Gzxv8kphisyTr-PZX58djQ";
                         System.out.println(url);
+
+                        // Avvio il parsing ed il calcolo dei km.
                         new GeoTask(AddActivity.this).execute(url);
                     }
                 }
-                // check che l'indirizzo di partenza non sia ancora stato scritto.
             }
         });
     }
@@ -80,19 +86,22 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo {
         /*
             // Questa parte dovrà essere sotituita dal caricamento delle coordinate sul database, non dovrebbe essere necessario disegnare un Marker in corrispondenza
             // anche del punto di arrivo.
-
+        */
         et = (EditText) findViewById(R.id.destinationAddress);
         String destination = et.getText().toString();
 
         list = gc.getFromLocationName(destination, 1);
-        add = list.get(0);
+        Address add2 = list.get(0);
         locality = add.getLocality();
 
         double latDest = add.getLatitude();
         double lngDest = add.getLongitude();
-        */
 
-        mapsActivity.addMarkerToMap(latStart, lngStart, "START");
+
+        final Spinner experienceSpinner = (Spinner) findViewById(R.id.ExperienceSpinner);
+        String experience = experienceSpinner.getSelectedItem().toString();
+
+        mapsActivity.addMarkerToMap(latStart, lngStart, add.getAddressLine(0), add2.getAddressLine(0), trackLength.getSelectedItem().toString(), experience.toString());
         finish();
 
         //mapsActivity.addMarkerToMap(latDest, lngDest, "DESTINATION");
@@ -108,21 +117,15 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo {
     public void setDouble(String min) {
         String res[] = min.split(",");
         int kilom = Integer.parseInt(res[1])/1000;
-        System.out.println("CHILOMETRI: "+kilom);
         if (kilom >= 0 && kilom <= 5) {
-            System.out.println("Primo if");
             trackLength.setSelection(0);
         } else if (kilom > 5 && kilom <= 10) {
-            System.out.println("Secondo if");
             trackLength.setSelection(1);
         } else if (kilom > 10 && kilom <= 15) {
-            System.out.println("Terzo if");
             trackLength.setSelection(2);
         } else if (kilom > 15 && kilom <= 20) {
-            System.out.println("Quarto if");
             trackLength.setSelection(3);
         } else if (kilom > 20) {
-            System.out.println("Quinto if");;
             trackLength.setSelection(4);
         }
     }

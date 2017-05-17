@@ -19,8 +19,6 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
@@ -112,10 +110,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(View v) {
 
 
-                //Intent intent = new Intent(v.getContext(), AddActivity.class);
-                //startActivity(intent);
+                Intent intent = new Intent(v.getContext(), AddActivity.class);
+                startActivity(intent);
 
-                try {
+                /*try {
                     Intent intent =
                             new PlaceAutocomplete
                                     .IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)
@@ -125,7 +123,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Log.i("1", e.toString());
                 } catch (GooglePlayServicesNotAvailableException e) {
                     Log.i("2", e.toString());
-                }
+                }*/
             }
         });
 
@@ -400,11 +398,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 // Getting reference to the TextView to set longitude
                 TextView tvLng = (TextView) v.findViewById(R.id.tv_lng);
 
+                TextView km = (TextView) v.findViewById(R.id.km_length);
+
+                TextView experience = (TextView) v.findViewById(R.id.experienceLevel);
+
                 // Setting the latitude
-                tvLat.setText("Latitude:" + latLng.latitude);
+                //tvLat.setText("Latitude:" + latLng.latitude);
 
                 // Setting the longitude
-                tvLng.setText("Longitude:" + latLng.longitude);
+                //tvLng.setText("Longitude:" + latLng.longitude);
+
+                tvLat.setText("Start: "+addrS);
+                tvLng.setText("Destination: "+addrD);
+
+                km.setText("Km: "+MapsActivity.trackKm);
+
+                experience.setText("Experience: "+trackExperience);
 
                 // Returning the view containing InfoWindow contents
                 return v;
@@ -439,14 +448,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 */
 
+    static String trackKm;
+    private String trackExperience;
+
+    private String addrS;
+    private String addrD;
+
+
     // Metodi per l'aggiunta di Markers nella mappa --> le posizioni di questi veranno get-tati dal DB.
-    public void addMarkerToMap(LatLng latLng, String description) {
+    public void addMarkerToMap(LatLng latLng, String km, String experience) {
+        MapsActivity.trackKm = km;
+        trackExperience = experience;
         mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker( // Al posto dell'argomento di icon, passare BitmapDescriptorFactory.fromResource(R.drawable.FILEIMMAGINE)));
-                BitmapDescriptorFactory.HUE_AZURE)).flat(false).title(description));
+                BitmapDescriptorFactory.HUE_AZURE)).flat(false));
     }
 
-    public void addMarkerToMap(double lat, double longit, String description) {
-        this.addMarkerToMap(new LatLng(lat, longit), description);
+    public void addMarkerToMap(double latS, double longitS, String addrS, String addrD, String km, String experience) {
+        this.addrS = addrS;
+        this.addrD = addrD;
+        this.addMarkerToMap(new LatLng(latS, longitS), km, experience);
     }
 }
 

@@ -8,9 +8,10 @@
     android:gravity="center"
     >
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical"
         >
 
         <TextView
@@ -28,12 +29,32 @@
             android:layout_height="wrap_content"
             android:textColor="#FF0000"
             android:padding="10dp"
-            android:layout_centerInParent="true"
             android:background="#00000000"
+            android:layout_below="@+id/tv_lat"
             android:id="@+id/tv_lng"
             />
 
-    </RelativeLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FF0000"
+            android:padding="10dp"
+            android:background="#00000000"
+            android:layout_below="@+id/tv_lng"
+            android:id="@+id/km_length"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FF0000"
+            android:padding="10dp"
+            android:background="#00000000"
+            android:layout_below="@+id/tv_lng"
+            android:id="@+id/experienceLevel"
+            />
+
+    </LinearLayout>
 
 </LinearLayout>
     <!--<?xml version="1.0" encoding="utf-8"?>
