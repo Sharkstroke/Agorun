@@ -19,6 +19,8 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
@@ -110,10 +112,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(View v) {
 
 
-                Intent intent = new Intent(v.getContext(), AddActivity.class);
-                startActivity(intent);
+                //Intent intent = new Intent(v.getContext(), AddActivity.class);
+                //startActivity(intent);
 
-                /*try {
+                try {
                     Intent intent =
                             new PlaceAutocomplete
                                     .IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)
@@ -123,7 +125,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Log.i("1", e.toString());
                 } catch (GooglePlayServicesNotAvailableException e) {
                     Log.i("2", e.toString());
-                }*/
+                }
             }
         });
 
