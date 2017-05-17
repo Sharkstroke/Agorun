@@ -4,17 +4,16 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Spinner;
 
 import java.io.IOException;
 import java.util.List;
-
-/**
- * Created by fabio on 15/05/17.
- */
-
+import java.util.Timer;
+import java.util.TimerTask;
 
 // TODO: aggiungere opzione per scegliere il tempo di corsa (approssimativo). Aggiungere l'impostazione automatica dei km minimi di corsa tramite le Google Matrix APIs.
 
@@ -41,7 +40,56 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo {
         trackLength = (Spinner) findViewById(R.id.trackLength);
         experienceSpinner = (Spinner) findViewById(R.id.ExperienceSpinner);
 
-        destinationAddress.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+
+
+        destinationAddress.addTextChangedListener(
+                new TextWatcher() {
+                    boolean isTyping = false;
+                    Timer timer = new Timer();
+                    long delay = 1500;
+                      @Override
+                      public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                      }
+
+                      @Override
+                      public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                      }
+
+                      @Override
+                      public void afterTextChanged(Editable s) {
+                          if (!isTyping) {
+                              isTyping = true;
+                          }
+                          timer.cancel();
+                          timer = new Timer();
+                          timer.schedule(new TimerTask() {
+                              @Override
+                              public void run() {
+                                  isTyping = false;
+                                  if (startAddress != null && startAddress.getText().toString().trim().length() > 0) {
+
+                                      // Elimino gli spazi tra le parole per passare gli indirizzi come url in modo corretto
+                                      String addressStartFixed = startAddress.getText().toString().replaceAll("\\s", "");
+                                      String addressDestinationFixed = destinationAddress.getText().toString().replaceAll("\\s", "");
+
+                                      // Lancio l'url passandogli gli indirizzi e la API key.
+                                      String url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins=" + addressStartFixed + "&destinations=" + addressDestinationFixed + "&mode=driving&language=fr-FR&avoid=tolls&key=AIzaSyCW_gvTeNeb_Gzxv8kphisyTr-PZX58djQ";
+                                      System.out.println(url);
+
+                                      // Avvio il parsing ed il calcolo dei km.
+                                      //new GeoTask(AddActivity.this).execute(url);
+                                      this.cancel();
+                                      startSearch(url);
+                                  }
+                              }
+                          }, delay);
+                      }
+                }
+        );
+
+        /*destinationAddress.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
@@ -63,7 +111,17 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo {
                     }
                 }
             }
+        });*/
+    }
+
+    public void startSearch(final String url) {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                new GeoTask(AddActivity.this).execute(url);
+            }
         });
+        //new GeoTask(AddActivity.this).execute(url);
     }
 
     // Metodo richiamato al click sul button di creazione attività: serve per ottenere le coordinate degli indirizzi selezionati.

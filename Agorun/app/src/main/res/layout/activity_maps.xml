@@ -15,10 +15,17 @@
             android:id="@+id/findPlace"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
             android:text="Search"
-            />
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true" />
+
+        <Button
+            android:id="@+id/newActivity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="New Activity"
+            android:layout_alignParentTop="true"
+            android:layout_alignEnd="@+id/searched_address" />
 
         <TextView
             android:layout_margin="20dp"

@@ -1,9 +1,5 @@
 package com.unipd.fabio.agorun;
 
-/**
- * Created by fabio on 15/05/17.
- */
-
 public class MyTrack {
 
     private String start;

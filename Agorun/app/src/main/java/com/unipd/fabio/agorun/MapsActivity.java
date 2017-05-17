@@ -19,6 +19,8 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
@@ -105,17 +107,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //AutoCompleteTextView actv = (AutoCompleteTextView) findViewById(R.id.findPlace);
         Button actv = (Button) findViewById(R.id.findPlace);
+        Button newActivity = (Button) findViewById(R.id.newActivity);
+
+        newActivity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), AddActivity.class);
+                startActivity(intent);
+            }
+        });
+
         actv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-
-                Intent intent = new Intent(v.getContext(), AddActivity.class);
-                startActivity(intent);
-
-                /*try {
-                    Intent intent =
-                            new PlaceAutocomplete
+                try {
+                    Intent intent = new PlaceAutocomplete
                                     .IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)
                                     .build(mact);
                     startActivityForResult(intent, 1);
@@ -123,7 +129,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Log.i("1", e.toString());
                 } catch (GooglePlayServicesNotAvailableException e) {
                     Log.i("2", e.toString());
-                }*/
+                }
             }
         });
 
@@ -151,14 +157,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Place place = PlaceAutocomplete.getPlace(this, data);
                 Log.e("Tag", "Place: " + place.getAddress() + place.getPhoneNumber());
 
-                /*((TextView) findViewById(R.id.searched_address))
-                        .setText(place.getName()+",\n"+
-                                place.getAddress() +"\n" + place.getPhoneNumber());*/
                 LatLng latLngFound = place.getLatLng();
-                mMap.addMarker(new MarkerOptions()
-                        .position(latLngFound)
-                        .flat(false)
-                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
 
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLngFound, 17));
 
