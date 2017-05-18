@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    android:gravity="end"
+    android:layout_gravity="end"
+    android:layoutDirection="rtl"
+    >
+
+
+    <item
+        android:id="@+id/one"
+        android:layoutDirection="rtl"
+        android:title="One"/>
+
+    <item
+        android:id="@+id/two"
+        android:layoutDirection="rtl"
+        android:title="Two"/>
+
+    <item
+        android:id="@+id/three"
+        android:layoutDirection="rtl"
+        android:title="Three"/>
+
+</menu>
