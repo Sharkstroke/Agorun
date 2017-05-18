@@ -36,22 +36,28 @@ public class GeoTask extends AsyncTask<String, Void, String> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        pd=new ProgressDialog(mContext);
-        pd.setMessage("Loading");
-        pd.setCancelable(false);
-        pd.show();
+        //pd=new ProgressDialog(mContext);
+        //pd.setMessage("Loading");
+        //pd.setCancelable(false);
+        //pd.show();
     }
     //This function is executed after the execution of "doInBackground(String...params)" to dismiss the dispalyed progress dialog and call "setDouble(Double)" defined in "MainActivity.java"
     @Override
     protected void onPostExecute(String aDouble) {
         super.onPostExecute(aDouble);
-        if(aDouble!=null)
-        {
-            geo1.setDouble(aDouble);
-            pd.dismiss();
+        try {
+            if(aDouble!=null)
+            {
+                geo1.setDouble(aDouble);
+                //pd.dismiss();
+            }
+            else {
+                Toast.makeText(mContext, "Address not found, retry with a valid one", Toast.LENGTH_SHORT).show();
+                this.cancel(true);
+            }
+        } catch(Exception e) {
+            System.out.println(e.toString());
         }
-        else
-            Toast.makeText(mContext, "Error4!Please Try Again wiht proper values", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -73,8 +79,20 @@ public class GeoTask extends AsyncTask<String, Void, String> {
                     line=br.readLine();
                 }
                 String json=sb.toString();
-                Log.d("JSON",json);
+                //String addresses =
+                System.out.println("TUTTO: "+json);
+                //JSONObject addrS = new JSONObject()
+
                 JSONObject root=new JSONObject(json);
+
+                JSONArray myArrayStart = root.getJSONArray("origin_addresses");
+                JSONArray myArrayDestination = root.getJSONArray("destination_addresses");
+
+                //String addrS = myArrayStart.
+
+                System.out.println("QUI è COSI':"+myArrayStart.toString()+"***"+myArrayDestination.toString());
+
+
                 JSONArray array_rows=root.getJSONArray("rows");
                 Log.d("JSON","array_rows:"+array_rows);
                 JSONObject object_rows=array_rows.getJSONObject(0);

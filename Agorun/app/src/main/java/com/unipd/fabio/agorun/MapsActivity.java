@@ -163,7 +163,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
                 Status status = PlaceAutocomplete.getStatus(this, data);
-                // TODO: Handle the error.
                 Log.e("Tag", status.getStatusMessage());
 
             } else if (resultCode == RESULT_CANCELED) {
@@ -401,13 +400,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 TextView experience = (TextView) v.findViewById(R.id.experienceLevel);
 
-                // Setting the latitude
-                //tvLat.setText("Latitude:" + latLng.latitude);
-
-                // Setting the longitude
-                //tvLng.setText("Longitude:" + latLng.longitude);
-
                 tvLat.setText("Start: "+addrS);
+
                 tvLng.setText("Destination: "+addrD);
 
                 km.setText("Km: "+MapsActivity.trackKm);
@@ -420,14 +414,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
 
         });
-
-        /**
-         * SOLO PER TESTARE LA COLORAZIONE DEL PERCORSO DEFINITO DA PUNTI IN SEQUENZA
-         */
-        /*
-        for (int k = 0; k < listCoords.size()-1; k++) {
-            this.drawTrack(listCoords.get(k), listCoords.get(k + 1));
-        }*/
 
     }
 /*
@@ -458,6 +444,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void addMarkerToMap(LatLng latLng, String km, String experience) {
         MapsActivity.trackKm = km;
         trackExperience = experience;
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
         mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker( // Al posto dell'argomento di icon, passare BitmapDescriptorFactory.fromResource(R.drawable.FILEIMMAGINE)));
                 BitmapDescriptorFactory.HUE_AZURE)).flat(false));
     }

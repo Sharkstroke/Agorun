@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
@@ -25,6 +26,7 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo {
     private EditText destinationAddress;
     private Spinner experienceSpinner;
     private Spinner trackLength;
+    private Button createActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,14 +41,14 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo {
         destinationAddress = (EditText) findViewById(R.id.destinationAddress);
         trackLength = (Spinner) findViewById(R.id.trackLength);
         experienceSpinner = (Spinner) findViewById(R.id.ExperienceSpinner);
-
+        createActivity = (Button) findViewById(R.id.createActivityButton);
 
 
         destinationAddress.addTextChangedListener(
                 new TextWatcher() {
                     boolean isTyping = false;
                     Timer timer = new Timer();
-                    long delay = 1500;
+                    long delay = 1000;
                       @Override
                       public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -76,7 +78,7 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo {
 
                                       // Lancio l'url passandogli gli indirizzi e la API key.
                                       String url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins=" + addressStartFixed + "&destinations=" + addressDestinationFixed + "&mode=driving&language=fr-FR&avoid=tolls&key=AIzaSyCW_gvTeNeb_Gzxv8kphisyTr-PZX58djQ";
-                                      System.out.println(url);
+                                      System.out.println("Destination address wrong: "+url);
 
                                       // Avvio il parsing ed il calcolo dei km.
                                       //new GeoTask(AddActivity.this).execute(url);
@@ -86,6 +88,53 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo {
                               }
                           }, delay);
                       }
+                }
+        );
+
+        startAddress.addTextChangedListener(
+                new TextWatcher() {
+                    boolean isTyping = false;
+                    Timer timer = new Timer();
+                    long delay = 1000;
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        if (!isTyping) {
+                            isTyping = true;
+                        }
+                        timer.cancel();
+                        timer = new Timer();
+                        timer.schedule(new TimerTask() {
+                            @Override
+                            public void run() {
+                                isTyping = false;
+                                if (destinationAddress != null && destinationAddress.getText().toString().trim().length() > 0) {
+
+                                    // Elimino gli spazi tra le parole per passare gli indirizzi come url in modo corretto
+                                    String addressStartFixed = startAddress.getText().toString().replaceAll("\\s", "");
+                                    String addressDestinationFixed = destinationAddress.getText().toString().replaceAll("\\s", "");
+
+                                    // Lancio l'url passandogli gli indirizzi e la API key.
+                                    String url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins=" + addressStartFixed + "&destinations=" + addressDestinationFixed + "&mode=driving&language=fr-FR&avoid=tolls&key=AIzaSyCW_gvTeNeb_Gzxv8kphisyTr-PZX58djQ";
+                                    System.out.println("Start address wrong: "+url);
+
+                                    // Avvio il parsing ed il calcolo dei km.
+                                    //new GeoTask(AddActivity.this).execute(url);
+                                    this.cancel();
+                                    startSearch(url);
+                                }
+                            }
+                        }, delay);
+                    }
                 }
         );
 
@@ -118,7 +167,11 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo {
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                new GeoTask(AddActivity.this).execute(url);
+                try {
+                    new GeoTask(AddActivity.this).execute(url);
+                } catch(Exception e) {
+                    System.out.println(e.toString());
+                }
             }
         });
         //new GeoTask(AddActivity.this).execute(url);
@@ -126,43 +179,50 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo {
 
     // Metodo richiamato al click sul button di creazione attività: serve per ottenere le coordinate degli indirizzi selezionati.
     public void geoLocate(View v) throws IOException {
-        // Ottengo le coordinate geografiche del punto di partenza così da disegnare il Marker.
-        EditText et = (EditText) findViewById(R.id.startAddress);
-        String start = et.getText().toString();
+            // Ottengo le coordinate geografiche del punto di partenza così da disegnare il Marker.
+            EditText et = (EditText) findViewById(R.id.startAddress);
+            String start = et.getText().toString();
+            System.out.println("STARTADDRESS=" + start);
+            Geocoder gc = new Geocoder(this);
+            List<Address> list = null;
 
-        Geocoder gc = new Geocoder(this);
-        List<Address> list = gc.getFromLocationName(start, 1);
-        Address add = list.get(0);
-        String locality = add.getLocality();
+            list = gc.getFromLocationName(start, 1);
 
-        double latStart = add.getLatitude();
-        double lngStart = add.getLongitude();
+            Address add = list.get(0);
+            System.out.println("ADDRESS: " + add);
+            String locality = add.getLocality();
 
-
-
-
-        /*
-            // Questa parte dovrà essere sotituita dal caricamento delle coordinate sul database, non dovrebbe essere necessario disegnare un Marker in corrispondenza
-            // anche del punto di arrivo.
-        */
-        et = (EditText) findViewById(R.id.destinationAddress);
-        String destination = et.getText().toString();
-
-        list = gc.getFromLocationName(destination, 1);
-        Address add2 = list.get(0);
-        locality = add.getLocality();
-
-        double latDest = add.getLatitude();
-        double lngDest = add.getLongitude();
+            double latStart = add.getLatitude();
+            double lngStart = add.getLongitude();
 
 
-        final Spinner experienceSpinner = (Spinner) findViewById(R.id.ExperienceSpinner);
-        String experience = experienceSpinner.getSelectedItem().toString();
 
-        mapsActivity.addMarkerToMap(latStart, lngStart, add.getAddressLine(0), add2.getAddressLine(0), trackLength.getSelectedItem().toString(), experience.toString());
-        finish();
 
-        //mapsActivity.addMarkerToMap(latDest, lngDest, "DESTINATION");
+            /*
+                // Questa parte dovrà essere sotituita dal caricamento delle coordinate sul database, non dovrebbe essere necessario disegnare un Marker in corrispondenza
+                // anche del punto di arrivo.
+            */
+            et = (EditText) findViewById(R.id.destinationAddress);
+            String destination = et.getText().toString();
+
+
+            list = gc.getFromLocationName(destination, 1);
+
+            Address add2 = list.get(0);
+            locality = add.getLocality();
+
+            double latDest = add.getLatitude();
+            double lngDest = add.getLongitude();
+
+
+            final Spinner experienceSpinner = (Spinner) findViewById(R.id.ExperienceSpinner);
+            String experience = experienceSpinner.getSelectedItem().toString();
+
+            mapsActivity.addMarkerToMap(latStart, lngStart, add.getAddressLine(0), add2.getAddressLine(0), trackLength.getSelectedItem().toString(), experience.toString());
+            finish();
+
+            //mapsActivity.addMarkerToMap(latDest, lngDest, "DESTINATION");
+
     }
 
     public void clickbutton(View v) {
@@ -186,5 +246,6 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo {
         } else if (kilom > 20) {
             trackLength.setSelection(4);
         }
+        createActivity.setEnabled(true);
     }
 }
