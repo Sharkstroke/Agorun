@@ -33,17 +33,28 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.new_track);
 
-        mapsActivity = MapsActivity.getMapsData();
-
-        // TODO: creare il button per intercettare l'avvenuta creazione della attività e creare il marker sulla mappa.
-
         startAddress = (EditText) findViewById(R.id.startAddress);
         destinationAddress = (EditText) findViewById(R.id.destinationAddress);
         trackLength = (Spinner) findViewById(R.id.trackLength);
         experienceSpinner = (Spinner) findViewById(R.id.ExperienceSpinner);
         createActivity = (Button) findViewById(R.id.createActivityButton);
 
+        if (getIntent().getExtras() != null) {
+            String startAddressPassed = getIntent().getExtras().getString("StartingAddress");
 
+            if (startAddressPassed != null) {
+                startAddress.setText(startAddressPassed);
+            }
+        }
+
+
+        mapsActivity = MapsActivity.getMapsData();
+
+        // TODO: creare il button per intercettare l'avvenuta creazione della attività e creare il marker sulla mappa.
+
+
+
+        // Controllo quando l'utente smette di digitare l'indirizzo di destinazione, avendo già completato quello di partenza.
         destinationAddress.addTextChangedListener(
                 new TextWatcher() {
                     boolean isTyping = false;
@@ -91,6 +102,7 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo {
                 }
         );
 
+        // Controllo quando l'utente smette di digitare l'indirizzo di partenza, avendo già completato quello di destinazione.
         startAddress.addTextChangedListener(
                 new TextWatcher() {
                     boolean isTyping = false;
@@ -137,30 +149,6 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo {
                     }
                 }
         );
-
-        /*destinationAddress.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    // Niente.
-                } else {
-                    // Controllo che il campo startAddress sia già stato compilato
-                    if (startAddress != null && startAddress.getText().toString().trim().length() > 0) {
-
-                        // Elimino gli spazi tra le parole per passare gli indirizzi come url in modo corretto
-                        String addressStartFixed = startAddress.getText().toString().replaceAll("\\s", "");
-                        String addressDestinationFixed = destinationAddress.getText().toString().replaceAll("\\s", "");
-
-                        // Lancio l'url passandogli gli indirizzi e la API key.
-                        String url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins=" + addressStartFixed + "&destinations=" + addressDestinationFixed + "&mode=driving&language=fr-FR&avoid=tolls&key=AIzaSyCW_gvTeNeb_Gzxv8kphisyTr-PZX58djQ";
-                        System.out.println(url);
-
-                        // Avvio il parsing ed il calcolo dei km.
-                        new GeoTask(AddActivity.this).execute(url);
-                    }
-                }
-            }
-        });*/
     }
 
     public void startSearch(final String url) {
@@ -168,13 +156,13 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo {
             @Override
             public void run() {
                 try {
+                    // Lancio la ricerca del percorso minimo tra partenza e destinazione, in background.
                     new GeoTask(AddActivity.this).execute(url);
                 } catch(Exception e) {
                     System.out.println(e.toString());
                 }
             }
         });
-        //new GeoTask(AddActivity.this).execute(url);
     }
 
     // Metodo richiamato al click sul button di creazione attività: serve per ottenere le coordinate degli indirizzi selezionati.

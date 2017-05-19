@@ -283,6 +283,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onMapLongClick(LatLng latLng) {
+        double latitude = latLng.latitude;
+        double longitude = latLng.longitude;
+        Geocoder gc = new Geocoder(this);
+        try {
+            List<Address> list = null;
+            list = gc.getFromLocation(latitude, longitude, 1);
+
+            Address add = list.get(0);
+
+            Intent newActivity = new Intent(MapsActivity.this, AddActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putString("StartingAddress", add.getAddressLine(0));
+            newActivity.putExtras(bundle);
+            startActivity(newActivity);
+        } catch (Exception e) {
+            Log.i("GG", e.toString());
+        }
         //mMap.addMarker(new MarkerOptions().position(latLng).title("Lat = "+latLng.latitude+", Long = "+latLng.longitude));
     }
 
@@ -292,6 +309,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         marker.showInfoWindow();
         return true;
     }
+
+    int tag = 0;
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -390,6 +409,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 // Getting the position from the marker
                 LatLng latLng = arg0.getPosition();
 
+
+                // Utilizzare il Tag per identificare il Marker.
+                arg0.setTag(Integer.valueOf(tag));
+
                 // Getting reference to the TextView to set latitude
                 TextView tvLat = (TextView) v.findViewById(R.id.tv_lat);
 
@@ -400,6 +423,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 TextView experience = (TextView) v.findViewById(R.id.experienceLevel);
 
+
+
                 tvLat.setText("Start: "+addrS);
 
                 tvLng.setText("Destination: "+addrD);
@@ -408,6 +433,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 experience.setText("Experience: "+trackExperience);
 
+                tag++;
+
                 // Returning the view containing InfoWindow contents
                 return v;
 
@@ -415,7 +442,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         });
 
+        mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+                //Intent activitySummary = new Intent(MapsActivity.this.get, ActivitySummary.class);
+                startActivity(new Intent(MapsActivity.this, ActivitySummary.class));
+            }
+        });
+
     }
+
+
 /*
     private class TimerThread extends Thread {
         @Override
