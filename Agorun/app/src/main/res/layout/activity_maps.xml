@@ -1,37 +1,61 @@
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/map"
-            android:name="com.google.android.gms.maps.SupportMapFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:context="com.imaadv.leaynik.ClinicFragment" />
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="com.imaadv.leaynik.ClinicFragment" />
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:background="@color/colorPrimaryDark">
+
 
         <Button
             android:id="@+id/findPlace"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Search"
             android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true" />
-
-        <Button
+            android:layout_centerHorizontal="true"
+            android:text="Search" />
+        <!--   Giulio mod.-->
+     <!--   <Button
             android:id="@+id/newActivity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="New Activity"
+            android:layout_alignEnd="@+id/searched_address"
             android:layout_alignParentTop="true"
-            android:layout_alignEnd="@+id/searched_address" />
+            android:text="New Activity" />-->
 
-        <TextView
-            android:layout_margin="20dp"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:textSize="25dp"
-            android:layout_below="@+id/findPlace"
-            android:id="@+id/searched_address"/>
+
+
+        <!--
+                <TextView
+                    android:layout_margin="20dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textSize="25dp"
+                    android:layout_below="@+id/findPlace"
+                    android:id="@+id/searched_address"/>-->
+
+        <!-- Giulio mod.-->
+    </android.support.v7.widget.Toolbar>
+
+    <ImageButton
+        android:id="@+id/button1"
+        android:layout_width="80dp"
+        android:layout_height="50dp"
+        android:layout_alignParentRight="true"
+        android:layout_weight="0.30"
+        android:backgroundTint="@color/colorPippo"
+        android:src="@drawable/ic_btn_1" />
 </RelativeLayout>

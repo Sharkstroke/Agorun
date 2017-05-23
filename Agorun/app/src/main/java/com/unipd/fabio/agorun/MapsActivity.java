@@ -1,6 +1,7 @@
 package com.unipd.fabio.agorun; /**package com.unipd.fabio.provamaps;*/
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Point;
@@ -11,13 +12,20 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.PopupMenu;
 import android.util.Log;
 import android.view.Display;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -54,6 +62,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private LocationManager m_locationManager;
     private Location l;
     private String provider;
+    private ImageButton HamburgerMenu;
+
 
     private LocationListener locationListener;
 
@@ -107,16 +117,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //AutoCompleteTextView actv = (AutoCompleteTextView) findViewById(R.id.findPlace);
         Button actv = (Button) findViewById(R.id.findPlace);
-        Button newActivity = (Button) findViewById(R.id.newActivity);
 
-        newActivity.setOnClickListener(new View.OnClickListener() {
+        /*Giulio mod.*/
+       /* Button newActivity = (Button) findViewById(R.id.newActivity);*/
+
+       /* newActivity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), AddActivity.class);
                 startActivity(intent);
             }
-        });
-
+        });*/
+         /*Giulio mod.*/
         actv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -133,6 +145,44 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
+         /*Giulio mod.*/
+        HamburgerMenu = (ImageButton) findViewById(R.id.button1);
+
+        HamburgerMenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+
+                PopupMenu popup = new PopupMenu(MapsActivity.this, HamburgerMenu);
+                //Inflating the Popup using xml file
+                popup.getMenuInflater()
+                        .inflate(R.menu.popup_maps, popup.getMenu());
+
+                //registering popup with OnMenuItemClickListener
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    public boolean onMenuItemClick(MenuItem item) {
+                        Toast.makeText(
+                                MapsActivity.this,
+                                "You Clicked : " + item.getTitle(),
+                                Toast.LENGTH_SHORT
+                        ).show();
+
+                        if(item.getItemId()== R.id.one)
+                        {
+                            Intent intent = new Intent(MapsActivity.this, AddActivity.class);
+                            startActivity(intent);
+                        }
+                        return true;
+                    }
+                });
+
+                popup.show(); //showing popup menu
+            }
+
+        });
+         /*Giulio mod.*/
+
     }
 
     public List<LatLng> getListCoords() {
@@ -146,6 +196,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onResume() {
         super.onResume();
+
+        if(mMap!=null) {
+            if (l == null) {
+                l = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            } else {
+                l = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            }
+           /* if (l != null) {
+                updateWithNewLocation(l);
+            }*/
+        }
         //setUpMapIfNeeded();
     }
 
@@ -312,6 +373,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     int tag = 0;
 
+    static AlertDialog alert;
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -367,7 +429,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             updateWithNewLocation(l);
 
         } else {
-            System.out.println("NULLO");
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+            builder.setMessage(
+                    "You need to activate location service to use this feature. Please turn on network or GPS mode in location settings")
+                    .setTitle("LostyFound")
+                    .setCancelable(false)
+                    .setPositiveButton("Settings",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    Intent intent = new Intent(
+                                            Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                                    startActivity(intent);
+                                    alert.dismiss();
+                                }
+                            })
+                    .setNegativeButton("Cancel",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    alert.dismiss();
+                                }
+                            });
+            alert = builder.create();
+            alert.show();
         }
 
         // Richiedo update di posizione continuamente
@@ -375,7 +459,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 new LocationListener() {
                     public void onLocationChanged(Location location) {
                         // Prima disegno il percorso, passando la nuova posizione rilevata.
-                        drawTrack(location);
+                        //drawTrack(location);
                         // Poi faccio l'update della posizione del marker.
                         updateWithNewLocation(location);
                     }
