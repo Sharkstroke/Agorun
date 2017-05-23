@@ -44,9 +44,11 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Timer;
 
 
@@ -80,6 +82,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Timer timer;
 
     private final MyLocationRegistered formerPos = new MyLocationRegistered();
+
+    private Map<Marker, String> markersMap = new HashMap<>();
 
 
     @Override
@@ -509,14 +513,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
 
-                tvLat.setText("Start: "+addrS);
-
-                tvLng.setText("Destination: "+addrD);
-
-                km.setText("Km: "+MapsActivity.trackKm);
-
-                experience.setText("Experience: "+trackExperience);
-
+                if (markersMap.containsKey(arg0)) {
+                    String details = markersMap.get(arg0);
+                    String[] strings = details.split("_");
+                    tvLat.setText("Start: "+strings[0]);
+                    tvLng.setText("Destination: "+strings[1]);
+                    km.setText("Km: "+strings[2]);
+                    experience.setText("Experience: "+strings[3]);
+                }
                 tag++;
 
                 // Returning the view containing InfoWindow contents
@@ -566,8 +570,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         MapsActivity.trackKm = km;
         trackExperience = experience;
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
-        mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker( // Al posto dell'argomento di icon, passare BitmapDescriptorFactory.fromResource(R.drawable.FILEIMMAGINE)));
+
+        Marker newMarker = mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker( // Al posto dell'argomento di icon, passare BitmapDescriptorFactory.fromResource(R.drawable.FILEIMMAGINE)));
                 BitmapDescriptorFactory.HUE_AZURE)).flat(false));
+        markersMap.put(newMarker, new String(addrS+"_"+addrD+"_"+km+"_"+experience));
     }
 
     public void addMarkerToMap(double latS, double longitS, String addrS, String addrD, String km, String experience) {
