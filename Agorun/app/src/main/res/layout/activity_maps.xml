@@ -1,4 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -17,16 +18,16 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:background="@color/colorPrimaryDark">
+        android:background="@color/colorPrimary">
 
 
-        <Button
+     <!--   <Button
             android:id="@+id/findPlace"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:text="Search" />
+            android:text="Search" />-->
         <!--   Giulio mod.-->
      <!--   <Button
             android:id="@+id/newActivity"
@@ -57,5 +58,28 @@
         android:layout_alignParentRight="true"
         android:layout_weight="0.30"
         android:backgroundTint="@color/colorPippo"
-        android:src="@drawable/ic_btn_1" />
+        android:src="@drawable/ic_btn_1"
+        android:layout_alignBottom="@+id/toolbar"
+        android:layout_marginRight="5dp"
+        android:layout_alignParentTop="true" />
+
+    <TextView
+        android:id="@+id/search_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:textSize="19dp"
+        android:background="@color/colorPrimary"
+
+        android:text="La tua posizione"
+
+        android:textColor="#FFFFFF"
+        android:padding="15dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignBottom="@+id/toolbar"
+        android:layout_toLeftOf="@+id/button1"
+        android:maxLines="1"
+        android:layout_toStartOf="@+id/button1" />
+
 </RelativeLayout>

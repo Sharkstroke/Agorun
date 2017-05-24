@@ -65,6 +65,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Location l;
     private String provider;
     private ImageButton HamburgerMenu;
+    private TextView  search_tw;
 
 
     private LocationListener locationListener;
@@ -120,7 +121,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
         //AutoCompleteTextView actv = (AutoCompleteTextView) findViewById(R.id.findPlace);
-        Button actv = (Button) findViewById(R.id.findPlace);
+        //Button actv = (Button) findViewById(R.id.findPlace);
+
+       search_tw = (TextView) findViewById(R.id.search_bar);
 
         /*Giulio mod.*/
        /* Button newActivity = (Button) findViewById(R.id.newActivity);*/
@@ -133,7 +136,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });*/
          /*Giulio mod.*/
-        actv.setOnClickListener(new View.OnClickListener() {
+        search_tw.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
@@ -219,7 +222,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (requestCode == 1) {
             if (resultCode == RESULT_OK) {
                 // retrive the data by using getPlace() method.
+
                 Place place = PlaceAutocomplete.getPlace(this, data);
+                search_tw.setText(place.getAddress().toString());
                 Log.e("Tag", "Place: " + place.getAddress() + place.getPhoneNumber());
 
                 LatLng latLngFound = place.getLatLng();
