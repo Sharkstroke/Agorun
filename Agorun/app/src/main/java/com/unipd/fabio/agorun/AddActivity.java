@@ -1,5 +1,8 @@
 package com.unipd.fabio.agorun;
 
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
+import android.graphics.Typeface;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
@@ -8,11 +11,20 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.TimePicker;
+import android.widget.Toast;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -27,6 +39,13 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo {
     private Spinner experienceSpinner;
     private Spinner trackLength;
     private Button createActivity;
+    private Calendar calendar;
+    private TextView dateview;
+    private TextView timeview;
+
+    private String datePar;
+    private String timePar;
+    private String dateTimePar;  // parametro da passare al db
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,6 +168,38 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo {
                     }
                 }
         );
+
+        // Setto la data di oggi
+
+        calendar = Calendar.getInstance();
+
+        dateview = (TextView) findViewById(R.id.datetextview);
+        dateview.setTypeface(null, Typeface.BOLD);
+
+        DateFormat df = DateFormat.getDateInstance();
+        dateview.setText(df.format(calendar.getTime()));
+
+        int yyyy = calendar.get(Calendar.YEAR);
+        int mm   = calendar.get(Calendar.MONTH) + 1;
+        int dd   = calendar.get(Calendar.DAY_OF_MONTH);
+
+        datePar = yyyy + "-" + mm + "-" + dd;
+
+        // setto l'ora corrente
+
+        timeview = (TextView) findViewById(R.id.timetextview);
+        timeview.setTypeface(null, Typeface.BOLD);
+
+        int hour   = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+
+        timeview.setText(checkHourMinute(hour,minute));
+        timePar = checkHourMinute(hour,minute);
+
+        dateTimePar = datePar + " " + timePar;
+
+        Toast.makeText(getApplicationContext(),dateTimePar,Toast.LENGTH_LONG).show();
+
     }
 
     public void startSearch(final String url) {
@@ -236,4 +287,69 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo {
         }
         createActivity.setEnabled(true);
     }
+
+    public void onClickDate (View view) {
+        calendar = Calendar.getInstance();
+
+        DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
+
+            public void onDateSet (DatePicker view,int year, int month, int day){
+                calendar.set(Calendar.YEAR, year);
+                calendar.set(Calendar.MONTH, month);
+                calendar.set(Calendar.DAY_OF_MONTH, day);
+
+                DateFormat df = DateFormat.getDateInstance();
+                dateview.setText(df.format(calendar.getTime()));
+
+                month++;
+                datePar = year + "-" + month + "-" + day;
+
+                dateTimePar = datePar + " " + timePar;
+
+                Toast.makeText(getApplicationContext(),dateTimePar,Toast.LENGTH_LONG).show();
+            }
+        };
+
+        new DatePickerDialog(AddActivity.this, date,
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)).show();
+
+    }
+
+    public void onClickTime (View view) {
+
+        TimePickerDialog.OnTimeSetListener time = new TimePickerDialog.OnTimeSetListener() {
+
+            public void onTimeSet(TimePicker view, int selectedHour, int selectedMinute) {
+
+                timeview.setText(checkHourMinute(selectedHour,selectedMinute));
+
+                timePar = checkHourMinute(selectedHour,selectedMinute);
+
+                dateTimePar = datePar + " " + timePar;
+
+                Toast.makeText(getApplicationContext(),dateTimePar,Toast.LENGTH_LONG).show();
+            }
+        };
+
+        new TimePickerDialog(AddActivity.this, time,
+                calendar.get(Calendar.HOUR_OF_DAY),
+                calendar.get(Calendar.MINUTE),
+                true).show();
+    }
+
+    private String checkHourMinute (int hour, int minute) {
+        String sh = hour + "";
+        String sm = minute + "";
+        if (hour < 10) {
+            sh = "0" + sh;
+        }
+        if (minute < 10) {
+            sm = "0" + sm;
+        }
+        return sh + ":" + sm;
+    }
+
+
 }

@@ -10,7 +10,7 @@
     <string name="SelectCustom">select</string>
     <string name="experienceChoice">Select your experience level:</string>
     <string name="sexChoice">Select your sex...</string>
-    <string name="startHint">Select the starting addres</string>
+    <string name="startHint">Select the starting address</string>
     <string name="destinationHint">Select your destination address</string>
     <string name="difficultyLevel">Select the difficulty of the track</string>
     <string name="shortTrack">Short: 0-5 km</string>
@@ -33,6 +33,8 @@
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="title_activity_signi__in_activity">Signi_In_activity</string>
+    <string name="choosedate">Choose the date of the activity</string>
+    <string name="choosetime">Choose the starting time</string>
     <!-- Giulio mod. -->
 </resources>
 

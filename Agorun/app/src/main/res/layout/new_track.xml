@@ -50,6 +50,40 @@
         android:entries="@array/experience"
         android:layout_marginBottom="10dp"/>
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/chooseDate"
+        android:clickable="false"
+        android:layout_marginTop="5dp"
+        android:text="@string/choosedate"/>
+
+    <TextView
+        android:id="@+id/datetextview"
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:padding="6dp"
+        android:clickable="true"
+        android:onClick="onClickDate"
+        android:layout_marginBottom="10dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/chooseTime"
+        android:clickable="false"
+        android:layout_marginTop="5dp"
+        android:text="@string/choosetime"/>
+
+    <TextView
+        android:id="@+id/timetextview"
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:padding="6dp"
+        android:clickable="true"
+        android:onClick="onClickTime"
+        android:layout_marginBottom="10dp" />
+
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
