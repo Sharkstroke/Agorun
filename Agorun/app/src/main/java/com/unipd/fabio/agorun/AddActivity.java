@@ -183,6 +183,7 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo {
         dateview = (TextView) findViewById(R.id.datetextview);
         dateview.setTypeface(null, Typeface.BOLD);
 
+
         DateFormat df = DateFormat.getDateInstance();
         dateview.setText(df.format(calendar.getTime()));
 
@@ -317,7 +318,7 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo {
             }
         };
 
-        new DatePickerDialog(AddActivity.this, date,
+        new DatePickerDialog(AddActivity.this,R.style.DialogThemeCustom, date,
                 calendar.get(Calendar.YEAR),
                 calendar.get(Calendar.MONTH),
                 calendar.get(Calendar.DAY_OF_MONTH)).show();
@@ -340,7 +341,7 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo {
             }
         };
 
-        new TimePickerDialog(AddActivity.this, time,
+        new TimePickerDialog(AddActivity.this, R.style.DialogThemeCustom, time,
                 calendar.get(Calendar.HOUR_OF_DAY),
                 calendar.get(Calendar.MINUTE),
                 true).show();
