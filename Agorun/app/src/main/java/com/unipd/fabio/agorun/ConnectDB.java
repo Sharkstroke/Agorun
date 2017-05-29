@@ -128,6 +128,24 @@ public class ConnectDB extends AsyncTask<String, Void, ArrayList<String>> {
                     }
 
                     return output;
+
+                case "createrun":
+                    if (param.length != 8) {
+                        output.add ("La creazione di un'attività richiede 8 parametri");
+                        return output;
+                    } else {
+                        url = new URL("https://mprogramming.000webhostapp.com/createrun.php?" +
+                                "user="    + user     + "&" +
+                                "stlat="   + param[1] + "&" +
+                                "stlong="  + param[2] + "&" +
+                                "endlat="  + param[3] + "&" +
+                                "endlong=" + param[4] + "&" +
+                                "length="  + param[5] + "&" +
+                                "diff="    + param[6] + "&" +
+                                "datetime="+ param[7]);
+                    }
+                    System.out.println(url);
+
             }
 
             conn = (HttpsURLConnection) url.openConnection();

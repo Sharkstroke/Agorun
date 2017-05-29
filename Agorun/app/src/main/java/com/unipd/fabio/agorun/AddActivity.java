@@ -21,16 +21,18 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
 // TODO: aggiungere opzione per scegliere il tempo di corsa (approssimativo). Aggiungere l'impostazione automatica dei km minimi di corsa tramite le Google Matrix APIs.
 
-public class AddActivity extends AppCompatActivity implements GeoTask.Geo {
+public class AddActivity extends AppCompatActivity implements GeoTask.Geo, DBConnection {
 
     private MapsActivity mapsActivity;
 
@@ -43,9 +45,17 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo {
     private TextView dateview;
     private TextView timeview;
 
+    private double latStart;
+    private double latDest;
+    private double lngStart;
+    private double lngDest;
+
     private String datePar;
     private String timePar;
     private String dateTimePar;  // parametro da passare al db
+
+    private String result = "";
+    private int connections = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -196,7 +206,7 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo {
         timeview.setText(checkHourMinute(hour,minute));
         timePar = checkHourMinute(hour,minute);
 
-        dateTimePar = datePar + " " + timePar;
+        dateTimePar = datePar + "%20" + timePar;
 
         Toast.makeText(getApplicationContext(),dateTimePar,Toast.LENGTH_LONG).show();
 
@@ -231,8 +241,8 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo {
             System.out.println("ADDRESS: " + add);
             String locality = add.getLocality();
 
-            double latStart = add.getLatitude();
-            double lngStart = add.getLongitude();
+            latStart = add.getLatitude();
+            lngStart = add.getLongitude();
 
 
 
@@ -250,8 +260,8 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo {
             Address add2 = list.get(0);
             locality = add.getLocality();
 
-            double latDest = add.getLatitude();
-            double lngDest = add.getLongitude();
+            latDest = add2.getLatitude();
+            lngDest = add2.getLongitude();
 
 
             final Spinner experienceSpinner = (Spinner) findViewById(R.id.ExperienceSpinner);
@@ -262,12 +272,57 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo {
 
             //mapsActivity.addMarkerToMap(latDest, lngDest, "DESTINATION");
 
+            connect();
+
     }
 
-    public void clickbutton(View v) {
-        final Spinner experienceSpinner = (Spinner) findViewById(R.id.ExperienceSpinner);
-        String experience = experienceSpinner.getSelectedItem().toString();
-        System.out.println("Ho scelto: "+experience.toString());
+    private void connect() {
+        connections++;
+/*
+        double longStart = 16.3679;
+        double latEnd = 24.3753;
+        double latStart = 3.3424;
+        double longEnd = 12.5903;*/
+
+        final Spinner lengthSpinner = (Spinner) findViewById(R.id.trackLength);
+        final Spinner diffSpinner   = (Spinner) findViewById(R.id.ExperienceSpinner);
+
+        if (!startAddress.getText().toString().equals("") && !startAddress.getText().toString().equals("")) {
+            new ConnectDB(this).execute(
+                    "createrun",
+                    latStart + "",
+                    lngStart + "",
+                    latDest + "",
+                    lngDest + "",
+                    lengthSpinner.getSelectedItemPosition() + "",
+                    diffSpinner.getSelectedItemPosition() + "",
+                    dateTimePar);
+        } else {
+            Toast.makeText(getApplicationContext(),"Insert Addresses",Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void onTaskCompleted(ArrayList<String> ls) {
+
+        if (connections >= 5) {                     // Provo la connessione 5 volte, altrimenti do errore di connessione
+            Toast.makeText(this, "Connection Problem", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        ListIterator it = ls.listIterator();
+        while (it.hasNext()) {
+            result = result + (it.next());
+        }
+
+        if (! result.equals("Success") && ! result.equals("Failed")) {
+            result = "";
+            Toast.makeText(this, result, Toast.LENGTH_SHORT).show();
+            connect();
+        } else if (result.equals("Success")) {
+            Toast.makeText(this, "Activity Created!", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "Creation of the activity failed", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -304,7 +359,7 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo {
                 month++;
                 datePar = year + "-" + month + "-" + day;
 
-                dateTimePar = datePar + " " + timePar;
+                dateTimePar = datePar + "%20" + timePar;
 
                 Toast.makeText(getApplicationContext(),dateTimePar,Toast.LENGTH_LONG).show();
             }
@@ -327,7 +382,7 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo {
 
                 timePar = checkHourMinute(selectedHour,selectedMinute);
 
-                dateTimePar = datePar + " " + timePar;
+                dateTimePar = datePar + "%20" + timePar;
 
                 Toast.makeText(getApplicationContext(),dateTimePar,Toast.LENGTH_LONG).show();
             }

@@ -87,8 +87,6 @@ public class LoginActivity extends AppCompatActivity implements DBConnection, Vi
 
     public void onTaskCompleted(ArrayList<String> ls) {
 
-        final TextView textView = (TextView) findViewById(R.id.username_login);
-
         if (connections >= 5) {                     // Provo la connessione 5 volte, altrimenti do errore di connessione
             t = Toast.makeText(this, result, Toast.LENGTH_SHORT);
             return;
