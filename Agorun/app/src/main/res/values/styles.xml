@@ -12,6 +12,10 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="DialogThemeCustom" parent="Theme.AppCompat.Light.Dialog">
+        <item name="colorAccent">@color/blue</item>
+    </style>
+
     <!-- Giulio mod. -->
 
     <style name="AppTheme.NoActionBar">

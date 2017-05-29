@@ -82,4 +82,20 @@
         android:maxLines="1"
         android:layout_toStartOf="@+id/button1" />
 
+    <TextView
+        android:id="@+id/destinationPointInMain"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/startingPointInMain" />
+
+    <TextView
+        android:id="@+id/startingPointInMain"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/toolbar"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
 </RelativeLayout>

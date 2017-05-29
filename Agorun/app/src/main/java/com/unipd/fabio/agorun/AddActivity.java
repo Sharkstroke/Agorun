@@ -20,13 +20,12 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
+
 import java.util.ListIterator;
-import java.util.Locale;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -72,7 +71,15 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo, DBCon
             String startAddressPassed = getIntent().getExtras().getString("StartingAddress");
 
             if (startAddressPassed != null) {
-                startAddress.setText(startAddressPassed);
+                //startAddress.setText(startAddressPassed);
+                String[] addresses = startAddressPassed.split("_");
+                this.startAddress.setText(addresses[0]);
+                this.destinationAddress.setText(addresses[1]);
+                String addressStartFixed = startAddress.getText().toString().replaceAll("\\s", "");
+                String addressDestinationFixed = destinationAddress.getText().toString().replaceAll("\\s", "");
+                String url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins=" + addressStartFixed + "&destinations=" + addressDestinationFixed + "&mode=driving&language=fr-FR&avoid=tolls&key=AIzaSyCW_gvTeNeb_Gzxv8kphisyTr-PZX58djQ";
+                System.out.println("Start address wrong: "+url);
+                startSearch(url);
             }
         }
 
@@ -96,11 +103,12 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo, DBCon
 
                       @Override
                       public void onTextChanged(CharSequence s, int start, int before, int count) {
-
+                          createActivity.setEnabled(false);
                       }
 
                       @Override
                       public void afterTextChanged(Editable s) {
+                          createActivity.setEnabled(false);
                           if (!isTyping) {
                               isTyping = true;
                           }
@@ -144,11 +152,12 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo, DBCon
 
                     @Override
                     public void onTextChanged(CharSequence s, int start, int before, int count) {
-
+                        createActivity.setEnabled(false);
                     }
 
                     @Override
                     public void afterTextChanged(Editable s) {
+                        createActivity.setEnabled(false);
                         if (!isTyping) {
                             isTyping = true;
                         }
@@ -185,6 +194,7 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo, DBCon
 
         dateview = (TextView) findViewById(R.id.datetextview);
         dateview.setTypeface(null, Typeface.BOLD);
+
 
         DateFormat df = DateFormat.getDateInstance();
         dateview.setText(df.format(calendar.getTime()));
@@ -238,7 +248,7 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo, DBCon
             list = gc.getFromLocationName(start, 1);
 
             Address add = list.get(0);
-            System.out.println("ADDRESS: " + add);
+            System.out.println("ADDRESS: " + add.getAddressLine(0)+" "+add.getLocality());
             String locality = add.getLocality();
 
             latStart = add.getLatitude();
@@ -267,7 +277,7 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo, DBCon
             final Spinner experienceSpinner = (Spinner) findViewById(R.id.ExperienceSpinner);
             String experience = experienceSpinner.getSelectedItem().toString();
 
-            mapsActivity.addMarkerToMap(latStart, lngStart, add.getAddressLine(0), add2.getAddressLine(0), trackLength.getSelectedItem().toString(), experience.toString());
+            mapsActivity.addMarkerToMap(latStart, lngStart, new String(add.getAddressLine(0)+" "+add.getLocality()), new String(add2.getAddressLine(0)+ " "+add2.getLocality()), trackLength.getSelectedItem().toString(), experience.toString());
             finish();
 
             //mapsActivity.addMarkerToMap(latDest, lngDest, "DESTINATION");
@@ -365,7 +375,7 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo, DBCon
             }
         };
 
-        new DatePickerDialog(AddActivity.this, date,
+        new DatePickerDialog(AddActivity.this,R.style.DialogThemeCustom, date,
                 calendar.get(Calendar.YEAR),
                 calendar.get(Calendar.MONTH),
                 calendar.get(Calendar.DAY_OF_MONTH)).show();
@@ -388,7 +398,7 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo, DBCon
             }
         };
 
-        new TimePickerDialog(AddActivity.this, time,
+        new TimePickerDialog(AddActivity.this, R.style.DialogThemeCustom, time,
                 calendar.get(Calendar.HOUR_OF_DAY),
                 calendar.get(Calendar.MINUTE),
                 true).show();

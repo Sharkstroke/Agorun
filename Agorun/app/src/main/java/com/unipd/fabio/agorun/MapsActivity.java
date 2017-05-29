@@ -21,7 +21,6 @@ import android.util.Log;
 import android.view.Display;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -66,6 +65,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private String provider;
     private ImageButton HamburgerMenu;
     private TextView  search_tw;
+    private TextView startingAddressTop;
+    private TextView destinationAddressTop;
 
 
     private LocationListener locationListener;
@@ -124,6 +125,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //Button actv = (Button) findViewById(R.id.findPlace);
 
        search_tw = (TextView) findViewById(R.id.search_bar);
+        this.startingAddressTop = (TextView) findViewById(R.id.startingPointInMain);
+        this.destinationAddressTop = (TextView) findViewById(R.id.destinationPointInMain);
 
         /*Giulio mod.*/
        /* Button newActivity = (Button) findViewById(R.id.newActivity);*/
@@ -351,22 +354,42 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapClick(LatLng latLng) {}
 
+    private Marker tempMarker;
+    String startingAdd = "";
+    String destinationAdd = "";
     @Override
     public void onMapLongClick(LatLng latLng) {
         double latitude = latLng.latitude;
         double longitude = latLng.longitude;
         Geocoder gc = new Geocoder(this);
         try {
-            List<Address> list = null;
-            list = gc.getFromLocation(latitude, longitude, 1);
+            if (tempMarker == null) {
+                List<Address> list = null;
+                list = gc.getFromLocation(latitude, longitude, 1);
 
-            Address add = list.get(0);
+                Address add = list.get(0);
+                startingAdd = add.getAddressLine(0) + ", " + add.getLocality();
+                startingAddressTop.setText("Starting point: " +startingAdd);
+                tempMarker = mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)).flat(false));
+                markersMap.put(tempMarker, "");
+            } else {
+                List<Address> list = null;
+                list = gc.getFromLocation(latitude, longitude, 1);
+                Address add = list.get(0);
+                destinationAdd = add.getAddressLine(0) + ", " + add.getLocality();
+                destinationAddressTop.setText("Destination address: "+destinationAdd);
+                //mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)).flat(false));
 
-            Intent newActivity = new Intent(MapsActivity.this, AddActivity.class);
-            Bundle bundle = new Bundle();
-            bundle.putString("StartingAddress", add.getAddressLine(0));
-            newActivity.putExtras(bundle);
-            startActivity(newActivity);
+                Intent newActivity = new Intent(MapsActivity.this, AddActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putString("StartingAddress", new String(startingAdd + "_" +destinationAdd));
+                newActivity.putExtras(bundle);
+                startActivity(newActivity);
+                tempMarker.remove();
+                tempMarker = null;
+                startingAdd = "";
+                destinationAdd = "";
+            }
         } catch (Exception e) {
             Log.i("GG", e.toString());
         }
