@@ -619,7 +619,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     // Metodi per l'aggiunta di Markers nella mappa --> le posizioni di questi veranno get-tati dal DB.
-    public void addMarkerToMap(LatLng latLng, String km, String experience) {
+    public Marker addMarkerToMap(LatLng latLng, String km, String experience) {
         MapsActivity.trackKm = km;
         trackExperience = experience;
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
@@ -627,12 +627,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Marker newMarker = mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker( // Al posto dell'argomento di icon, passare BitmapDescriptorFactory.fromResource(R.drawable.FILEIMMAGINE)));
                 BitmapDescriptorFactory.HUE_AZURE)).flat(false));
         markersMap.put(newMarker, new String(addrS+"_"+addrD+"_"+km+"_"+experience));
+        return newMarker;
     }
 
-    public void addMarkerToMap(double latS, double longitS, String addrS, String addrD, String km, String experience) {
+    public Marker addMarkerToMap(double latS, double longitS, String addrS, String addrD, String km, String experience) {
         this.addrS = addrS;
         this.addrD = addrD;
-        this.addMarkerToMap(new LatLng(latS, longitS), km, experience);
+        return this.addMarkerToMap(new LatLng(latS, longitS), km, experience);
     }
 
     private void connect() {
@@ -658,7 +659,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 double lat  = Double.parseDouble(session_point[1]);
                 double lng = Double.parseDouble(session_point[2]);
 
-                addMarkerToMap(lat,lng,"","","","");
+                Marker marker = addMarkerToMap(lat,lng,"","","","");
+
+                if (session_point.length == 4) {
+                    marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                }
+
                 result = "";
             }
         }
