@@ -144,7 +144,11 @@ public class ConnectDB extends AsyncTask<String, Void, ArrayList<String>> {
                                 "diff="    + param[6] + "&" +
                                 "datetime="+ param[7]);
                     }
-                    System.out.println(url);
+                    break;
+
+                case "getruns":
+                    url = new URL("https://mprogramming.000webhostapp.com/getruns.php");
+                    break;
 
             }
 

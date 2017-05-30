@@ -281,7 +281,6 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo, DBCon
             finish();
 
             //mapsActivity.addMarkerToMap(latDest, lngDest, "DESTINATION");
-
             connect();
 
     }
@@ -333,6 +332,8 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo, DBCon
         } else {
             Toast.makeText(this, "Creation of the activity failed", Toast.LENGTH_SHORT).show();
         }
+
+        result = "";
     }
 
     @Override

@@ -37,6 +37,8 @@
     <string name="choosetime">Choose the starting time</string>
     <string name="destinationPointInMain">Destination address:</string>
     <string name="startingPointInMain">Starting address:</string>
+    <string name="hintemail">Email</string>
+    <string name="hintpassword">Password</string>
     <!-- Giulio mod. -->
 </resources>
 

@@ -43,15 +43,17 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Timer;
 
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnMapLongClickListener, GoogleMap.OnMarkerClickListener {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnMapLongClickListener, GoogleMap.OnMarkerClickListener, DBConnection {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     public Marker whereAmI;
@@ -86,6 +88,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private final MyLocationRegistered formerPos = new MyLocationRegistered();
 
     private Map<Marker, String> markersMap = new HashMap<>();
+
+    private int connections = 0;
 
 
     @Override
@@ -566,6 +570,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
+        // addMarkerToMap(40.1111,11.1111,"","","","");
+        connect();
+
     }
 
 
@@ -608,6 +615,36 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         this.addrS = addrS;
         this.addrD = addrD;
         this.addMarkerToMap(new LatLng(latS, longitS), km, experience);
+    }
+
+    private void connect() {
+        connections++;
+        new ConnectDB(this).execute("getruns");
+    }
+
+    public void onTaskCompleted (ArrayList<String> ls) {
+
+        String result = "";
+
+        if (connections >= 5) {                     // Provo la connessione 5 volte, altrimenti do errore di connessione
+            Toast.makeText(this, "Connection Problem", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        ListIterator it = ls.listIterator();
+        while (it.hasNext()) {
+            result = result + (it.next());
+            if (!result.equals("Problems selecting activities") && !(result.charAt(0)=='C')) {  // Connection failed
+                Log.d("result",result);
+                String[] session_point = result.split(";");
+                double lat  = Double.parseDouble(session_point[1]);
+                double lng = Double.parseDouble(session_point[2]);
+
+                addMarkerToMap(lat,lng,"","","","");
+                result = "";
+            }
+        }
+        result = "";
     }
 }
 
