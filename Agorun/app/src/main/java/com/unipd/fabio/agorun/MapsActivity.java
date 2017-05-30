@@ -38,12 +38,14 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -413,6 +415,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        Calendar cal = Calendar.getInstance();
+        int currentHour = cal.get(Calendar.HOUR_OF_DAY);
+        boolean success = false;
+        if (currentHour <= 19) {
+            success = mMap.setMapStyle(
+                    MapStyleOptions.loadRawResourceStyle(
+                            this, R.raw.day_style_json));
+        } else {
+            success = mMap.setMapStyle(
+                    MapStyleOptions.loadRawResourceStyle(
+                            this, R.raw.night_style_json));
+        }
+
+        if (!success) {
+            System.out.println("JSON parsing non funzionante.");
+        }
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
