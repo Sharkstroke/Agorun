@@ -147,7 +147,7 @@ public class ConnectDB extends AsyncTask<String, Void, ArrayList<String>> {
                     break;
 
                 case "getruns":
-                    url = new URL("https://mprogramming.000webhostapp.com/getruns.php");
+                    url = new URL("https://mprogramming.000webhostapp.com/getruns.php?user=" + user);
                     break;
 
             }
