@@ -150,6 +150,10 @@ public class ConnectDB extends AsyncTask<String, Void, ArrayList<String>> {
                     url = new URL("https://mprogramming.000webhostapp.com/getruns.php?user=" + user);
                     break;
 
+                case "getinforun":
+                    url = new URL("https://mprogramming.000webhostapp.com/getinforun.php?sid=" + param[1]);
+                    break;
+
             }
 
             conn = (HttpsURLConnection) url.openConnection();

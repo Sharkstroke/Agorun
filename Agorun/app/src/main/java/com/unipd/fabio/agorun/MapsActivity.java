@@ -561,19 +561,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 TextView experience = (TextView) v.findViewById(R.id.experienceLevel);
 
-
-
                 if (markersMap.containsKey(arg0)) {
                     String details = markersMap.get(arg0);
                     String[] strings = details.split("_");
-                    tvLat.setText("Start: "+strings[0]);
-                    tvLng.setText("Destination: "+strings[1]);
-                    km.setText("Km: "+strings[2]);
-                    experience.setText("Experience: "+strings[3]);
+                    String sid = strings[0];
+
+                    connect("getinforun",sid);
+
+                    tvLat.setText("Start: "+strings[1]);
+
+                    tvLng.setText("Destination: "+strings[2]);
+                    km.setText("Km: "+strings[3]);
+                    experience.setText("Experience: "+strings[4]);
                 }
                 tag++;
 
                 // Returning the view containing InfoWindow contents
+
+
                 return v;
 
             }
@@ -589,7 +594,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
         // addMarkerToMap(40.1111,11.1111,"","","","");
-        connect();
+        connect("getruns");
 
     }
 
@@ -619,26 +624,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     // Metodi per l'aggiunta di Markers nella mappa --> le posizioni di questi veranno get-tati dal DB.
-    public Marker addMarkerToMap(LatLng latLng, String km, String experience) {
+    public Marker addMarkerToMap(String sid, LatLng latLng, String km, String experience) {
         MapsActivity.trackKm = km;
         trackExperience = experience;
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
 
         Marker newMarker = mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker( // Al posto dell'argomento di icon, passare BitmapDescriptorFactory.fromResource(R.drawable.FILEIMMAGINE)));
                 BitmapDescriptorFactory.HUE_AZURE)).flat(false));
-        markersMap.put(newMarker, new String(addrS+"_"+addrD+"_"+km+"_"+experience));
+        markersMap.put(newMarker, new String(sid+"_"+addrS+"_"+addrD+"_"+km+"_"+experience));
         return newMarker;
     }
 
-    public Marker addMarkerToMap(double latS, double longitS, String addrS, String addrD, String km, String experience) {
+    public Marker addMarkerToMap(String sid, double latS, double longitS, String addrS, String addrD, String km, String experience) {
         this.addrS = addrS;
         this.addrD = addrD;
-        return this.addMarkerToMap(new LatLng(latS, longitS), km, experience);
+        return this.addMarkerToMap(sid, new LatLng(latS, longitS), km, experience);
     }
 
-    private void connect() {
+    private void connect(String mode, String sid) {
         connections++;
-        new ConnectDB(this).execute("getruns");
+        new ConnectDB(this).execute(mode,sid);     // se mode="getruns" il secondo parametro viene ignorato
     }
 
     public void onTaskCompleted (ArrayList<String> ls) {
@@ -656,13 +661,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if (!result.equals("Problems selecting activities") && !(result.charAt(0)=='C')) {  // Connection failed
                 Log.d("result",result);
                 String[] session_point = result.split(";");
-                double lat  = Double.parseDouble(session_point[1]);
+                String sid = session_point[0];
+                double lat = Double.parseDouble(session_point[1]);
                 double lng = Double.parseDouble(session_point[2]);
 
-                Marker marker = addMarkerToMap(lat,lng,"","","","");
+                Geocoder gc = new Geocoder(this);
+                try {
+                    if (tempMarker == null) {
+                        List<Address> list = null;
+                        list = gc.getFromLocation(lat, lng, 1);
 
-                if (session_point.length == 4) {
-                    marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                        Address addS = list.get(0);
+                        String startingAddress = addS.getAddressLine(0)+", "+ addS.getLocality();
+
+                        Marker marker = addMarkerToMap(sid, lat,lng,startingAddress,"Prova","Prova","Prova");
+
+                        if (session_point.length == 4) {
+                            marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                        }
+                    }
+                } catch(Exception e) {
+                    System.out.println("Localizzazione non funzionante.");
                 }
 
                 result = "";
