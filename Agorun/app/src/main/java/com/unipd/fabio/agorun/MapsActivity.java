@@ -44,6 +44,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -53,6 +54,7 @@ import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Timer;
+import java.util.concurrent.ExecutionException;
 
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnMapLongClickListener, GoogleMap.OnMarkerClickListener, DBConnection {
@@ -93,6 +95,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private int connections = 0;
 
+    private String[] session_info;
+    private Marker markerclicked;
+    private String sidclicked;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -405,7 +410,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public boolean onMarkerClick(Marker marker) {
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), 17));
-        marker.showInfoWindow();
+   //     marker.showInfoWindow();//////////// Mod riccardo
+        connections = 0;
+        markerclicked = marker;
+        Log.d("Marker clicked","fadlk");
+        if (markersMap.containsKey(marker)) {
+            String details = markersMap.get(marker);
+            String[] strings = details.split("_");
+            sidclicked = strings[0];
+            connect("getinforun", sidclicked);
+        }
+        ///////// mod riccardo
         return true;
     }
 
@@ -529,61 +544,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // InfoWindow viene usata per customizzare le finestre di info che appaiono al click su un Marker.
         // La customizzazione qui avviene tramite un Adapter.
-        mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
 
-            // Use default InfoWindow frame
-            @Override
-            public View getInfoWindow(Marker arg0) {
-                return null;
-            }
-
-            // Defines the contents of the InfoWindow
-            @Override
-            public View getInfoContents(Marker arg0) {
-
-                // Getting view from the layout file info_window_layout
-                View v = getLayoutInflater().inflate(R.layout.windowlayout, null);
-
-                // Getting the position from the marker
-                LatLng latLng = arg0.getPosition();
-
-
-                // Utilizzare il Tag per identificare il Marker.
-                arg0.setTag(Integer.valueOf(tag));
-
-                // Getting reference to the TextView to set latitude
-                TextView tvLat = (TextView) v.findViewById(R.id.tv_lat);
-
-                // Getting reference to the TextView to set longitude
-                TextView tvLng = (TextView) v.findViewById(R.id.tv_lng);
-
-                TextView km = (TextView) v.findViewById(R.id.km_length);
-
-                TextView experience = (TextView) v.findViewById(R.id.experienceLevel);
-
-                if (markersMap.containsKey(arg0)) {
-                    String details = markersMap.get(arg0);
-                    String[] strings = details.split("_");
-                    String sid = strings[0];
-
-                    connect("getinforun",sid);
-
-                    tvLat.setText("Start: "+strings[1]);
-
-                    tvLng.setText("Destination: "+strings[2]);
-                    km.setText("Km: "+strings[3]);
-                    experience.setText("Experience: "+strings[4]);
-                }
-                tag++;
-
-                // Returning the view containing InfoWindow contents
-
-
-                return v;
-
-            }
-
-        });
 
         mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
@@ -594,7 +555,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
         // addMarkerToMap(40.1111,11.1111,"","","","");
-        connect("getruns");
+        connect("getruns",null);
 
     }
 
@@ -655,38 +616,147 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             return;
         }
 
-        ListIterator it = ls.listIterator();
-        while (it.hasNext()) {
-            result = result + (it.next());
-            if (!result.equals("Problems selecting activities") && !(result.charAt(0)=='C')) {  // Connection failed
-                Log.d("result",result);
-                String[] session_point = result.split(";");
-                String sid = session_point[0];
-                double lat = Double.parseDouble(session_point[1]);
-                double lng = Double.parseDouble(session_point[2]);
+        String query = ls.remove(0);
 
-                Geocoder gc = new Geocoder(this);
-                try {
-                    if (tempMarker == null) {
-                        List<Address> list = null;
-                        list = gc.getFromLocation(lat, lng, 1);
+        if (query.equals("getruns")) {
 
-                        Address addS = list.get(0);
-                        String startingAddress = addS.getAddressLine(0)+", "+ addS.getLocality();
+            ListIterator it = ls.listIterator();
+            while (it.hasNext()) {
+                result = result + (it.next());
+                if (!result.equals("Problems selecting activities") && !(result.charAt(0)=='C')) {  // Connection failed
+                    //            Log.d("result",result);
 
-                        Marker marker = addMarkerToMap(sid, lat,lng,startingAddress,"Prova","Prova","Prova");
+                    connections = 0;
 
-                        if (session_point.length == 4) {
-                            marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                    String[] session_point = result.split(";");
+                    String sid = session_point[0];
+
+    //                Log.d("sid", sid);
+
+                    double lat = Double.parseDouble(session_point[1]);
+                    double lng = Double.parseDouble(session_point[2]);
+
+                    Geocoder gc = new Geocoder(this);
+                    try {
+                        if (tempMarker == null) {
+                            List<Address> list = null;
+                            list = gc.getFromLocation(lat, lng, 1);
+
+                            Address addS = list.get(0);
+                            String startingAddress = addS.getAddressLine(0) + ", " + addS.getLocality();
+
+                            Marker marker = addMarkerToMap(sid, lat, lng, startingAddress, "Prova", "Prova", "Prova");
+
+                            if (session_point.length == 4) {
+                                marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                                Log.d("Green",sid);
+                            }
                         }
+                    } catch (Exception e) {
+                        Log.d("Error", e.getMessage());
                     }
-                } catch(Exception e) {
-                    System.out.println("Localizzazione non funzionante.");
-                }
 
-                result = "";
+                    result = "";
+                } else {
+                    connections++;
+                    result = "";
+                    connect("getruns",null);
+                }
+            }
+        } else {
+            ListIterator it = ls.listIterator();
+
+            while (it.hasNext()) {
+                result = result + it.next();
+                session_info = result.split(";");
+
+                if (session_info[0].equals("ok")) {
+
+                    //          Log.d("result", result);
+                    mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+
+                        // Use default InfoWindow frame
+                        @Override
+                        public View getInfoWindow(Marker arg0) {
+                            return null;
+                        }
+
+                        // Defines the contents of the InfoWindow
+                        @Override
+                        public View getInfoContents(Marker arg0) {
+
+                            connections = 0;
+
+                            // Getting view from the layout file info_window_layout
+                            View v = getLayoutInflater().inflate(R.layout.windowlayout, null);
+
+                            // Getting the position from the marker
+                            LatLng latLng = arg0.getPosition();
+
+
+                            // Utilizzare il Tag per identificare il Marker.
+                            arg0.setTag(Integer.valueOf(tag));
+
+                            // Getting reference to the TextView to set latitude
+                            TextView tvLat = (TextView) v.findViewById(R.id.tv_lat);
+
+                            // Getting reference to the TextView to set longitude
+                            TextView tvLng = (TextView) v.findViewById(R.id.tv_lng);
+
+                            TextView km = (TextView) v.findViewById(R.id.km_length);
+
+                            TextView experience = (TextView) v.findViewById(R.id.experienceLevel);
+
+                            if (markersMap.containsKey(arg0)) {
+                                String details = markersMap.get(arg0);
+                                String[] strings = details.split("_");
+                                String sid = strings[0];
+
+                                double endlat = Double.parseDouble(session_info[1]);
+                                double endlng = Double.parseDouble(session_info[2]);
+                                String length = session_info[3];
+                                String difficulty = session_info[4];
+                                String datetime = session_info[5];
+                                String name = session_info[6];
+                                int numOfJoins = Integer.parseInt(session_info[7]);
+                                int medlevel = Integer.parseInt(session_info[8]);
+
+
+                                //       tvLat.setText("Start: "+strings[1]);
+                                tvLat.setText("Indirizzo di partenza");
+                                //       tvLng.setText("Destination: " + strings[2]);
+                                tvLng.setText("Indirizzo di arrivo");
+                                //       km.setText("Km: " + strings[3]);
+                                km.setText("Km: " + length);
+                                //       experience.setText("Experience: " + strings[4]);
+                                experience.setText("Experiece " + difficulty);
+                            }
+                            tag++;
+
+                            // Returning the view containing InfoWindow contents
+
+                            //      infowindow = v;
+
+                            return v;
+
+                        }
+
+                    });
+                    markerclicked.showInfoWindow();
+                } else {
+                    connections++;
+                    result = "";
+                    connect("getinforun", sidclicked);
+                }
             }
         }
+/*
+                session_info = result.split(";");
+                TextView tvLat = (TextView) infowindow.findViewById(R.id.tv_lat);
+                tvLat.setText("sfda");
+                Log.d("Connection ok","ciao");
+            }
+        }*/
         result = "";
     }
 }

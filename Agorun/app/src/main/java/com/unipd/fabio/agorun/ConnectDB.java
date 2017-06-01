@@ -148,10 +148,12 @@ public class ConnectDB extends AsyncTask<String, Void, ArrayList<String>> {
 
                 case "getruns":
                     url = new URL("https://mprogramming.000webhostapp.com/getruns.php?user=" + user);
+                    output.add("getruns");
                     break;
 
                 case "getinforun":
                     url = new URL("https://mprogramming.000webhostapp.com/getinforun.php?sid=" + param[1]);
+                    output.add("getinforun");
                     break;
 
             }

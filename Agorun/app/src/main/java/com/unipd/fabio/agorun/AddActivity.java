@@ -277,7 +277,8 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo, DBCon
             final Spinner experienceSpinner = (Spinner) findViewById(R.id.ExperienceSpinner);
             String experience = experienceSpinner.getSelectedItem().toString();
 
-            mapsActivity.addMarkerToMap(latStart, lngStart, new String(add.getAddressLine(0)+" "+add.getLocality()), new String(add2.getAddressLine(0)+ " "+add2.getLocality()), trackLength.getSelectedItem().toString(), experience.toString());
+        // ATTENZIONE!!! SID GIOCATTOLO
+            mapsActivity.addMarkerToMap("1",latStart, lngStart, new String(add.getAddressLine(0)+" "+add.getLocality()), new String(add2.getAddressLine(0)+ " "+add2.getLocality()), trackLength.getSelectedItem().toString(), experience.toString());
             finish();
 
             //mapsActivity.addMarkerToMap(latDest, lngDest, "DESTINATION");
