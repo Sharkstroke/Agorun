@@ -44,6 +44,8 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo, DBCon
     private TextView dateview;
     private TextView timeview;
 
+    private static final boolean IS_MY_ACTIVITY = true;
+
     private double latStart;
     private double latDest;
     private double lngStart;
@@ -278,7 +280,7 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo, DBCon
             String experience = experienceSpinner.getSelectedItem().toString();
 
         // ATTENZIONE!!! SID GIOCATTOLO
-            mapsActivity.addMarkerToMap("1",latStart, lngStart, new String(add.getAddressLine(0)+" "+add.getLocality()), new String(add2.getAddressLine(0)+ " "+add2.getLocality()), trackLength.getSelectedItem().toString(), experience.toString());
+            mapsActivity.addMarkerToMap(IS_MY_ACTIVITY, "1",latStart, lngStart, new String(add.getAddressLine(0)+" "+add.getLocality()), new String(add2.getAddressLine(0)+ " "+add2.getLocality()), trackLength.getSelectedItem().toString(), experience.toString());
             finish();
 
             //mapsActivity.addMarkerToMap(latDest, lngDest, "DESTINATION");

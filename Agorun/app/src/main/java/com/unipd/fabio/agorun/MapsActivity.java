@@ -44,7 +44,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.io.IOException;
-import java.io.InterruptedIOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -54,7 +53,6 @@ import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Timer;
-import java.util.concurrent.ExecutionException;
 
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnMapLongClickListener, GoogleMap.OnMarkerClickListener, DBConnection {
@@ -73,6 +71,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private TextView  search_tw;
     private TextView startingAddressTop;
     private TextView destinationAddressTop;
+
+    private static final int THRESHOLD_HOUR = 19;
 
 
     private LocationListener locationListener;
@@ -433,7 +433,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Calendar cal = Calendar.getInstance();
         int currentHour = cal.get(Calendar.HOUR_OF_DAY);
         boolean success = false;
-        if (currentHour <= 19) {
+        if (currentHour <= THRESHOLD_HOUR) {
             success = mMap.setMapStyle(
                     MapStyleOptions.loadRawResourceStyle(
                             this, R.raw.day_style_json));
@@ -585,21 +585,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     // Metodi per l'aggiunta di Markers nella mappa --> le posizioni di questi veranno get-tati dal DB.
-    public Marker addMarkerToMap(String sid, LatLng latLng, String km, String experience) {
+    public Marker addMarkerToMap(boolean isMyActivity, String sid, LatLng latLng, String km, String experience) {
         MapsActivity.trackKm = km;
         trackExperience = experience;
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
 
-        Marker newMarker = mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker( // Al posto dell'argomento di icon, passare BitmapDescriptorFactory.fromResource(R.drawable.FILEIMMAGINE)));
-                BitmapDescriptorFactory.HUE_AZURE)).flat(false));
-        markersMap.put(newMarker, new String(sid+"_"+addrS+"_"+addrD+"_"+km+"_"+experience));
-        return newMarker;
+        Marker marker = mMap.addMarker(new MarkerOptions().position(latLng));
+        if (isMyActivity) {
+            marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+        } else {
+            marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+        }
+        /*Marker newMarker = mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker( // Al posto dell'argomento di icon, passare BitmapDescriptorFactory.fromResource(R.drawable.FILEIMMAGINE)));
+                BitmapDescriptorFactory.HUE_AZURE)).flat(false)); */
+        if (addrD == "" && km == "" && experience == "") {
+            markersMap.put(marker, new String(sid+"_"+addrS));
+        } else {
+            markersMap.put(marker, new String(sid + "_" + addrS + "_" + addrD + "_" + km + "_" + experience));
+        }
+        return marker;
     }
 
-    public Marker addMarkerToMap(String sid, double latS, double longitS, String addrS, String addrD, String km, String experience) {
+    public Marker addMarkerToMap(boolean isMyActivity, String sid, double latS, double longitS, String addrS, String addrD, String km, String experience) {
         this.addrS = addrS;
         this.addrD = addrD;
-        return this.addMarkerToMap(sid, new LatLng(latS, longitS), km, experience);
+        return this.addMarkerToMap(isMyActivity, sid, new LatLng(latS, longitS), km, experience);
     }
 
     private void connect(String mode, String sid) {
@@ -645,7 +655,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             Address addS = list.get(0);
                             String startingAddress = addS.getAddressLine(0) + ", " + addS.getLocality();
 
-                            Marker marker = addMarkerToMap(sid, lat, lng, startingAddress, "Prova", "Prova", "Prova");
+                            Marker marker = addMarkerToMap(false, sid, lat, lng, startingAddress, "", "", "");
 
                             if (session_point.length == 4) {
                                 marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
@@ -721,15 +731,50 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 int numOfJoins = Integer.parseInt(session_info[7]);
                                 int medlevel = Integer.parseInt(session_info[8]);
 
+                                /*sid+"_"+addrS+"_"+addrD+"_"+km+"_"+experience)*/
 
-                                //       tvLat.setText("Start: "+strings[1]);
-                                tvLat.setText("Indirizzo di partenza");
-                                //       tvLng.setText("Destination: " + strings[2]);
-                                tvLng.setText("Indirizzo di arrivo");
-                                //       km.setText("Km: " + strings[3]);
-                                km.setText("Km: " + length);
-                                //       experience.setText("Experience: " + strings[4]);
-                                experience.setText("Experiece " + difficulty);
+                                String[] gotFromHashMap = markersMap.get(arg0).split("_");
+                                if (gotFromHashMap.length > 2) {
+                                    String string = markersMap.get(arg0);
+                                    String concat = string+"_"+datetime+"_"+name;
+                                    markersMap.put(arg0, concat);
+                                    System.out.println("CONCATENAZIONE: "+concat);
+
+                                    tvLat.setText("Indirizzo di partenza: "+gotFromHashMap[1]);
+
+                                    tvLng.setText("Indirizzo di arrivo: "+gotFromHashMap[2]);
+                                    System.out.println("DESTINAzione?:"+ gotFromHashMap[2]);
+
+                                    km.setText("Km: " + gotFromHashMap[3]);
+
+                                    experience.setText("Experience " + gotFromHashMap[3]);
+                                } else {
+                                    Geocoder gc = new Geocoder(mact);
+                                    try {
+                                        // Traduco latitudine e longitudine del punto di arrivo.
+                                        List<Address> list = null;
+                                        list = gc.getFromLocation(endlat, endlng, 1);
+                                        Address add = list.get(0);
+                                        String dest = add.getAddressLine(0) + ", " + add.getLocality();
+
+                                        String string = markersMap.get(arg0);
+                                        String putData = string+"_"+dest+"_"+length+"_"+difficulty;
+                                        markersMap.put(arg0, putData);
+                                        System.out.println("PUT DATA: "+putData);
+
+                                        tvLat.setText("Indirizzo di partenza: "+ gotFromHashMap[1]);
+
+                                        tvLng.setText("Indirizzo di arrivo: "+dest);
+                                        //       km.setText("Km: " + strings[3]);
+                                        km.setText("Km: " + length);
+
+                                        experience.setText("Experience " + difficulty);
+
+                                    } catch(Exception e) {
+                                        System.out.println("Geolocalizzazione fallita.");
+                                    }
+                                }
+
                             }
                             tag++;
 
