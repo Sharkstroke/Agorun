@@ -245,12 +245,13 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo, DBCon
             String start = et.getText().toString();
             System.out.println("STARTADDRESS=" + start);
             Geocoder gc = new Geocoder(this);
+        try {
             List<Address> list = null;
 
             list = gc.getFromLocationName(start, 1);
 
             Address add = list.get(0);
-            System.out.println("ADDRESS: " + add.getAddressLine(0)+" "+add.getLocality());
+            System.out.println("ADDRESS: " + add.getAddressLine(0) + " " + add.getLocality());
             String locality = add.getLocality();
 
             latStart = add.getLatitude();
@@ -279,13 +280,15 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo, DBCon
             final Spinner experienceSpinner = (Spinner) findViewById(R.id.ExperienceSpinner);
             String experience = experienceSpinner.getSelectedItem().toString();
 
-        // ATTENZIONE!!! SID GIOCATTOLO
-            mapsActivity.addMarkerToMap(IS_MY_ACTIVITY, "1",latStart, lngStart, new String(add.getAddressLine(0)+" "+add.getLocality()), new String(add2.getAddressLine(0)+ " "+add2.getLocality()), trackLength.getSelectedItem().toString(), experience.toString());
+            // ATTENZIONE!!! SID GIOCATTOLO
+            mapsActivity.addMarkerToMap(IS_MY_ACTIVITY, "1", latStart, lngStart, new String(add.getAddressLine(0) + " " + add.getLocality()), new String(add2.getAddressLine(0) + " " + add2.getLocality()), trackLength.getSelectedItem().toString(), experience.toString());
             finish();
 
             //mapsActivity.addMarkerToMap(latDest, lngDest, "DESTINATION");
             connect();
-
+        } catch(Exception e) {
+            System.out.println("Geolocalizzazione fallita.");
+        }
     }
 
     private void connect() {

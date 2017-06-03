@@ -550,7 +550,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onInfoWindowClick(Marker marker) {
                 //Intent activitySummary = new Intent(MapsActivity.this.get, ActivitySummary.class);
-                startActivity(new Intent(MapsActivity.this, ActivitySummary.class));
+                Intent newActivity = new Intent(MapsActivity.this, ActivitySummary.class);
+                if (markersMap.containsKey(marker)) {
+                    String data = markersMap.get(marker);
+                    Bundle bundle = new Bundle();
+                    bundle.putString("ActivityData",data);
+                    newActivity.putExtras(bundle);
+                    startActivity(newActivity);
+                }
             }
         });
 
@@ -615,6 +622,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void connect(String mode, String sid) {
         connections++;
         new ConnectDB(this).execute(mode,sid);     // se mode="getruns" il secondo parametro viene ignorato
+    }
+
+    public String getLengthRange(String length) {
+        if (length.equals("0")) {
+            return "Short: 0-5 km";
+        } else if (length.equals("1")) {
+            return "Medium: 6-10 km";
+        } else if (length.equals("2")) {
+            return "Long: 11-15 km";
+        } else if (length.equals("3")) {
+            return "Champion: 16-20 km";
+        } else {
+            return "God: 21+ km";
+        }
+    }
+
+    public String getDifficultyRange(String difficulty) {
+        if (difficulty.equals("0")) {
+            return "Beginner";
+        } else if (difficulty.equals("1")) {
+            return "Amateur";
+        } else if (difficulty.equals("2")) {
+            return "Advanced";
+        } else {
+            return "Expert";
+        }
     }
 
     public void onTaskCompleted (ArrayList<String> ls) {
@@ -733,6 +766,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                 /*sid+"_"+addrS+"_"+addrD+"_"+km+"_"+experience)*/
 
+
+
                                 String[] gotFromHashMap = markersMap.get(arg0).split("_");
                                 if (gotFromHashMap.length > 2) {
                                     String string = markersMap.get(arg0);
@@ -743,11 +778,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     tvLat.setText("Indirizzo di partenza: "+gotFromHashMap[1]);
 
                                     tvLng.setText("Indirizzo di arrivo: "+gotFromHashMap[2]);
-                                    System.out.println("DESTINAzione?:"+ gotFromHashMap[2]);
 
-                                    km.setText("Km: " + gotFromHashMap[3]);
+                                    km.setText("Km: " + getLengthRange(gotFromHashMap[3]));
 
-                                    experience.setText("Experience " + gotFromHashMap[3]);
+                                    experience.setText("Experience: " + getDifficultyRange(gotFromHashMap[4]));
                                 } else {
                                     Geocoder gc = new Geocoder(mact);
                                     try {
@@ -766,9 +800,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                         tvLng.setText("Indirizzo di arrivo: "+dest);
                                         //       km.setText("Km: " + strings[3]);
-                                        km.setText("Km: " + length);
+                                        km.setText("Km: " + getLengthRange(length));
 
-                                        experience.setText("Experience " + difficulty);
+                                        experience.setText("Experience: " + getDifficultyRange(difficulty));
 
                                     } catch(Exception e) {
                                         System.out.println("Geolocalizzazione fallita.");

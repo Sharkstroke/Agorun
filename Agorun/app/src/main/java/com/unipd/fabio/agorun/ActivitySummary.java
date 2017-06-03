@@ -11,6 +11,9 @@ public class ActivitySummary extends Activity {
     private TextView organizerSurname;
     private TextView activityStartAddress;
     private TextView activityDestinationAddress;
+    private TextView activityLength;
+    private TextView activityDifficulty;
+    private TextView creatorName;
     private TextView activityTime;
 
 
@@ -23,14 +26,35 @@ public class ActivitySummary extends Activity {
         organizerSurname = (TextView) findViewById(R.id.organizerSurname);
         activityStartAddress = (TextView) findViewById(R.id.activityStartAddress);
         activityDestinationAddress = (TextView) findViewById(R.id.activityDestinationAddress);
+        activityLength = (TextView) findViewById(R.id.activityLength);
+        activityDifficulty = (TextView) findViewById(R.id.activityDifficulty);
+        creatorName = (TextView) findViewById(R.id.creatorName);
+
         activityTime = (TextView) findViewById(R.id.activityTime);
 
-        organizerName.setText("Fabio");
-        organizerSurname.setText("Pazzini");
-        activityStartAddress.setText("Via Ognissanti 7");
-        activityDestinationAddress.setText("Via Morvillo 2");
-        activityTime.setText("16:30");
+        if (getIntent().getExtras() != null) {
+            String startAddressPassed = getIntent().getExtras().getString("ActivityData");
 
+            /*
+                0: sid
+                1: start
+                2: destination
+                3: length
+                4: difficulty
+                5: datetime
+                6: name
+             */
+            if (startAddressPassed != null) {
+                //startAddress.setText(startAddressPassed);
+                String[] addresses = startAddressPassed.split("_");
+                activityStartAddress.setText("Start: "+addresses[1]);
+                activityDestinationAddress.setText("Destination: "+addresses[2]);
+                activityLength.setText("Length: "+MapsActivity.getMapsData().getLengthRange(addresses[3]));
+                activityDifficulty.setText("Difficulty: "+MapsActivity.getMapsData().getDifficultyRange(addresses[4]));
+
+                //MapsActivity.getMapsData().getLengthRange()
+            }
+        }
 
 
     }
