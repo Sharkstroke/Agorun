@@ -22,6 +22,7 @@ import android.view.Display;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -71,6 +72,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private TextView  search_tw;
     private TextView startingAddressTop;
     private TextView destinationAddressTop;
+    private ProgressBar progressBar;
 
     private static final int THRESHOLD_HOUR = 19;
 
@@ -203,6 +205,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         });
          /*Giulio mod.*/
+
+        progressBar = (ProgressBar) findViewById(R.id.loading);
+        progressBar.setVisibility(View.GONE);
 
     }
 
@@ -363,7 +368,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void setUpMap() {}
 
     @Override
-    public void onMapClick(LatLng latLng) {}
+    public void onMapClick(LatLng latLng) { progressBar.setVisibility(View.GONE); }
 
     private Marker tempMarker;
     String startingAdd = "";
@@ -420,6 +425,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             sidclicked = strings[0];
             connect("getinforun", sidclicked);
         }
+        progressBar.setVisibility(View.VISIBLE);
         ///////// mod riccardo
         return true;
     }
@@ -824,6 +830,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     });
                     markerclicked.showInfoWindow();
+                    progressBar.setVisibility(View.GONE);
                 } else {
                     connections++;
                     result = "";
