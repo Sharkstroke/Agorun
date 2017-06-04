@@ -155,7 +155,39 @@ public class ConnectDB extends AsyncTask<String, Void, ArrayList<String>> {
                     url = new URL("https://mprogramming.000webhostapp.com/getinforun.php?sid=" + param[1]);
                     output.add("getinforun");
                     break;
+                ////  TODO: da togliere!!!
+                case "uploadimage":
+                    url = new URL("https://mprogramming.000webhostapp.com/uploadimage.php?user=" + user);
+                    conn = (HttpsURLConnection) url.openConnection();
+                    conn.setDoOutput(true);
+                    conn.setRequestProperty("charset", "UTF-8");
+                    conn.setUseCaches(false);
 
+                    OutputStream wr = conn.getOutputStream();
+                    wr.write(("encodedstring=" + param[1])
+                            .getBytes());
+                    wr.flush();
+                    wr.close();
+
+                    int responseCode = conn.getResponseCode();
+
+                    if (responseCode == HttpURLConnection.HTTP_OK) {
+                        BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+
+                        String line;
+
+                        while ((line = in.readLine()) != null) {
+                            output.add(line);
+                        }
+                        in.close();
+                    } else {
+                        output.add("Post connection failed");
+                    }
+                    break;
+
+                case "getimage":
+                    url = new URL("https://mprogramming.000webhostapp.com/getimage.php?user=" + user);
+                    break;
             }
 
             conn = (HttpsURLConnection) url.openConnection();

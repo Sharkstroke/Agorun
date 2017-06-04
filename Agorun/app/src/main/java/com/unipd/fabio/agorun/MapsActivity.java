@@ -661,6 +661,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         String query = ls.remove(0);
 
+        Log.d("LINE",ls.get(0));
+
         if (query.equals("getruns")) {
 
             ListIterator it = ls.listIterator();

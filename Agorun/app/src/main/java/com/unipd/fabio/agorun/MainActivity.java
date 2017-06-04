@@ -268,4 +268,11 @@ public class MainActivity extends AppCompatActivity implements
             llProfileLayout.setVisibility(View.GONE);
         }
     }
+
+    // TODO: Mod Riccardo, TOGLIERE!!!
+
+    public void onClickSend (View view) {
+        Intent intent = new Intent(this,ImageProva.class);
+        startActivity(intent);
+    }
 }
