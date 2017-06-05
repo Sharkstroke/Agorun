@@ -9,7 +9,10 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="com.imaadv.leaynik.ClinicFragment" />
+        tools:context="com.imaadv.leaynik.ClinicFragment"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
@@ -103,5 +106,25 @@
         android:layout_width="35dp"
         android:layout_height="35dp"
         android:layout_below="@+id/search_bar" />
+
+    <Button
+        android:id="@+id/startMonitorButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:onClick="startMonitoring"
+        android:text="@string/startMonitoring" />
+
+    <Button
+        android:id="@+id/stopMonitoring"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="stopMonitoring"
+        android:text="@string/stopMonitorButton"
+        android:layout_alignParentBottom="true"
+        android:visibility="invisible"
+        android:layout_toLeftOf="@+id/button1"
+        android:layout_toStartOf="@+id/button1" />
 
 </RelativeLayout>

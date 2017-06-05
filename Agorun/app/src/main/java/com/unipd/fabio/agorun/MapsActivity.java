@@ -21,6 +21,7 @@ import android.util.Log;
 import android.view.Display;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -73,8 +74,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private TextView startingAddressTop;
     private TextView destinationAddressTop;
     private ProgressBar progressBar;
+    private Button stopMonitoring;
+    private Button startMonitoring;
 
     private static final int THRESHOLD_HOUR = 19;
+    private static final int POSITION_FREQUENCY = 1500;
+
+    private static boolean IS_MONITORING;
 
 
     private LocationListener locationListener;
@@ -137,9 +143,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //AutoCompleteTextView actv = (AutoCompleteTextView) findViewById(R.id.findPlace);
         //Button actv = (Button) findViewById(R.id.findPlace);
 
-       search_tw = (TextView) findViewById(R.id.search_bar);
+        search_tw = (TextView) findViewById(R.id.search_bar);
         this.startingAddressTop = (TextView) findViewById(R.id.startingPointInMain);
         this.destinationAddressTop = (TextView) findViewById(R.id.destinationPointInMain);
+        this.stopMonitoring = (Button) findViewById(R.id.stopMonitoring);
+        this.startMonitoring = (Button) findViewById(R.id.startMonitorButton);
 
         /*Giulio mod.*/
        /* Button newActivity = (Button) findViewById(R.id.newActivity);*/
@@ -328,6 +336,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.addPolyline(new PolylineOptions().add(ll1, ll2).width(7).color(Color.RED).geodesic(true));
     }
 
+    private void pushPositionToDatabase(Location location) {
+        // TODO: push della posizione al DB.
+    }
+
     /**
      * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
      * installed) and the map has not already been instantiated.. This will ensure that we only ever
@@ -430,6 +442,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return true;
     }
 
+    public void startMonitoring(View view) {
+        // TODO: ottenimento sid dell'attività joinata e che si sta per avviare In base al sid eccetera, identificare i due marker di partenza e di arrivo
+        // TODO: e rendere invisibili tutti i marker sulla mappa tranne questi due.
+        for (Marker m : markersMap.keySet()) {
+            m.setVisible(!m.isVisible());
+        }
+
+        stopMonitoring.setVisibility(View.VISIBLE);
+        // Inizio il monitoring
+        IS_MONITORING = true;
+
+    }
+
+    public void stopMonitoring(View view) {
+        // TODO: fornire opzioni per fare il resume o per concludere l'attività.
+        IS_MONITORING = false;
+
+
+    }
+
     int tag = 0;
 
     static AlertDialog alert;
@@ -479,9 +511,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         locationListener = new LocationListener() {
             public void onLocationChanged(Location location) {
                 // Prima disegno il percorso, passando la nuova posizione rilevata.
-                drawTrack(location);
+                //drawTrack(location);
                 // Poi faccio l'update della posizione del marker.
-                updateWithNewLocation(location);
+                //updateWithNewLocation(location);
             }
 
             public void onProviderDisabled(String provider) {}
@@ -530,11 +562,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         // Richiedo update di posizione continuamente
-        locationManager.requestLocationUpdates(provider, 2000, 5,
+        locationManager.requestLocationUpdates(provider, POSITION_FREQUENCY, 5,
                 new LocationListener() {
                     public void onLocationChanged(Location location) {
                         // Prima disegno il percorso, passando la nuova posizione rilevata.
-                        //drawTrack(location);
+                        if (IS_MONITORING) {
+                            drawTrack(location);
+                            pushPositionToDatabase(location);
+                        }
                         // Poi faccio l'update della posizione del marker.
                         updateWithNewLocation(location);
                     }

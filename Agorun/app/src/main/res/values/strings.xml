@@ -39,6 +39,9 @@
     <string name="startingPointInMain">Starting address:</string>
     <string name="hintemail">Email</string>
     <string name="hintpassword">Password</string>
+    <string name="joinText">JOIN</string>
+    <string name="startMonitoring">START</string>
+    <string name="stopMonitorButton">STOP</string>
     <!-- Giulio mod. -->
 </resources>
 

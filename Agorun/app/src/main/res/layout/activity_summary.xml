@@ -45,7 +45,13 @@
         android:id="@+id/creatorName"
         />
 
-
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/joinText"
+        android:onClick="joinPressed"
+        android:id="@+id/joinButton"
+        />
 
     <TextView
         android:layout_width="wrap_content"

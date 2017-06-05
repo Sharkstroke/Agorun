@@ -3,6 +3,7 @@ package com.unipd.fabio.agorun;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.widget.Button;
 import android.widget.TextView;
 
 public class ActivitySummary extends Activity {
@@ -15,6 +16,8 @@ public class ActivitySummary extends Activity {
     private TextView activityDifficulty;
     private TextView creatorName;
     private TextView activityTime;
+
+    private Button joinButton;
 
 
     @Override
@@ -29,6 +32,7 @@ public class ActivitySummary extends Activity {
         activityLength = (TextView) findViewById(R.id.activityLength);
         activityDifficulty = (TextView) findViewById(R.id.activityDifficulty);
         creatorName = (TextView) findViewById(R.id.creatorName);
+        joinButton = (Button) findViewById(R.id.joinButton);
 
         activityTime = (TextView) findViewById(R.id.activityTime);
 
@@ -57,5 +61,9 @@ public class ActivitySummary extends Activity {
         }
 
 
+    }
+
+    public void joinPressed() {
+        // TODO: Richiesta al DB per joinare l'attività.
     }
 }
