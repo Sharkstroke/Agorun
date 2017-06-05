@@ -104,6 +104,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private Map<Marker, String> markersMap = new HashMap<>();
 
+    private Map<Double, Double> positionsRecorded = new HashMap<>();
+
     private int connections = 0;
 
     private String[] session_info;
@@ -114,6 +116,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
 
         timer = new Timer();
 
@@ -259,7 +262,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 LatLng latLngFound = place.getLatLng();
 
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLngFound, 17));
+                //mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLngFound, 17));
 
             } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
                 Status status = PlaceAutocomplete.getStatus(this, data);
@@ -339,8 +342,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.addPolyline(new PolylineOptions().add(ll1, ll2).width(7).color(Color.RED).geodesic(true));
     }
 
-    private void pushPositionToDatabase(Location location) {
-        // TODO: push della posizione al DB.
+    private void recordPosition(Location location) {
+        positionsRecorded.put(location.getLatitude(), location.getLongitude());
     }
 
     /**
@@ -461,7 +464,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return true;
     }
 
-    public void startMonitoring(View view) {
+    public void startMonitoringPressed(View view) {
         // TODO: ottenimento sid dell'attività joinata e che si sta per avviare In base al sid eccetera, identificare i due marker di partenza e di arrivo
         // TODO: e rendere invisibili tutti i marker sulla mappa tranne questi due.
         for (Marker m : markersMap.keySet()) {
@@ -471,6 +474,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         stopMonitoring.setVisibility(View.VISIBLE);
         // Inizio il monitoring
         IS_MONITORING = true;
+
+        System.out.println("MAP SIZE="+positionsRecorded.size());
 
     }
 
@@ -550,8 +555,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         if (l != null) {
             LatLng latlng=fromLocationToLatLng(l);
-            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latlng,
-                    17));
+            //googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latlng,
+              //      17));
             updateWithNewLocation(l);
 
         } else {
@@ -586,11 +591,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     public void onLocationChanged(Location location) {
                         // Prima disegno il percorso, passando la nuova posizione rilevata.
                         if (IS_MONITORING) {
+                            recordPosition(location);
                             drawTrack(location);
-                            pushPositionToDatabase(location);
+                            updateWithNewLocation(location);
                         }
                         // Poi faccio l'update della posizione del marker.
-                        updateWithNewLocation(location);
+
                     }
 
                     public void onProviderDisabled(String provider) {}
@@ -655,11 +661,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public Marker addMarkerToMap(boolean isMyActivity, String sid, LatLng latLng, String km, String experience) {
         MapsActivity.trackKm = km;
         trackExperience = experience;
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
+        //mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
 
         Marker marker = mMap.addMarker(new MarkerOptions().position(latLng));
         if (isMyActivity) {
             marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
         } else {
             marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
         }
@@ -711,7 +718,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void onTaskCompleted (ArrayList<String> ls) {
-
         String result = "";
 
         if (connections >= 5) {                     // Provo la connessione 5 volte, altrimenti do errore di connessione
@@ -721,52 +727,55 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         String query = ls.remove(0);
 
-        Log.d("LINE",ls.get(0));
+        //Log.d("LINE",ls.get(0));
 
         if (query.equals("getruns")) {
+            try {
+                ListIterator it = ls.listIterator();
+                while (it.hasNext()) {
+                    result = result + (it.next());
+                    if (!result.equals("Problems selecting activities") && !(result.charAt(0) == 'C')) {  // Connection failed
+                        //            Log.d("result",result);
 
-            ListIterator it = ls.listIterator();
-            while (it.hasNext()) {
-                result = result + (it.next());
-                if (!result.equals("Problems selecting activities") && !(result.charAt(0)=='C')) {  // Connection failed
-                    //            Log.d("result",result);
+                        connections = 0;
 
-                    connections = 0;
+                        String[] session_point = result.split(";");
+                        String sid = session_point[0];
 
-                    String[] session_point = result.split(";");
-                    String sid = session_point[0];
+                        //                Log.d("sid", sid);
 
-    //                Log.d("sid", sid);
+                        double lat = Double.parseDouble(session_point[1]);
+                        double lng = Double.parseDouble(session_point[2]);
 
-                    double lat = Double.parseDouble(session_point[1]);
-                    double lng = Double.parseDouble(session_point[2]);
+                        Geocoder gc = new Geocoder(this);
+                        try {
+                            if (tempMarker == null) {
+                                List<Address> list = null;
+                                list = gc.getFromLocation(lat, lng, 1);
 
-                    Geocoder gc = new Geocoder(this);
-                    try {
-                        if (tempMarker == null) {
-                            List<Address> list = null;
-                            list = gc.getFromLocation(lat, lng, 1);
+                                Address addS = list.get(0);
+                                String startingAddress = addS.getAddressLine(0) + ", " + addS.getLocality();
 
-                            Address addS = list.get(0);
-                            String startingAddress = addS.getAddressLine(0) + ", " + addS.getLocality();
+                                Marker marker = addMarkerToMap(false, sid, lat, lng, startingAddress, "", "", "");
 
-                            Marker marker = addMarkerToMap(false, sid, lat, lng, startingAddress, "", "", "");
-
-                            if (session_point.length == 4) {
-                                marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-                                Log.d("Green",sid);
+                                if (session_point.length == 4) {
+                                    marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                                    Log.d("Green", sid);
+                                }
                             }
+                        } catch (Exception e) {
+                            Log.d("Error", e.getMessage());
                         }
-                    } catch (Exception e) {
-                        Log.d("Error", e.getMessage());
-                    }
 
-                    result = "";
-                } else {
-                    connections++;
-                    result = "";
-                    connect("getruns",null);
+                        result = "";
+                    } else {
+                        connections++;
+                        result = "";
+                        connect("getruns", null);
+                    }
                 }
+            } catch(Exception e) {
+                System.out.println("Connessione al DB fallita.");
             }
         } else {
             ListIterator it = ls.listIterator();
