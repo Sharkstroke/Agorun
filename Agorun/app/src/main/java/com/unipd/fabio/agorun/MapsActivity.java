@@ -21,8 +21,11 @@ import android.util.Log;
 import android.view.Display;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -451,6 +454,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             connect("getinforun", sidclicked);
         }
         progressBar.setVisibility(View.VISIBLE);
+
+        // Giuliio Mod.
+        final LinearLayout layout = (LinearLayout)findViewById(R.id.user_activity_info);
+
+        setContentView(R.layout.acitivityuser_info);
+
+        Animation slideUp = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_up);
+        Animation slideDown = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_down);
+
+        if(layout.getVisibility()==View.INVISIBLE){
+
+            layout.startAnimation(slideUp);
+            layout.setVisibility(View.VISIBLE);
+        }
+        // Giulio Mod. End
+
         ///////// mod riccardo
         return true;
     }
@@ -832,7 +851,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if (session_info[0].equals("ok")) {
 
                     //          Log.d("result", result);
-                    mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+
+
+                /*    mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
 
                         // Use default InfoWindow frame
                         @Override
@@ -847,7 +868,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             connections = 0;
 
                             // Getting view from the layout file info_window_layout
-                            View v = getLayoutInflater().inflate(R.layout.windowlayout, null);
+                            View v = getLayoutInflater().inflate(R.layout.acitivityuser_info, null);
 
                             // Getting the position from the marker
                             LatLng latLng = arg0.getPosition();
@@ -857,14 +878,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             arg0.setTag(Integer.valueOf(tag));
 
                             // Getting reference to the TextView to set latitude
-                            TextView tvLat = (TextView) v.findViewById(R.id.tv_lat);
+                            TextView tvLat = (TextView) v.findViewById(R.id.act_start);
 
                             // Getting reference to the TextView to set longitude
-                            TextView tvLng = (TextView) v.findViewById(R.id.tv_lng);
+                            TextView tvLng = (TextView) v.findViewById(R.id.act_dest);
 
-                            TextView km = (TextView) v.findViewById(R.id.km_length);
+                            TextView km = (TextView) v.findViewById(R.id.act_km);
 
-                            TextView experience = (TextView) v.findViewById(R.id.experienceLevel);
+                            TextView experience = (TextView) v.findViewById(R.id.act_exp);
 
                             if (markersMap.containsKey(arg0)) {
                                 String details = markersMap.get(arg0);
@@ -880,7 +901,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 int numOfJoins = Integer.parseInt(session_info[7]);
                                 int medlevel = Integer.parseInt(session_info[8]);
 
-                                /*sid+"_"+addrS+"_"+addrD+"_"+km+"_"+experience)*/
+                                *//*sid+"_"+addrS+"_"+addrD+"_"+km+"_"+experience)*//*
 
 
 
@@ -936,8 +957,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                         }
 
-                    });
-                    markerclicked.showInfoWindow();
+                    });*/
+                    //markerclicked.showInfoWindow();
+
+                    // Giulio Mod.
                     progressBar.setVisibility(View.GONE);
                 } else {
                     connections++;

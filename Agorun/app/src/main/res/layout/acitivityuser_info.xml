@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="650px"
+
+    android:weightSum="1">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="50dp"></LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="50dp"
+        android:background="@color/colorPrimary"
+        android:weightSum="1">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/act_user"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:layout_marginTop="45dp"
+                android:backgroundTint="#FFFFFF"
+                android:textColorHint="#FFFFFF"
+                android:inputType="none"
+                android:text="Name" />
+
+            <EditText
+                android:id="@+id/act_start"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:backgroundTint="#FFFFFF"
+                android:ems="10"
+                android:inputType="none"
+                android:text="Start"
+                android:textColorHint="#FFFFFF" />
+
+            <EditText
+                android:id="@+id/act_dest"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:layout_marginTop="10dp"
+                android:backgroundTint="#FFFFFF"
+                android:textColorHint="#FFFFFF"
+                android:inputType="none"
+                android:text="Destination" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/act_exp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:backgroundTint="#FFFFFF"
+                android:ems="10"
+                android:inputType="none"
+                android:text="Experiece"
+                android:textColorHint="#FFFFFF" />
+
+            <EditText
+                android:id="@+id/act_km"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:layout_marginTop="45dp"
+                android:backgroundTint="#FFFFFF"
+                android:textColorHint="#FFFFFF"
+                android:inputType="none"
+                android:text="Km" />
+
+            <ImageView
+                android:id="@+id/act_showmore"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                app:srcCompat="@drawable/ic_expand_00000" />
+
+
+        </LinearLayout>
+
+
+
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        app:srcCompat="@mipmap/ic_launcher_round"
+
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+
+
+
+</RelativeLayout>
