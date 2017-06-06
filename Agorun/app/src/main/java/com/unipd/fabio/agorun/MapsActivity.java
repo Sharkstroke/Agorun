@@ -55,6 +55,7 @@ import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnMapLongClickListener, GoogleMap.OnMarkerClickListener, DBConnection {
@@ -95,6 +96,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private LatLng latlng8 = new LatLng(45.407302, 11.891325);
     private List<LatLng> listCoords = new LinkedList<>();
 
+
     private Timer timer;
 
     private final MyLocationRegistered formerPos = new MyLocationRegistered();
@@ -108,6 +110,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private String[] session_info;
     private Marker markerclicked;
     private String sidclicked;
+
+    Timer cameraSteadyTimer = new Timer();
+
+
+    private double cameraCenterPointLatitude;
+    private double cameraCenterPointLongitude;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -293,6 +302,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             if (mMap != null) {
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latlng, 17));
+
             }
 
             if(whereAmI!=null) {
@@ -467,6 +477,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
+    int radius = 10;
+    // TODO: il metodo deve ritornare un booleano e deve controllare se l'utente si trova nel rettangolo attorno al punto di destinazione oppure se la distanza
+    // TODO: tra l'utente ed il punto di destinazione è minore del raggio definito come campo.
+    public void checkDestinationReached() {
+        //double distance = SphericalUtil.computeDistanceBetween(mMarkerA.getPosition(), mMarkerB.getPosition());
+        //mTextView.setText("The markers are " + formatNumber(distance) + " apart.");
+        //Bounds bounds = new Bounds(l.getLatitude()-10, l.getLatitude()+10, l.getLongitude()-5, l.getLongitude()+5);
+        //return bounds.contains(l.getLatitude(), l.getLongitude());
+    }
+
     int tag = 0;
 
     static AlertDialog alert;
@@ -608,8 +628,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
+        /***
+         *
+         * Setto un listener per la telecamera così da consentire la registrazione del movimento ed il successivo
+         * download delle attività nella zona.
+         */
+        mMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
+            long delay = 700;
+            @Override
+            public void onCameraMove() {
+                timer.cancel();
+                timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        this.cancel();
+                        // TODO: invio al DB per calcolare attività in zona.
+                        setCoordinates();
+                        //System.out.println("lat="+mMap.getCameraPosition().target.latitude+", lng = "+mMap.getCameraPosition().target.longitude);
+                    }
+                }, delay);
+            }
+        });
+
+
+
         // addMarkerToMap(40.1111,11.1111,"","","","");
-        connect("getruns",null);
+
+        //connect("getruns",null);
 
     }
 
@@ -630,6 +676,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 */
+
+    private void setCoordinates() {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    cameraCenterPointLatitude = mMap.getCameraPosition().target.latitude;
+                    cameraCenterPointLongitude = mMap.getCameraPosition().target.longitude;
+                    System.out.println("Lat: "+cameraCenterPointLatitude+"; Lon: "+cameraCenterPointLongitude);
+                } catch(Exception e) {
+                    System.out.println(e.toString());
+                }
+            }
+        });
+    }
 
     static String trackKm;
     private String trackExperience;
@@ -701,6 +762,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onTaskCompleted (ArrayList<String> ls) {
         String result = "";
 
+
+
         if (connections >= 5) {                     // Provo la connessione 5 volte, altrimenti do errore di connessione
             Toast.makeText(this, "Connection Problem", Toast.LENGTH_SHORT).show();
             return;
@@ -755,6 +818,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         connect("getruns", null);
                     }
                 }
+
             } catch(Exception e) {
                 System.out.println("Connessione al DB fallita.");
             }
@@ -891,5 +955,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }*/
         result = "";
     }
+
 }
 

@@ -198,7 +198,7 @@ public class ConnectDB extends AsyncTask<String, Void, ArrayList<String>> {
             String line;
 
             while ((line = in.readLine()) != null) {
-                System.out.println("LINE: "+line);
+                //System.out.println("LINE: "+line);
                 output.add(line);
             }
             in.close();

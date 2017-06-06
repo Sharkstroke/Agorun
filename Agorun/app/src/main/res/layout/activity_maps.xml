@@ -107,6 +107,21 @@
         android:layout_height="35dp"
         android:layout_below="@+id/search_bar" />
 
+    <LinearLayout
+        android:id="@+id/linlaHeaderProgress"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone" >
+
+        <ProgressBar
+            android:id="@+id/pbHeaderProgress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+        </ProgressBar>
+    </LinearLayout>
+
     <Button
         android:id="@+id/startMonitorButton"
         android:layout_width="wrap_content"
