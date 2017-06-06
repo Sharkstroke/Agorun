@@ -147,8 +147,17 @@ public class ConnectDB extends AsyncTask<String, Void, ArrayList<String>> {
                     break;
 
                 case "getruns":
-                    url = new URL("https://mprogramming.000webhostapp.com/getruns.php?user=" + user);
-                    output.add("getruns");
+                    if (param.length != 3) {
+                        output.add("La get delle attività richiede 3 parametri");
+                        return output;
+                    } else {
+                        url = new URL("https://mprogramming.000webhostapp.com/getruns.php?" +
+                                "user=" + user + "&" +
+                                "lat=" + param[1] +"&" +
+                                "lng=" + param[2]);
+                        output.add("getruns");
+                        System.out.println("PATH = " + url.toString());
+                    }
                     break;
 
                 case "getinforun":
@@ -198,7 +207,7 @@ public class ConnectDB extends AsyncTask<String, Void, ArrayList<String>> {
             String line;
 
             while ((line = in.readLine()) != null) {
-                //System.out.println("LINE: "+line);
+                System.out.println("LINE: "+line);
                 output.add(line);
             }
             in.close();

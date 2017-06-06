@@ -704,6 +704,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     cameraCenterPointLatitude = mMap.getCameraPosition().target.latitude;
                     cameraCenterPointLongitude = mMap.getCameraPosition().target.longitude;
                     System.out.println("Lat: "+cameraCenterPointLatitude+"; Lon: "+cameraCenterPointLongitude);
+                    connections = 0;
+                    progressBar.setVisibility(View.VISIBLE);
+                    connect("getruns",null);
                 } catch(Exception e) {
                     System.out.println(e.toString());
                 }
@@ -749,7 +752,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void connect(String mode, String sid) {
         connections++;
-        new ConnectDB(this).execute(mode,sid);     // se mode="getruns" il secondo parametro viene ignorato
+        ConnectDB cdb = new ConnectDB(this);
+        if(mode.equals("getruns")) {
+            cdb.execute(mode,cameraCenterPointLatitude+"",cameraCenterPointLongitude+"");
+        } else {
+            cdb.execute(mode, sid);
+        }
     }
 
     public String getLengthRange(String length) {
@@ -797,8 +805,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 ListIterator it = ls.listIterator();
                 while (it.hasNext()) {
                     result = result + (it.next());
-                    if (!result.equals("Problems selecting activities") && !(result.charAt(0) == 'C')) {  // Connection failed
-                        //            Log.d("result",result);
+                    if (result.equals("Problems selecting activities")) {
+                        Toast.makeText(getApplicationContext(), "Here there are no activities!", Toast.LENGTH_SHORT).show();
+                    } else if (!(result.charAt(0) == 'C')) {  // Connection failed
+                                    Log.d("result",result);
 
                         connections = 0;
 
@@ -832,6 +842,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                         result = "";
                     } else {
+                        Log.d("result",result);
                         connections++;
                         result = "";
                         connect("getruns", null);
@@ -839,8 +850,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
 
             } catch(Exception e) {
-                System.out.println("Connessione al DB fallita.");
+                System.out.println(e.getMessage());
             }
+            progressBar.setVisibility(View.GONE);
         } else {
             ListIterator it = ls.listIterator();
 
