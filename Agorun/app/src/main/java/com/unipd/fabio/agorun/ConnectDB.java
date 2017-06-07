@@ -22,6 +22,8 @@ public class ConnectDB extends AsyncTask<String, Void, ArrayList<String>> {
     private static String user;        /////  INSERITO DALL'UTENTE
     private DBConnection activity;
 
+    private final String urldb = "https://mprogramming.000webhostapp.com/";
+
     public ConnectDB(String user) {
         this.user = user;
     }
@@ -47,7 +49,7 @@ public class ConnectDB extends AsyncTask<String, Void, ArrayList<String>> {
         try {
 
             HttpsURLConnection conn;
-            URL url = new URL("https://mprogramming.000webhostapp.com/");
+            URL url = new URL(urldb);
 
             switch (param[0]) {
                 case "login":
@@ -58,7 +60,7 @@ public class ConnectDB extends AsyncTask<String, Void, ArrayList<String>> {
                     } else {
 
                         user = param[1];
-                        url = new URL("https://mprogramming.000webhostapp.com/login_MODIFICA.php");
+                        url = new URL(urldb + "login_MODIFICA.php");
                         conn = (HttpsURLConnection) url.openConnection();
                         conn.setDoOutput(true);
                         conn.setRequestProperty("charset", "UTF-8");
@@ -95,7 +97,7 @@ public class ConnectDB extends AsyncTask<String, Void, ArrayList<String>> {
                     } else {
 
                         user = param[4];
-                        url = new URL("https://mprogramming.000webhostapp.com/register_MODIFICA.php");
+                        url = new URL(urldb + "register_MODIFICA.php");
                         conn = (HttpsURLConnection) url.openConnection();
                         conn.setDoOutput(true);
                         conn.setRequestProperty("charset", "UTF-8");
@@ -134,7 +136,7 @@ public class ConnectDB extends AsyncTask<String, Void, ArrayList<String>> {
                         output.add ("La creazione di un'attività richiede 8 parametri");
                         return output;
                     } else {
-                        url = new URL("https://mprogramming.000webhostapp.com/createrun.php?" +
+                        url = new URL(urldb + "createrun.php?" +
                                 "user="    + user     + "&" +
                                 "stlat="   + param[1] + "&" +
                                 "stlong="  + param[2] + "&" +
@@ -151,7 +153,7 @@ public class ConnectDB extends AsyncTask<String, Void, ArrayList<String>> {
                         output.add("La get delle attività richiede 5 parametri");
                         return output;
                     } else {
-                        url = new URL("https://mprogramming.000webhostapp.com/getruns.php?" +
+                        url = new URL(urldb + "getruns.php?" +
                                 "user=" + user + "&" +
                                 "latne=" + param[1] +"&" +
                                 "lngne=" + param[2] + "&" +
@@ -163,12 +165,12 @@ public class ConnectDB extends AsyncTask<String, Void, ArrayList<String>> {
                     break;
 
                 case "getinforun":
-                    url = new URL("https://mprogramming.000webhostapp.com/getinforun.php?sid=" + param[1]);
+                    url = new URL(urldb + "getinforun.php?sid=" + param[1]);
                     output.add("getinforun");
                     break;
-                ////  TODO: da togliere!!!
+                ////  TODO: da togliere forse!!!
                 case "uploadimage":
-                    url = new URL("https://mprogramming.000webhostapp.com/uploadimage.php?user=" + user);
+                    url = new URL(urldb + "uploadimage.php?user=" + user);
                     conn = (HttpsURLConnection) url.openConnection();
                     conn.setDoOutput(true);
                     conn.setRequestProperty("charset", "UTF-8");
@@ -197,7 +199,7 @@ public class ConnectDB extends AsyncTask<String, Void, ArrayList<String>> {
                     break;
 
                 case "getimage":
-                    url = new URL("https://mprogramming.000webhostapp.com/getimage.php?user=" + user);
+                    url = new URL(urldb + "getimage.php?user=" + user);
                     break;
             }
 
