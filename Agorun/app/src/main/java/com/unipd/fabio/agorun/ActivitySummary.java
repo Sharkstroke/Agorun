@@ -3,10 +3,14 @@ package com.unipd.fabio.agorun;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
-public class ActivitySummary extends Activity {
+import java.util.ArrayList;
+
+public class ActivitySummary extends Activity implements DBConnection {
 
     private TextView organizerName;
     private TextView organizerSurname;
@@ -19,6 +23,8 @@ public class ActivitySummary extends Activity {
 
     private Button joinButton;
 
+    private String sid;
+    private int connections;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -51,6 +57,7 @@ public class ActivitySummary extends Activity {
             if (startAddressPassed != null) {
                 //startAddress.setText(startAddressPassed);
                 String[] addresses = startAddressPassed.split("_");
+                sid = addresses[0];
                 activityStartAddress.setText("Start: "+addresses[1]);
                 activityDestinationAddress.setText("Destination: "+addresses[2]);
                 activityLength.setText("Length: "+MapsActivity.getMapsData().getLengthRange(addresses[3]));
@@ -63,7 +70,28 @@ public class ActivitySummary extends Activity {
 
     }
 
-    public void joinPressed() {
-        // TODO: Richiesta al DB per joinare l'attività.
+    public void joinPressed(View view) {
+        connections = 0;
+        connect();
+    }
+
+    private void connect() {
+        new ConnectDB(this).execute("joinrun",sid);
+    }
+
+    public void onTaskCompleted (ArrayList<String> ls) {
+
+        if (connections >= 5) {
+            Toast.makeText(getApplicationContext(),"Connection problem",Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (! ls.get(0).equals("Join Riuscito")) {
+            connections++;
+            connect();
+        } else {
+            Toast.makeText(getApplicationContext(),sid,Toast.LENGTH_SHORT).show();
+        }
+
     }
 }

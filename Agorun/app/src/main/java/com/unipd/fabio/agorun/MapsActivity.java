@@ -882,10 +882,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 if (session_info[0].equals("ok")) {
 
-                    //          Log.d("result", result);
+                             Log.d("result", result);
 
 
-                /*    mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+                    mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
 
                         // Use default InfoWindow frame
                         @Override
@@ -933,7 +933,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 int numOfJoins = Integer.parseInt(session_info[7]);
                                 int medlevel = Integer.parseInt(session_info[8]);
 
-                                *//*sid+"_"+addrS+"_"+addrD+"_"+km+"_"+experience)*//*
+                                /*sid+"_"+addrS+"_"+addrD+"_"+km+"_"+experience)*/
 
 
 
@@ -989,8 +989,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                         }
 
-                    });*/
-                    //markerclicked.showInfoWindow();
+                    });
+                    markerclicked.showInfoWindow();
 
                     // Giulio Mod.
                     progressBar.setVisibility(View.GONE);
