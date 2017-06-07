@@ -147,14 +147,16 @@ public class ConnectDB extends AsyncTask<String, Void, ArrayList<String>> {
                     break;
 
                 case "getruns":
-                    if (param.length != 3) {
-                        output.add("La get delle attività richiede 3 parametri");
+                    if (param.length != 5) {
+                        output.add("La get delle attività richiede 5 parametri");
                         return output;
                     } else {
                         url = new URL("https://mprogramming.000webhostapp.com/getruns.php?" +
                                 "user=" + user + "&" +
-                                "lat=" + param[1] +"&" +
-                                "lng=" + param[2]);
+                                "latne=" + param[1] +"&" +
+                                "lngne=" + param[2] + "&" +
+                                "latsw=" + param[3] + "&" +
+                                "lngsw=" + param[4]);
                         output.add("getruns");
                         System.out.println("PATH = " + url.toString());
                     }

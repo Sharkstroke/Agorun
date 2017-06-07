@@ -25,7 +25,6 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -43,6 +42,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -117,8 +117,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Timer cameraSteadyTimer = new Timer();
 
 
-    private double cameraCenterPointLatitude;
-    private double cameraCenterPointLongitude;
+    private LatLng northEast;
+    private LatLng southWest;
+
+    private double latNorthEast;
+    private double lngNorthEast;
+    private double latSouthWest;
+    private double lngSouthWest;
 
 
     @Override
@@ -271,7 +276,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 LatLng latLngFound = place.getLatLng();
 
-                //mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLngFound, 17));
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLngFound, 17));
 
             } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
                 Status status = PlaceAutocomplete.getStatus(this, data);
@@ -456,18 +461,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         progressBar.setVisibility(View.VISIBLE);
 
         // Giuliio Mod.
-        final LinearLayout layout = (LinearLayout)findViewById(R.id.user_activity_info);
+        //final LinearLayout layout = (LinearLayout)findViewById(R.id.user_activity_info);
 
-        setContentView(R.layout.acitivityuser_info);
+        //setContentView(R.layout.acitivityuser_info);
 
         Animation slideUp = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_up);
         Animation slideDown = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_down);
 
-        if(layout.getVisibility()==View.INVISIBLE){
+        /*if(layout.getVisibility()==View.INVISIBLE){
 
             layout.startAnimation(slideUp);
             layout.setVisibility(View.VISIBLE);
-        }
+        }*/
         // Giulio Mod. End
 
         ///////// mod riccardo
@@ -653,20 +658,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
          * download delle attività nella zona.
          */
         mMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
-            long delay = 700;
+            long delay = 500;
             @Override
             public void onCameraMove() {
-                timer.cancel();
-                timer = new Timer();
-                timer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        this.cancel();
-                        // TODO: invio al DB per calcolare attività in zona.
-                        setCoordinates();
-                        //System.out.println("lat="+mMap.getCameraPosition().target.latitude+", lng = "+mMap.getCameraPosition().target.longitude);
-                    }
-                }, delay);
+                if (timer != null) {
+                    timer.cancel();
+                }
+                if (mMap.getCameraPosition().zoom >= 14.50) {
+                    timer = new Timer();
+                    timer.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            this.cancel();
+                            // TODO: invio al DB per calcolare attività in zona.
+                            setCoordinates();
+                            //System.out.println("lat="+mMap.getCameraPosition().target.latitude+", lng = "+mMap.getCameraPosition().target.longitude);
+                        }
+                    }, delay);
+                }
             }
         });
 
@@ -700,10 +709,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                System.out.println("ZOOM LEVEL = "+mMap.getCameraPosition().zoom);
                 try {
-                    cameraCenterPointLatitude = mMap.getCameraPosition().target.latitude;
-                    cameraCenterPointLongitude = mMap.getCameraPosition().target.longitude;
-                    System.out.println("Lat: "+cameraCenterPointLatitude+"; Lon: "+cameraCenterPointLongitude);
+                    LatLngBounds bounds = mMap.getProjection().getVisibleRegion().latLngBounds;
+                    northEast = bounds.northeast;
+                    southWest = bounds.southwest;
+
+                    latNorthEast = northEast.latitude;
+                    lngNorthEast = northEast.longitude;
+                    latSouthWest = southWest.latitude;
+                    lngSouthWest = southWest.longitude;
+
+                    System.out.println("NORTH EAST: "+latNorthEast+", "+lngNorthEast);
+                    System.out.println("SOUTH WEST: "+latSouthWest+", "+lngSouthWest);
+
+                    //System.out.println("Lat: "+cameraCenterPointLatitude+"; Lon: "+cameraCenterPointLongitude);
                     connections = 0;
                     progressBar.setVisibility(View.VISIBLE);
                     connect("getruns",null);
@@ -754,7 +774,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         connections++;
         ConnectDB cdb = new ConnectDB(this);
         if(mode.equals("getruns")) {
-            cdb.execute(mode,cameraCenterPointLatitude+"",cameraCenterPointLongitude+"");
+            cdb.execute(mode,latNorthEast+"",lngNorthEast+"",latSouthWest+"",lngSouthWest+"");
         } else {
             cdb.execute(mode, sid);
         }
@@ -837,7 +857,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 }
                             }
                         } catch (Exception e) {
-                            Log.d("Error", e.getMessage());
+                            Log.d("Error Localization", e.getMessage());
                         }
 
                         result = "";
