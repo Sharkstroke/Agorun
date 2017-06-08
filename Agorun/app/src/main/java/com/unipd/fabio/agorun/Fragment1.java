@@ -138,7 +138,7 @@ public class Fragment1 extends Fragment {
     private void moveToFragment(Fragment fragment) {
 
         getFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_to_top, R.anim.slide_down)
-                .add(R.id.map, fragment, "first").addToBackStack(null).commit();
+                .add(R.id.map, fragment, "second").addToBackStack(null).commit();
 
     }
 

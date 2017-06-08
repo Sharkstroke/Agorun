@@ -11,10 +11,16 @@
 
     >
 
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginTop="50dp"></LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="50dp">
+        android:layout_marginTop="100dp">
 
 
         <LinearLayout
@@ -25,16 +31,7 @@
             android:weightSum="1">
 
 
-            <ImageView
-                android:id="@+id/imageView"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:layout_gravity="center_horizontal"
-                android:onClick="onCl1ick"
-                android:src="@mipmap/ic_launcher_round" />
+
 
 
             <TextView
@@ -44,7 +41,7 @@
                 android:textAlignment="center"
             android:ems="10"
             android:inputType="none"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="50dp"
             android:text="Name"
             android:textColor="#FFFFFF"
             android:textSize="20dp" />
@@ -112,6 +109,16 @@
 
     </LinearLayout>
 
-
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="50dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_gravity="center_horizontal"
+        android:onClick="onCl1ick"
+        android:src="@mipmap/ic_launcher_round" />
 
 </FrameLayout>
