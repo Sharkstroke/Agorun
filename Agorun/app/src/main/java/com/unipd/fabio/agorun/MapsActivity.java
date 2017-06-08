@@ -480,7 +480,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void startMonitoringPressed(View view) {
-        // TODO: ottenimento sid dell'attività joinata e che si sta per avviare In base al sid eccetera, identificare i due marker di partenza e di arrivo
+        // TODO: ottenimento sid dell'attività session_info[0].equals("ok")ata e che si sta per avviare In base al sid eccetera, identificare i due marker di partenza e di arrivo
         // TODO: e rendere invisibili tutti i marker sulla mappa tranne questi due.
         for (Marker m : markersMap.keySet()) {
             m.setVisible(!m.isVisible());
