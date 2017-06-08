@@ -7,10 +7,18 @@ package com.unipd.fabio.agorun;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
+import android.view.FocusFinder;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.bumptech.glide.load.model.ImageVideoWrapper;
+
+import static android.R.attr.fragment;
 
 
 /**
@@ -22,6 +30,9 @@ public class Fragment1 extends Fragment {
     private  static String stop;
     private  static String km;
     private  static String exp;
+    private View view;
+    private Fragment3 fragment3;
+
 
     public Fragment1() {
         // Required empty public constructor
@@ -70,7 +81,8 @@ public class Fragment1 extends Fragment {
         this.km =  getArguments().getString("km");
         this.exp =  getArguments().getString("exp");
 
-        View view = inflater.inflate(R.layout.fragment_fragment1, container,  false);
+      view = inflater.inflate(R.layout.fragment_fragment1, container,  false);
+
         TextView txtview1  = (TextView) view.findViewById(R.id.act_start);
         TextView txtview2  = (TextView) view.findViewById(R.id.act_dest);
         TextView txtview3  = (TextView) view.findViewById(R.id.act_exp);
@@ -80,10 +92,53 @@ public class Fragment1 extends Fragment {
         txtview3.setText(this.exp);
         txtview4.setText(this.km);
 
+        view.setOnTouchListener(new OnSwipeTouchListener(getContext()) {
+
+            public void onSwipeTop() {
+                Toast.makeText(getContext(), "top", Toast.LENGTH_SHORT).show();
+                Log.d("top","top");
+                fragment3 = new Fragment3();
+                moveToFragment(fragment3);
+
+
+            }
+
+            public void onSwipeRight() {
+                Toast.makeText(getContext(), "right", Toast.LENGTH_SHORT).show();
+                Log.d("right","right");
+            }
+            public void onSwipeLeft() {
+                Toast.makeText(getContext(), "left", Toast.LENGTH_SHORT).show();
+                Log.d("left","left");
+            }
+            public void onSwipeBottom() {
+                Toast.makeText(getContext(), "bottom", Toast.LENGTH_SHORT).show();
+                Log.d("bottom","bottom");
+            }
+
+            /*public boolean onTouch(View v, MotionEvent event) {
+
+                if(event.getAction() == MotionEvent.ACTION_DOWN){
+                    Toast.makeText(getContext(),"left",Toast.LENGTH_SHORT).show();
+                }
+                return true;
+            }*/
+        });
+
+
+
+
 
         return view;
 
 
+
+    }
+
+    private void moveToFragment(Fragment fragment) {
+
+        getFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_to_top, R.anim.slide_down)
+                .add(R.id.map, fragment, "first").addToBackStack(null).commit();
 
     }
 

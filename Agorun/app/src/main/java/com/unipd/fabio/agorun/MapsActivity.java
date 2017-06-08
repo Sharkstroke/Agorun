@@ -18,10 +18,12 @@ import android.provider.Settings;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
 import android.util.Log;
 import android.view.Display;
+import android.view.GestureDetector;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
@@ -63,8 +65,12 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static com.unipd.fabio.agorun.R.id.imageView;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnMapLongClickListener, GoogleMap.OnMarkerClickListener, DBConnection {
+
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,
+        GoogleMap.OnMapClickListener, GoogleMap.OnMapLongClickListener, GoogleMap.OnMarkerClickListener,
+        DBConnection {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     public Marker whereAmI;
@@ -135,11 +141,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private String km;
     private String exp;
 
+    private OnSwipeTouchListener GestureManager;
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
 
 
         timer = new Timer();
@@ -246,7 +257,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         progressBar = (ProgressBar) findViewById(R.id.loading);
         progressBar.setVisibility(View.GONE);
 
+        GestureManager = (new OnSwipeTouchListener(MapsActivity.this) {
+            public void onSwipeTop() {
+                Toast.makeText(MapsActivity.this, "top", Toast.LENGTH_SHORT).show();
+            }
+            public void onSwipeRight() {
+                Toast.makeText(MapsActivity.this, "right", Toast.LENGTH_SHORT).show();
+            }
+            public void onSwipeLeft() {
+                Toast.makeText(MapsActivity.this, "left", Toast.LENGTH_SHORT).show();
+            }
+            public void onSwipeBottom() {
+                Toast.makeText(MapsActivity.this, "bottom", Toast.LENGTH_SHORT).show();
+            }
+
+        });
+
+
+
+
+
     }
+
+
 
     public List<LatLng> getListCoords() {
         return this.listCoords;
@@ -461,7 +494,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), 17));
+
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        LatLng newCameraPosition = new LatLng(marker.getPosition().latitude-0.001, marker.getPosition().longitude);
+
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(newCameraPosition, 17));
         //     marker.showInfoWindow();//////////// Mod riccardo
         connections = 0;
         markerclicked = marker;
@@ -1045,6 +1084,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }*/
         result = "";
     }
+
 
 }
 

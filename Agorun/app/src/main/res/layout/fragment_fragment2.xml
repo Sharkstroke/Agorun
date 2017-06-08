@@ -25,6 +25,18 @@
             android:weightSum="1">
 
 
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_gravity="center_horizontal"
+                android:onClick="onCl1ick"
+                android:src="@mipmap/ic_launcher_round" />
+
+
             <TextView
             android:id="@+id/act_user"
             android:layout_width="match_parent"
@@ -97,17 +109,9 @@
 
         </LinearLayout>
 
+
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:paddingLeft="-10px"
-        android:onClick="onCl1ick"
-        app:srcCompat="@mipmap/ic_launcher_round" />
+
 
 </FrameLayout>

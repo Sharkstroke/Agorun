@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 /**
@@ -39,6 +40,9 @@ public class Fragment3 extends Fragment {
 
         TextView txtview5  = (TextView) view.findViewById(R.id.act_km);
         txtview5.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.left_to_right));
+
+        ImageView img = (ImageView) view.findViewById(R.id.imageView);
+        img.startAnimation(AnimationUtils.loadAnimation(getContext(),R.anim.left_to_right));
 
         return view;
 
