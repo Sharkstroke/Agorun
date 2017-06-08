@@ -1,4 +1,6 @@
-package com.unipd.fabio.agorun; /**package com.unipd.fabio.provamaps;*/
+package com.unipd.fabio.agorun; /**
+ * package com.unipd.fabio.provamaps;
+ */
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -14,6 +16,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
@@ -74,7 +77,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Location l;
     private String provider;
     private ImageButton HamburgerMenu;
-    private TextView  search_tw;
+    private TextView search_tw;
     private TextView startingAddressTop;
     private TextView destinationAddressTop;
     private ProgressBar progressBar;
@@ -125,6 +128,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private double latSouthWest;
     private double lngSouthWest;
 
+    private Fragment fragment1;
+
+    private String start;
+    private String stop;
+    private String km;
+    private String exp;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -136,8 +146,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         mact = this;
 
-        String svcName= Context.LOCATION_SERVICE;
-        locationManager = (LocationManager)getSystemService(svcName);
+        String svcName = Context.LOCATION_SERVICE;
+        locationManager = (LocationManager) getSystemService(svcName);
 
         Criteria criteria = new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_FINE);
@@ -185,8 +195,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onClick(View v) {
                 try {
                     Intent intent = new PlaceAutocomplete
-                                    .IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)
-                                    .build(mact);
+                            .IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)
+                            .build(mact);
                     startActivityForResult(intent, 1);
                 } catch (GooglePlayServicesRepairableException e) {
                     Log.i("1", e.toString());
@@ -219,8 +229,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 Toast.LENGTH_SHORT
                         ).show();
 
-                        if(item.getItemId()== R.id.one)
-                        {
+                        if (item.getItemId() == R.id.one) {
                             Intent intent = new Intent(MapsActivity.this, AddActivity.class);
                             startActivity(intent);
                         }
@@ -251,7 +260,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onResume() {
         super.onResume();
 
-        if(mMap!=null) {
+        if (mMap != null) {
             if (l == null) {
                 l = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             } else {
@@ -288,7 +297,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    public static LatLng fromLocationToLatLng(Location location){
+    public static LatLng fromLocationToLatLng(Location location) {
         return new LatLng(location.getLatitude(), location.getLongitude());
 
     }
@@ -300,20 +309,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             formerPos.setPosition(location);
             // Update the map location.
 
-            LatLng latlng=fromLocationToLatLng(location);
+            LatLng latlng = fromLocationToLatLng(location);
 
 
             //System.out.println("Latitude: "+latlng.latitude+", Longitude: "+latlng.longitude);
 
             //mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latlng,
-              //      17));
+            //      17));
 
             if (mMap != null) {
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latlng, 17));
 
             }
 
-            if(whereAmI!=null) {
+            if (whereAmI != null) {
                 whereAmI.remove();
             }
 
@@ -349,8 +358,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     // Coloro il pezzo di strada che va dalla posizione precedentemente registrata a quella attuale.
     private void drawTrack(Location location) {
         mMap.addPolyline((new PolylineOptions().add(new LatLng(formerPos.getPosition().getLatitude(), formerPos.getPosition().getLongitude()),
-                                                    new LatLng(location.getLatitude(), location.getLongitude())
-                                                    )).width(5).color(Color.BLUE).geodesic(true));
+                new LatLng(location.getLatitude(), location.getLongitude())
+        )).width(5).color(Color.BLUE).geodesic(true));
     }
 
     private void drawTrack(LatLng ll1, LatLng ll2) {
@@ -381,7 +390,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (mMap == null) {
             // Try to obtain the map from the SupportMapFragment.
             //MapFragment map = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMapAsync(this);
-                    //.getMap();
+            //.getMap();
             MapFragment map = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
             map.getMapAsync(this);
             // Check if we were successful in obtaining the map.
@@ -392,20 +401,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         }
     }
+
     /**
      * This is where we can add markers or lines, add listeners or move the camera. In this case, we
      * just add a marker near Africa.
      * <p/>
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
-    private void setUpMap() {}
+    private void setUpMap() {
+    }
 
     @Override
-    public void onMapClick(LatLng latLng) { progressBar.setVisibility(View.GONE); }
+    public void onMapClick(LatLng latLng) {
+        progressBar.setVisibility(View.GONE);
+    }
 
     private Marker tempMarker;
     String startingAdd = "";
     String destinationAdd = "";
+
     @Override
     public void onMapLongClick(LatLng latLng) {
         double latitude = latLng.latitude;
@@ -418,7 +432,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 Address add = list.get(0);
                 startingAdd = add.getAddressLine(0) + ", " + add.getLocality();
-                startingAddressTop.setText("Starting point: " +startingAdd);
+                startingAddressTop.setText("Starting point: " + startingAdd);
                 tempMarker = mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)).flat(false));
                 markersMap.put(tempMarker, "");
             } else {
@@ -426,12 +440,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 list = gc.getFromLocation(latitude, longitude, 1);
                 Address add = list.get(0);
                 destinationAdd = add.getAddressLine(0) + ", " + add.getLocality();
-                destinationAddressTop.setText("Destination address: "+destinationAdd);
+                destinationAddressTop.setText("Destination address: " + destinationAdd);
                 //mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)).flat(false));
 
                 Intent newActivity = new Intent(MapsActivity.this, AddActivity.class);
                 Bundle bundle = new Bundle();
-                bundle.putString("StartingAddress", new String(startingAdd + "_" +destinationAdd));
+                bundle.putString("StartingAddress", new String(startingAdd + "_" + destinationAdd));
                 newActivity.putExtras(bundle);
                 startActivity(newActivity);
                 tempMarker.remove();
@@ -448,35 +462,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public boolean onMarkerClick(Marker marker) {
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), 17));
-   //     marker.showInfoWindow();//////////// Mod riccardo
+        //     marker.showInfoWindow();//////////// Mod riccardo
         connections = 0;
         markerclicked = marker;
-        Log.d("Marker clicked","fadlk");
+        Log.d("Marker clicked", "fadlk");
         if (markersMap.containsKey(marker)) {
             String details = markersMap.get(marker);
             String[] strings = details.split("_");
             sidclicked = strings[0];
             connect("getinforun", sidclicked);
+
+
         }
         progressBar.setVisibility(View.VISIBLE);
-
-        // Giuliio Mod.
-        //final LinearLayout layout = (LinearLayout)findViewById(R.id.user_activity_info);
-
-        //setContentView(R.layout.acitivityuser_info);
-
-        Animation slideUp = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_up);
-        Animation slideDown = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_down);
-
-        /*if(layout.getVisibility()==View.INVISIBLE){
-
-            layout.startAnimation(slideUp);
-            layout.setVisibility(View.VISIBLE);
-        }*/
-        // Giulio Mod. End
-
         ///////// mod riccardo
         return true;
+    }
+
+    private void moveToFragment(Fragment fragment) {
+
+        getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_up, R.anim.slide_down)
+                .add(R.id.map, fragment, "first").addToBackStack(null).commit();
+
     }
 
     public void startMonitoringPressed(View view) {
@@ -490,7 +497,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Inizio il monitoring
         IS_MONITORING = true;
 
-        System.out.println("MAP SIZE="+positionsRecorded.size());
+        System.out.println("MAP SIZE=" + positionsRecorded.size());
 
     }
 
@@ -502,6 +509,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     int radius = 10;
+
     // TODO: il metodo deve ritornare un booleano e deve controllare se l'utente si trova nel rettangolo attorno al punto di destinazione oppure se la distanza
     // TODO: tra l'utente ed il punto di destinazione è minore del raggio definito come campo.
     public void checkDestinationReached() {
@@ -514,6 +522,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     int tag = 0;
 
     static AlertDialog alert;
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -565,10 +574,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 //updateWithNewLocation(location);
             }
 
-            public void onProviderDisabled(String provider) {}
-            public void onProviderEnabled(String provider) {}
+            public void onProviderDisabled(String provider) {
+            }
+
+            public void onProviderEnabled(String provider) {
+            }
+
             public void onStatusChanged(String provider, int status,
-                                        Bundle extras) {}
+                                        Bundle extras) {
+            }
         };
 
         l = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
@@ -579,9 +593,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             locationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, locationListener, null);
         }
         if (l != null) {
-            LatLng latlng=fromLocationToLatLng(l);
+            LatLng latlng = fromLocationToLatLng(l);
             //googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latlng,
-              //      17));
+            //      17));
             updateWithNewLocation(l);
 
         } else {
@@ -624,13 +638,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     }
 
-                    public void onProviderDisabled(String provider) {}
-                    public void onProviderEnabled(String provider) {}
+                    public void onProviderDisabled(String provider) {
+                    }
+
+                    public void onProviderEnabled(String provider) {
+                    }
+
                     public void onStatusChanged(String provider, int status,
-                                                Bundle extras) {}
+                                                Bundle extras) {
+                    }
                 }
         );
-
 
 
         // InfoWindow viene usata per customizzare le finestre di info che appaiono al click su un Marker.
@@ -645,7 +663,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if (markersMap.containsKey(marker)) {
                     String data = markersMap.get(marker);
                     Bundle bundle = new Bundle();
-                    bundle.putString("ActivityData",data);
+                    bundle.putString("ActivityData", data);
                     newActivity.putExtras(bundle);
                     startActivity(newActivity);
                 }
@@ -659,6 +677,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
          */
         mMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
             long delay = 500;
+
             @Override
             public void onCameraMove() {
                 if (timer != null) {
@@ -678,7 +697,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             }
         });
-
 
 
         // addMarkerToMap(40.1111,11.1111,"","","","");
@@ -709,7 +727,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                System.out.println("ZOOM LEVEL = "+mMap.getCameraPosition().zoom);
+                System.out.println("ZOOM LEVEL = " + mMap.getCameraPosition().zoom);
                 try {
                     LatLngBounds bounds = mMap.getProjection().getVisibleRegion().latLngBounds;
                     northEast = bounds.northeast;
@@ -720,14 +738,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     latSouthWest = southWest.latitude;
                     lngSouthWest = southWest.longitude;
 
-                    System.out.println("NORTH EAST: "+latNorthEast+", "+lngNorthEast);
-                    System.out.println("SOUTH WEST: "+latSouthWest+", "+lngSouthWest);
+                    System.out.println("NORTH EAST: " + latNorthEast + ", " + lngNorthEast);
+                    System.out.println("SOUTH WEST: " + latSouthWest + ", " + lngSouthWest);
 
                     //System.out.println("Lat: "+cameraCenterPointLatitude+"; Lon: "+cameraCenterPointLongitude);
                     connections = 0;
                     progressBar.setVisibility(View.VISIBLE);
-                    connect("getruns",null);
-                } catch(Exception e) {
+                    connect("getruns", null);
+                } catch (Exception e) {
                     System.out.println(e.toString());
                 }
             }
@@ -757,7 +775,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         /*Marker newMarker = mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker( // Al posto dell'argomento di icon, passare BitmapDescriptorFactory.fromResource(R.drawable.FILEIMMAGINE)));
                 BitmapDescriptorFactory.HUE_AZURE)).flat(false)); */
         if (addrD == "" && km == "" && experience == "") {
-            markersMap.put(marker, new String(sid+"_"+addrS));
+            markersMap.put(marker, new String(sid + "_" + addrS));
         } else {
             markersMap.put(marker, new String(sid + "_" + addrS + "_" + addrD + "_" + km + "_" + experience));
         }
@@ -773,8 +791,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void connect(String mode, String sid) {
         connections++;
         ConnectDB cdb = new ConnectDB(this);
-        if(mode.equals("getruns")) {
-            cdb.execute(mode,latNorthEast+"",lngNorthEast+"",latSouthWest+"",lngSouthWest+"");
+        if (mode.equals("getruns")) {
+            cdb.execute(mode, latNorthEast + "", lngNorthEast + "", latSouthWest + "", lngSouthWest + "");
         } else {
             cdb.execute(mode, sid);
         }
@@ -806,9 +824,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    public void onTaskCompleted (ArrayList<String> ls) {
+    public void onTaskCompleted(ArrayList<String> ls) {
         String result = "";
-
 
 
         if (connections >= 5) {                     // Provo la connessione 5 volte, altrimenti do errore di connessione
@@ -828,7 +845,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     if (result.equals("Problems selecting activities")) {
                         Toast.makeText(getApplicationContext(), "Here there are no activities!", Toast.LENGTH_SHORT).show();
                     } else if (!(result.charAt(0) == 'C')) {  // Connection failed
-                                    Log.d("result",result);
+                        Log.d("result", result);
 
                         connections = 0;
 
@@ -862,14 +879,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                         result = "";
                     } else {
-                        Log.d("result",result);
+                        Log.d("result", result);
                         connections++;
                         result = "";
                         connect("getruns", null);
                     }
                 }
 
-            } catch(Exception e) {
+            } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
             progressBar.setVisibility(View.GONE);
@@ -882,115 +899,133 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 if (session_info[0].equals("ok")) {
 
-                             Log.d("result", result);
+                    Log.d("result", result);
+                    //TODO: Controllare che tutte le if-else serve a qualcosa
+                    //Giulio mod.
+                    //mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
 
-
-                    mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
-
-                        // Use default InfoWindow frame
-                        @Override
+                    // Use default InfoWindow frame
+                     /*   @Override
                         public View getInfoWindow(Marker arg0) {
                             return null;
-                        }
+                        }*/
 
-                        // Defines the contents of the InfoWindow
-                        @Override
-                        public View getInfoContents(Marker arg0) {
+                    // Defines the contents of the InfoWindow
+                    // @Override
+                    //public View getInfoContents(Marker arg0) {
+                    Marker arg0 = markerclicked;
+                    connections = 0;
 
-                            connections = 0;
+                    // Getting view from the layout file info_window_layout
+                    View v = getLayoutInflater().inflate(R.layout.acitivityuser_info, null);
 
-                            // Getting view from the layout file info_window_layout
-                            View v = getLayoutInflater().inflate(R.layout.acitivityuser_info, null);
-
-                            // Getting the position from the marker
-                            LatLng latLng = arg0.getPosition();
+                    // Getting the position from the marker
+                    LatLng latLng = arg0.getPosition();
 
 
-                            // Utilizzare il Tag per identificare il Marker.
-                            arg0.setTag(Integer.valueOf(tag));
+                    // Utilizzare il Tag per identificare il Marker.
+                    arg0.setTag(Integer.valueOf(tag));
 
-                            // Getting reference to the TextView to set latitude
-                            TextView tvLat = (TextView) v.findViewById(R.id.act_start);
+                    // Getting reference to the TextView to set latitude
+                           /* TextView tvLat = (TextView) v.findViewById(R.id.act_start);
 
                             // Getting reference to the TextView to set longitude
                             TextView tvLng = (TextView) v.findViewById(R.id.act_dest);
 
                             TextView km = (TextView) v.findViewById(R.id.act_km);
 
-                            TextView experience = (TextView) v.findViewById(R.id.act_exp);
+                            TextView experience = (TextView) v.findViewById(R.id.act_exp);*/
 
-                            if (markersMap.containsKey(arg0)) {
-                                String details = markersMap.get(arg0);
-                                String[] strings = details.split("_");
-                                String sid = strings[0];
+                    if (markersMap.containsKey(arg0)) {
+                        String details = markersMap.get(arg0);
+                        String[] strings = details.split("_");
+                        String sid = strings[0];
 
-                                double endlat = Double.parseDouble(session_info[1]);
-                                double endlng = Double.parseDouble(session_info[2]);
-                                String length = session_info[3];
-                                String difficulty = session_info[4];
-                                String datetime = session_info[5];
-                                String name = session_info[6];
-                                int numOfJoins = Integer.parseInt(session_info[7]);
-                                int medlevel = Integer.parseInt(session_info[8]);
+                        double endlat = Double.parseDouble(session_info[1]);
+                        double endlng = Double.parseDouble(session_info[2]);
+                        String length = session_info[3];
+                        String difficulty = session_info[4];
+                        String datetime = session_info[5];
+                        String name = session_info[6];
+                        int numOfJoins = Integer.parseInt(session_info[7]);
+                        int medlevel = Integer.parseInt(session_info[8]);
 
-                                /*sid+"_"+addrS+"_"+addrD+"_"+km+"_"+experience)*/
+                        //*sid+"_"+addrS+"_"+addrD+"_"+km+"_"+experience)*//*
 
 
+                        String[] gotFromHashMap = markersMap.get(arg0).split("_");
+                        if (gotFromHashMap.length > 2) {
+                            String string = markersMap.get(arg0);
+                            String concat = string + "_" + datetime + "_" + name;
+                            markersMap.put(arg0, concat);
+                            System.out.println("CONCATENAZIONE: " + concat);
 
-                                String[] gotFromHashMap = markersMap.get(arg0).split("_");
-                                if (gotFromHashMap.length > 2) {
-                                    String string = markersMap.get(arg0);
-                                    String concat = string+"_"+datetime+"_"+name;
-                                    markersMap.put(arg0, concat);
-                                    System.out.println("CONCATENAZIONE: "+concat);
+                            //tvLat.setText("Indirizzo di partenza: " + gotFromHashMap[1]);
 
-                                    tvLat.setText("Indirizzo di partenza: "+gotFromHashMap[1]);
+                            start = gotFromHashMap[1];
+                            //tvLng.setText("Indirizzo di arrivo: " + gotFromHashMap[2]);
+                            stop = gotFromHashMap[2];
+                            //km.setText("Km: " + getLengthRange(gotFromHashMap[3]));
+                            km = gotFromHashMap[3];
+                            //experience.setText("Experience: " + getDifficultyRange(gotFromHashMap[4]));
+                            exp = gotFromHashMap[4];
+                        } else {
+                            Geocoder gc = new Geocoder(mact);
+                            try {
+                                // Traduco latitudine e longitudine del punto di arrivo.
+                                List<Address> list = null;
+                                list = gc.getFromLocation(endlat, endlng, 1);
+                                Address add = list.get(0);
+                                String dest = add.getAddressLine(0) + ", " + add.getLocality();
 
-                                    tvLng.setText("Indirizzo di arrivo: "+gotFromHashMap[2]);
+                                String string = markersMap.get(arg0);
+                                String putData = string + "_" + dest + "_" + length + "_" + difficulty;
+                                markersMap.put(arg0, putData);
+                                System.out.println("PUT DATA: " + putData);
 
-                                    km.setText("Km: " + getLengthRange(gotFromHashMap[3]));
+                                //tvLat.setText("Indirizzo di partenza: " + gotFromHashMap[1]);
+                                start = gotFromHashMap[1];
 
-                                    experience.setText("Experience: " + getDifficultyRange(gotFromHashMap[4]));
-                                } else {
-                                    Geocoder gc = new Geocoder(mact);
-                                    try {
-                                        // Traduco latitudine e longitudine del punto di arrivo.
-                                        List<Address> list = null;
-                                        list = gc.getFromLocation(endlat, endlng, 1);
-                                        Address add = list.get(0);
-                                        String dest = add.getAddressLine(0) + ", " + add.getLocality();
+                                //tvLng.setText("Indirizzo di arrivo: " + dest);
+                                stop = dest;
+                                //       km.setText("Km: " + strings[3]);
+                                //km.setText("Km: " + getLengthRange(length));
+                                km = getLengthRange(length);
+                                //experience.setText("Experience: " + getDifficultyRange(difficulty));
+                                exp = getDifficultyRange(difficulty);
 
-                                        String string = markersMap.get(arg0);
-                                        String putData = string+"_"+dest+"_"+length+"_"+difficulty;
-                                        markersMap.put(arg0, putData);
-                                        System.out.println("PUT DATA: "+putData);
-
-                                        tvLat.setText("Indirizzo di partenza: "+ gotFromHashMap[1]);
-
-                                        tvLng.setText("Indirizzo di arrivo: "+dest);
-                                        //       km.setText("Km: " + strings[3]);
-                                        km.setText("Km: " + getLengthRange(length));
-
-                                        experience.setText("Experience: " + getDifficultyRange(difficulty));
-
-                                    } catch(Exception e) {
-                                        System.out.println("Geolocalizzazione fallita.");
-                                    }
-                                }
-
+                            } catch (Exception e) {
+                                System.out.println("Geolocalizzazione fallita.");
                             }
-                            tag++;
-
-                            // Returning the view containing InfoWindow contents
-
-                            //      infowindow = v;
-
-                            return v;
-
                         }
 
-                    });
-                    markerclicked.showInfoWindow();
+                    }
+                    tag++;
+
+
+                    fragment1 = new Fragment1();
+
+                    Bundle args = new Bundle();
+                    args.putString("start", start);
+                    args.putString("stop", stop);
+                    args.putString("km", km);
+                    args.putString("exp", exp);
+
+
+                    fragment1.setArguments(args);
+                    moveToFragment(fragment1);
+
+
+                    // Returning the view containing InfoWindow contents
+
+                    //      infowindow = v;
+
+                    //return v;
+
+                    // }
+
+                    //  });
+                    //   markerclicked.showInfoWindow();
 
                     // Giulio Mod.
                     progressBar.setVisibility(View.GONE);
