@@ -250,7 +250,7 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo, DBCon
             list = gc.getFromLocationName(start, 1);
 
             add = list.get(0);
-            System.out.println("ADDRESS: " + add.getAddressLine(0)+" "+add.getLocality());
+            System.out.println("ADDRESS: " + add.getAddressLine(0)+", "+add.getLocality());
 
             String locality = add.getLocality();
 
@@ -333,8 +333,8 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo, DBCon
         } else if (result.equals("Success")) {
             Toast.makeText(this, "Activity Created!", Toast.LENGTH_SHORT).show();
             mapsActivity.addMarkerToMap(IS_MY_ACTIVITY, ls.get(1),latStart, lngStart,
-                    new String(add.getAddressLine(0)+" "+add.getLocality()),
-                    new String(add2.getAddressLine(0)+ " "+add2.getLocality()),
+                    new String(add.getAddressLine(0)+", "+add.getLocality()),
+                    new String(add2.getAddressLine(0)+ ", "+add2.getLocality()),
                     trackLength.getSelectedItem().toString(),
                     experienceSpinner.getSelectedItem().toString());
         } else {

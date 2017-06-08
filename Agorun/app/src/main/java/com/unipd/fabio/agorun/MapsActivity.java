@@ -20,12 +20,11 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Display;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
@@ -53,6 +52,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -958,13 +958,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             String string = markersMap.get(arg0);
                             String concat = string + "_" + datetime + "_" + name;
                             markersMap.put(arg0, concat);
-                            System.out.println("CONCATENAZIONE: " + concat);
+
 
                             //tvLat.setText("Indirizzo di partenza: " + gotFromHashMap[1]);
 
-                            start = gotFromHashMap[1];
+                            String[] startParsed = gotFromHashMap[1].split(",");
+                            String[] newStart = Arrays.copyOf(startParsed, startParsed.length-1);
+                            start = TextUtils.join(",", newStart);
+
                             //tvLng.setText("Indirizzo di arrivo: " + gotFromHashMap[2]);
-                            stop = gotFromHashMap[2];
+                            String[] stopParsed = gotFromHashMap[2].split(",");
+                            String[] newStop = Arrays.copyOf(stopParsed, stopParsed.length-1);
+                            stop = TextUtils.join(",", newStop);
                             //km.setText("Km: " + getLengthRange(gotFromHashMap[3]));
                             km = gotFromHashMap[3];
                             //experience.setText("Experience: " + getDifficultyRange(gotFromHashMap[4]));
@@ -984,10 +989,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 System.out.println("PUT DATA: " + putData);
 
                                 //tvLat.setText("Indirizzo di partenza: " + gotFromHashMap[1]);
-                                start = gotFromHashMap[1];
+                                String[] startParsed = gotFromHashMap[1].split(",");
+                                String[] newStart = Arrays.copyOf(startParsed, startParsed.length-1);
+                                start = TextUtils.join(",", newStart);
+
 
                                 //tvLng.setText("Indirizzo di arrivo: " + dest);
-                                stop = dest;
+                                String[] stopParsed = dest.split(",");
+                                String[] newStop = Arrays.copyOf(stopParsed, stopParsed.length-1);
+                                stop = TextUtils.join(",", newStop);
                                 //       km.setText("Km: " + strings[3]);
                                 //km.setText("Km: " + getLengthRange(length));
                                 km = getLengthRange(length);
