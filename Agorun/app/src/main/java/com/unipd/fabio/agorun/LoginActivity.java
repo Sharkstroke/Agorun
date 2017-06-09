@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -97,6 +98,8 @@ public class LoginActivity extends AppCompatActivity implements DBConnection, Vi
             result = result + (it.next());
         }
 
+        Log.d("result",result);
+
 
         if (!result.equals("Login avvenuto con successo") && !result.equals("Wrong Password") &&
                 !result.equals("Registrati")) {
@@ -104,7 +107,7 @@ public class LoginActivity extends AppCompatActivity implements DBConnection, Vi
             t = Toast.makeText(this, result, Toast.LENGTH_SHORT);
             t.show();
             connect();
-        } else if (result.equals("Login avvenuto con successo")) {
+        } else if (result.equals("Login avvenuto con successo")) {;
 
 
             prefs = getSharedPreferences("UserData", 0);

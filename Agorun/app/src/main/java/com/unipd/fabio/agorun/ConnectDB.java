@@ -60,7 +60,7 @@ public class ConnectDB extends AsyncTask<String, Void, ArrayList<String>> {
                     } else {
 
                         user = param[1];
-                        url = new URL(urldb + "login_MODIFICA.php");
+                        url = new URL("https://www.agorun.com/database/" + "login.php");
                         conn = (HttpsURLConnection) url.openConnection();
                         conn.setDoOutput(true);
                         conn.setRequestProperty("charset", "UTF-8");
