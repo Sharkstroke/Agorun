@@ -22,7 +22,7 @@ public class ConnectDB extends AsyncTask<String, Void, ArrayList<String>> {
     private static String user;        /////  INSERITO DALL'UTENTE
     private DBConnection activity;
 
-    private final String urldb = "https://mprogramming.000webhostapp.com/";
+    private final String urldb = "https://www.agorun.com/database/";
 
     public ConnectDB(String user) {
         this.user = user;
@@ -60,7 +60,7 @@ public class ConnectDB extends AsyncTask<String, Void, ArrayList<String>> {
                     } else {
 
                         user = param[1];
-                        url = new URL("https://www.agorun.com/database/" + "login.php");
+                        url = new URL(urldb + "login.php");
                         conn = (HttpsURLConnection) url.openConnection();
                         conn.setDoOutput(true);
                         conn.setRequestProperty("charset", "UTF-8");
@@ -88,6 +88,8 @@ public class ConnectDB extends AsyncTask<String, Void, ArrayList<String>> {
                     }
 
                     return output;
+
+                // TODO: Aggiustare url di register quando viene aggiustata l'attivita'
 
                 case "register":
 
