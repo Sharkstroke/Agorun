@@ -18,13 +18,11 @@ import android.provider.Settings;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Display;
-import android.view.GestureDetector;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -39,6 +37,7 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -64,8 +63,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import static com.unipd.fabio.agorun.R.id.imageView;
 
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,
@@ -116,6 +113,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Map<Marker, String> markersMap = new HashMap<>();
 
     private Map<Double, Double> positionsRecorded = new HashMap<>();
+
+    private Map<Marker, Marker> destinationsMap = new HashMap<>();
 
     private int connections = 0;
 
@@ -514,6 +513,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         }
         progressBar.setVisibility(View.VISIBLE);
+
         ///////// mod riccardo
         return true;
     }
@@ -556,6 +556,47 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //mTextView.setText("The markers are " + formatNumber(distance) + " apart.");
         //Bounds bounds = new Bounds(l.getLatitude()-10, l.getLatitude()+10, l.getLongitude()-5, l.getLongitude()+5);
         //return bounds.contains(l.getLatitude(), l.getLongitude());
+    }
+
+    public void twoMarkersZoom(Marker marker) {
+        if (markersMap.containsKey(marker)) {
+            if (!destinationsMap.containsKey(marker)) {
+                String[] parsed = markersMap.get(marker).split(",");
+                String destination = parsed[2];
+                Geocoder gc = new Geocoder(this);
+                try {
+                    if (tempMarker == null) {
+                        List<Address> list = null;
+                        list = gc.getFromLocationName(destination, 1);
+
+                        Address address = list.get(0);
+
+                        LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                        Marker secondMarker = mMap.addMarker(new MarkerOptions().position(latLng).flat(false));
+                        builder.include(marker.getPosition());
+                        builder.include(secondMarker.getPosition());
+                        LatLngBounds bounds = builder.build();
+                        int padding = 20;
+                        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+                        mMap.animateCamera(cu);
+
+                        destinationsMap.put(marker, secondMarker);
+
+                    }
+                } catch (Exception e) {
+                    Log.d("Error Localization", e.getMessage());
+                }
+            } else {
+                LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                builder.include(marker.getPosition());
+                builder.include(destinationsMap.get(marker).getPosition());
+                LatLngBounds bounds = builder.build();
+                int padding = 14;
+                CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+                mMap.animateCamera(cu);
+            }
+        }
     }
 
     int tag = 0;
@@ -1013,6 +1054,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             km = gotFromHashMap[3];
                             //experience.setText("Experience: " + getDifficultyRange(gotFromHashMap[4]));
                             exp = gotFromHashMap[4];
+                            this.twoMarkersZoom(arg0);
+
                         } else {
                             Geocoder gc = new Geocoder(mact);
                             try {
@@ -1042,7 +1085,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 km = getLengthRange(length);
                                 //experience.setText("Experience: " + getDifficultyRange(difficulty));
                                 exp = getDifficultyRange(difficulty);
-
+                                this.twoMarkersZoom(arg0);
                             } catch (Exception e) {
                                 System.out.println("Geolocalizzazione fallita.");
                             }
