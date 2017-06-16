@@ -49,6 +49,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.io.IOException;
@@ -105,6 +106,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private LatLng latlng8 = new LatLng(45.407302, 11.891325);
     private List<LatLng> listCoords = new LinkedList<>();
 
+    private List<LatLng> routePoints = new LinkedList<>();
 
     private Timer timer;
 
@@ -343,12 +345,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             LatLng latlng = fromLocationToLatLng(location);
 
-
-            //System.out.println("Latitude: "+latlng.latitude+", Longitude: "+latlng.longitude);
-
-            //mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latlng,
-            //      17));
-
             if (mMap != null) {
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latlng, 17));
 
@@ -357,9 +353,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if (whereAmI != null) {
                 whereAmI.remove();
             }
-
-            /*whereAmI=mMap.addMarker(new MarkerOptions().position(latlng).icon(BitmapDescriptorFactory.defaultMarker(
-                    BitmapDescriptorFactory.HUE_AZURE)).flat(false).title("I'm here!"));*/
 
             double lat = location.getLatitude();
             double lng = location.getLongitude();
@@ -389,9 +382,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     // Coloro il pezzo di strada che va dalla posizione precedentemente registrata a quella attuale.
     private void drawTrack(Location location) {
-        mMap.addPolyline((new PolylineOptions().add(new LatLng(formerPos.getPosition().getLatitude(), formerPos.getPosition().getLongitude()),
+        /*mMap.addPolyline((new PolylineOptions().add(new LatLng(formerPos.getPosition().getLatitude(), formerPos.getPosition().getLongitude()),
                 new LatLng(location.getLatitude(), location.getLongitude())
-        )).width(5).color(Color.BLUE).geodesic(true));
+        )).width(5).color(Color.RED).geodesic(true));*/
+        Polyline route = mMap.addPolyline(new PolylineOptions()
+                .width(5)
+                .color(Color.GREEN)
+                .geodesic(true)
+        );
+        route.setPoints(routePoints);
     }
 
     private void drawTrack(LatLng ll1, LatLng ll2) {
@@ -400,6 +399,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void recordPosition(Location location) {
         positionsRecorded.put(location.getLatitude(), location.getLongitude());
+        routePoints.add(new LatLng(location.getLatitude(), location.getLongitude()));
+        System.out.println("HO CAMBIATO LA MIA POSIZIONE");
     }
 
     /**
@@ -446,6 +447,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapClick(LatLng latLng) {
         progressBar.setVisibility(View.GONE);
+        disableDestinationMarkers();
     }
 
     private Marker tempMarker;
@@ -454,6 +456,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onMapLongClick(LatLng latLng) {
+        disableDestinationMarkers();
         double latitude = latLng.latitude;
         double longitude = latLng.longitude;
         Geocoder gc = new Geocoder(this);
@@ -465,7 +468,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Address add = list.get(0);
                 startingAdd = add.getAddressLine(0) + ", " + add.getLocality();
                 startingAddressTop.setText("Starting point: " + startingAdd);
-                tempMarker = mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)).flat(false));
+                tempMarker = mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker()).flat(false));
                 markersMap.put(tempMarker, "");
             } else {
                 List<Address> list = null;
@@ -493,7 +496,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-
+        disableDestinationMarkers();
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
@@ -518,6 +521,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return true;
     }
 
+    public int getConnections() {
+        return connections;
+    }
+
+    private void disableDestinationMarkers() {
+        for (Marker m : destinationsMap.values()) {
+            m.setVisible(false);
+        }
+    }
+
     private void moveToFragment(Fragment fragment) {
 
         getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_up, R.anim.slide_down)
@@ -536,7 +549,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Inizio il monitoring
         IS_MONITORING = true;
 
-        System.out.println("MAP SIZE=" + positionsRecorded.size());
+       // System.out.println("MAP SIZE=" + positionsRecorded.size());
 
     }
 
@@ -577,7 +590,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         builder.include(marker.getPosition());
                         builder.include(secondMarker.getPosition());
                         LatLngBounds bounds = builder.build();
-                        int padding = 20;
+                        int padding = 50;
                         CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
                         mMap.animateCamera(cu);
 
@@ -709,11 +722,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 new LocationListener() {
                     public void onLocationChanged(Location location) {
                         // Prima disegno il percorso, passando la nuova posizione rilevata.
-                        if (IS_MONITORING) {
+                        //if (!IS_MONITORING) {
                             recordPosition(location);
                             drawTrack(location);
                             updateWithNewLocation(location);
-                        }
+                        //}
                         // Poi faccio l'update della posizione del marker.
 
                     }
@@ -756,7 +769,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
          * download delle attività nella zona.
          */
         mMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
-            long delay = 500;
+            long delay = 700;
 
             @Override
             public void onCameraMove() {
@@ -803,11 +816,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 */
 
+    public Marker getTempMarker() {
+        return this.tempMarker;
+    }
+
+    public void setConnections(int connections) {
+        this.connections = connections;
+    }
+
     private void setCoordinates() {
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                System.out.println("ZOOM LEVEL = " + mMap.getCameraPosition().zoom);
+                //System.out.println("ZOOM LEVEL = " + mMap.getCameraPosition().zoom);
                 try {
                     LatLngBounds bounds = mMap.getProjection().getVisibleRegion().latLngBounds;
                     northEast = bounds.northeast;
@@ -818,8 +839,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     latSouthWest = southWest.latitude;
                     lngSouthWest = southWest.longitude;
 
-                    System.out.println("NORTH EAST: " + latNorthEast + ", " + lngNorthEast);
-                    System.out.println("SOUTH WEST: " + latSouthWest + ", " + lngSouthWest);
+                    //System.out.println("NORTH EAST: " + latNorthEast + ", " + lngNorthEast);
+                    //System.out.println("SOUTH WEST: " + latSouthWest + ", " + lngSouthWest);
 
                     //System.out.println("Lat: "+cameraCenterPointLatitude+"; Lon: "+cameraCenterPointLongitude);
                     connections = 0;
@@ -850,7 +871,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
         } else {
-            marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+            marker.setIcon(BitmapDescriptorFactory.defaultMarker());
         }
         /*Marker newMarker = mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker( // Al posto dell'argomento di icon, passare BitmapDescriptorFactory.fromResource(R.drawable.FILEIMMAGINE)));
                 BitmapDescriptorFactory.HUE_AZURE)).flat(false)); */
@@ -904,6 +925,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    public String geoLocateStart(double lat, double lng) {
+        Geocoder gc = new Geocoder(this);
+        try {
+            List<Address> list = null;
+            list = gc.getFromLocation(lat, lng, 1);
+
+            Address addS = list.get(0);
+            String startingAddress = addS.getAddressLine(0) + ", " + addS.getLocality();
+            return startingAddress;
+        } catch (Exception e) {
+            System.out.println("ERRORACCIO");
+            //Log.d("Error Localization", e.getMessage());
+        }
+        return null;
+    }
+
+    ListIterator positionsIterator;
+
+
+    private List<LatLng> downloadedPositions = new ArrayList<>();
+
     public void onTaskCompleted(ArrayList<String> ls) {
         String result = "";
 
@@ -920,7 +962,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (query.equals("getruns")) {
             try {
                 ListIterator it = ls.listIterator();
-                while (it.hasNext()) {
+                //this.positionsIterator = ls.listIterator();
+                /*while (it.hasNext()) {
                     result = result + (it.next());
                     if (result.equals("Problems selecting activities")) {
                         Toast.makeText(getApplicationContext(), "Here there are no activities!", Toast.LENGTH_SHORT).show();
@@ -946,7 +989,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 Address addS = list.get(0);
                                 String startingAddress = addS.getAddressLine(0) + ", " + addS.getLocality();
 
-                                Marker marker = addMarkerToMap(false, sid, lat, lng, startingAddress, "", "", "");
+                                //Marker marker = addMarkerToMap(false, sid, lat, lng, startingAddress, "", "", "");
 
                                 if (session_point.length == 4) {
                                     marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
@@ -964,6 +1007,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         result = "";
                         connect("getruns", null);
                     }
+                }*/
+
+                if (mMap != null) {
+                    DrawMarkers drawMarkers = new DrawMarkers();
+                    drawMarkers.execute(it, null, null);
+                    //System.out.println("***************dopo la chiamata**********");
                 }
 
             } catch (Exception e) {
@@ -1068,7 +1117,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 String string = markersMap.get(arg0);
                                 String putData = string + "_" + dest + "_" + length + "_" + difficulty;
                                 markersMap.put(arg0, putData);
-                                System.out.println("PUT DATA: " + putData);
+                                //System.out.println("PUT DATA: " + putData);
 
                                 //tvLat.setText("Indirizzo di partenza: " + gotFromHashMap[1]);
                                 String[] startParsed = gotFromHashMap[1].split(",");
