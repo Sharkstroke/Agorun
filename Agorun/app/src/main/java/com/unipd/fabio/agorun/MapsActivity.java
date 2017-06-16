@@ -769,7 +769,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
          * download delle attività nella zona.
          */
         mMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
-            long delay = 700;
+            long delay = 460;
 
             @Override
             public void onCameraMove() {

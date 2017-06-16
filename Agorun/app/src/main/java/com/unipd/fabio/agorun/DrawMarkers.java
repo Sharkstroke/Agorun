@@ -6,9 +6,9 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.ListIterator;
+import java.util.Map;
 
 /**
  * Created by fabio on 14/06/17.
@@ -21,7 +21,8 @@ public class DrawMarkers extends AsyncTask<ListIterator, Void, Void> {
     double lat;
     double lng;
     String[] session_point;
-    List<LatLng> list = new ArrayList<>();
+    Map<LatLng, String> map = new HashMap<>();
+    String addrS;
 
     @Override
     protected Void doInBackground(ListIterator... params) {
@@ -48,7 +49,8 @@ public class DrawMarkers extends AsyncTask<ListIterator, Void, Void> {
 
                     lat = Double.parseDouble(session_point[1]);
                     lng = Double.parseDouble(session_point[2]);
-                    list.add(new LatLng(lat, lng));
+                    addrS = mapsActivity.geoLocateStart(lat, lng);
+                    map.put(new LatLng(lat, lng), addrS);
 
                     //Geocoder gc = new Geocoder(mapsActivity);
                     //try {
@@ -69,12 +71,14 @@ public class DrawMarkers extends AsyncTask<ListIterator, Void, Void> {
         return null;
     }
 
+
     @Override
     protected void onProgressUpdate(Void... params) {
         //System.out.println("RICHIAMO!!!!");
 
-        for (LatLng latLng : list) {
-            Marker marker = mapsActivity.addMarkerToMap(false, sid, latLng.latitude, latLng.longitude, "Ciao", "", "", "");
+        for (LatLng latLng : map.keySet()) {
+
+            Marker marker = mapsActivity.addMarkerToMap(false, sid, latLng.latitude, latLng.longitude, map.get(latLng), "", "", "");
             if (mapsActivity.getTempMarker() == null) {
 
                 if (session_point.length == 4) {
