@@ -134,6 +134,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private double lngNorthEast;
     private double latSouthWest;
     private double lngSouthWest;
+    private String sids = "";
 
     private Fragment fragment1;
 
@@ -511,6 +512,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             String details = markersMap.get(marker);
             String[] strings = details.split("_");
             sidclicked = strings[0];
+            Toast.makeText(getApplicationContext(),sidclicked,Toast.LENGTH_LONG).show();
             connect("getinforun", sidclicked);
 
 
@@ -839,6 +841,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     latSouthWest = southWest.latitude;
                     lngSouthWest = southWest.longitude;
 
+                    for (Map.Entry<Marker,String> ms : markersMap.entrySet()) {
+                        String value = ms.getValue();
+                        Log.d("key,value",ms.getKey() + "/" + ms.getValue());
+                        int limit = value.indexOf('_');
+                        if (limit != -1) {
+                            String sid = value.substring(0, limit);
+                            if (! Arrays.asList(sids.split(",")).contains(sid)) {
+                                sids += (sid + ",");
+                            }
+                        }
+                    }
+
                     //System.out.println("NORTH EAST: " + latNorthEast + ", " + lngNorthEast);
                     //System.out.println("SOUTH WEST: " + latSouthWest + ", " + lngSouthWest);
 
@@ -893,7 +907,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         connections++;
         ConnectDB cdb = new ConnectDB(this);
         if (mode.equals("getruns")) {
-            cdb.execute(mode, latNorthEast + "", lngNorthEast + "", latSouthWest + "", lngSouthWest + "");
+            cdb.execute(mode, latNorthEast + "", lngNorthEast + "", latSouthWest + "", lngSouthWest + "",
+                    sids);
         } else {
             cdb.execute(mode, sid);
         }

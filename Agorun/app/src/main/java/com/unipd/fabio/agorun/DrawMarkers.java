@@ -6,7 +6,9 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
@@ -23,6 +25,10 @@ public class DrawMarkers extends AsyncTask<ListIterator, Void, Void> {
     String[] session_point;
     Map<LatLng, String> map = new HashMap<>();
     String addrS;
+
+    List<String> sids = new ArrayList<>();
+    List<LatLng> list = new ArrayList<>();
+
 
     @Override
     protected Void doInBackground(ListIterator... params) {
@@ -43,7 +49,7 @@ public class DrawMarkers extends AsyncTask<ListIterator, Void, Void> {
                     mapsActivity.setConnections(0);
 
                     session_point = result.split(";");
-                    sid = session_point[0];
+                    sids.add(session_point[0]);
 
                     //                Log.d("sid", sid);
 
@@ -61,7 +67,8 @@ public class DrawMarkers extends AsyncTask<ListIterator, Void, Void> {
                     }*/
 
                     result = "";
-                    //System.out.println("SONO DENTRO AL CICLOOOOO");
+              //      System.out.println("SONO DENTRO AL CICLOOOOO");
+              //      publishProgress();
 
                 }
             }
@@ -76,9 +83,22 @@ public class DrawMarkers extends AsyncTask<ListIterator, Void, Void> {
     protected void onProgressUpdate(Void... params) {
         //System.out.println("RICHIAMO!!!!");
 
+// <<<<<<< Updated upstream
+        int i = 0;
         for (LatLng latLng : map.keySet()) {
 
-            Marker marker = mapsActivity.addMarkerToMap(false, sid, latLng.latitude, latLng.longitude, map.get(latLng), "", "", "");
+            Marker marker = mapsActivity.addMarkerToMap(false, sids.get(i), latLng.latitude, latLng.longitude, map.get(latLng), "", "", "");
+            i++;
+/*
+=======
+        for (int i=0; i<sids.size(); i++) {
+            Marker marker = mapsActivity.addMarkerToMap(
+                    false,
+                    sids.get(i),
+                    map.keySet().list.get(i).latitude,
+                    list.get(i).longitude,
+                    map.get(), "", "", "");
+>>>>>>> Stashed changes  */
             if (mapsActivity.getTempMarker() == null) {
 
                 if (session_point.length == 4) {
