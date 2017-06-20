@@ -162,7 +162,7 @@ public class ConnectDB extends AsyncTask<String, Void, ArrayList<String>> {
                     break;
 
                 case "getruns":
-                    if (param.length != 5) {
+                    if (param.length != 6) {
                         output.add("La get delle attività richiede 5 parametri");
                         return output;
                     } else {
@@ -171,7 +171,8 @@ public class ConnectDB extends AsyncTask<String, Void, ArrayList<String>> {
                                 "latne=" + param[1] +"&" +
                                 "lngne=" + param[2] + "&" +
                                 "latsw=" + param[3] + "&" +
-                                "lngsw=" + param[4]);
+                                "lngsw=" + param[4] + "&" +
+                                "sids="  + param[5]);
                         output.add("getruns");
                         System.out.println("PATH = " + url.toString());
                     }
