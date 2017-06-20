@@ -454,6 +454,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     String startingAdd = "";
     String destinationAdd = "";
 
+    private LatLng startLatLng;
+    private LatLng destLatLng;
+
     @Override
     public void onMapLongClick(LatLng latLng) {
         disableDestinationMarkers();
@@ -470,17 +473,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 startingAddressTop.setText("Starting point: " + startingAdd);
                 tempMarker = mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker()).flat(false));
                 markersMap.put(tempMarker, "");
+                startLatLng = latLng;
             } else {
                 List<Address> list = null;
                 list = gc.getFromLocation(latitude, longitude, 1);
                 Address add = list.get(0);
                 destinationAdd = add.getAddressLine(0) + ", " + add.getLocality();
+
+                destLatLng = latLng;
+
                 destinationAddressTop.setText("Destination address: " + destinationAdd);
                 //mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)).flat(false));
 
                 Intent newActivity = new Intent(MapsActivity.this, AddActivity.class);
                 Bundle bundle = new Bundle();
-                bundle.putString("StartingAddress", new String(startingAdd + "_" + destinationAdd));
+                bundle.putString("StartingAddress", new String(startingAdd + "_" + destinationAdd + "_" +
+                                                                startLatLng.latitude + "_" + startLatLng.longitude + "_" +
+                                                                destLatLng.latitude + "_" + destLatLng.longitude));
                 newActivity.putExtras(bundle);
                 startActivity(newActivity);
                 tempMarker.remove();
@@ -886,6 +895,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public Marker addMarkerToMap(boolean isMyActivity, String sid, double latS, double longitS, String addrS, String addrD, String km, String experience) {
         this.addrS = addrS;
         this.addrD = addrD;
+        //System.out.println("ADDR-D = "+addrD);
         return this.addMarkerToMap(isMyActivity, sid, new LatLng(latS, longitS), km, experience);
     }
 

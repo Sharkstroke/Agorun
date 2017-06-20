@@ -57,6 +57,13 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo, DBCon
     private String result = "";
     private int connections = 0;
 
+    private double preciseStartLat;
+    private double preciseStartLng;
+    private double preciseDestLat;
+    private double preciseDestLng;
+
+    private boolean PRECISE_COORDS = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,10 +79,17 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo, DBCon
             String startAddressPassed = getIntent().getExtras().getString("StartingAddress");
 
             if (startAddressPassed != null) {
+                this.PRECISE_COORDS = true;
                 //startAddress.setText(startAddressPassed);
                 String[] addresses = startAddressPassed.split("_");
                 this.startAddress.setText(addresses[0]);
                 this.destinationAddress.setText(addresses[1]);
+                this.preciseStartLat = Double.parseDouble(addresses[2]);
+                this.preciseStartLng = Double.parseDouble(addresses[3]);
+                this.preciseDestLat = Double.parseDouble(addresses[4]);
+                this.preciseDestLng = Double.parseDouble(addresses[5]);
+
+
                 String addressStartFixed = startAddress.getText().toString().replaceAll("\\s", "");
                 String addressDestinationFixed = destinationAddress.getText().toString().replaceAll("\\s", "");
                 String url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins=" + addressStartFixed + "&destinations=" + addressDestinationFixed + "&mode=driving&language=fr-FR&avoid=tolls&key=AIzaSyCW_gvTeNeb_Gzxv8kphisyTr-PZX58djQ";
@@ -247,17 +261,20 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo, DBCon
         try {
             List<Address> list = null;
 
-            list = gc.getFromLocationName(start, 1);
 
-            add = list.get(0);
-            System.out.println("ADDRESS: " + add.getAddressLine(0)+", "+add.getLocality());
+                list = gc.getFromLocationName(start, 1);
 
-            String locality = add.getLocality();
+                add = list.get(0);
+                System.out.println("ADDRESS: " + add.getAddressLine(0)+", "+add.getLocality());
 
-            latStart = add.getLatitude();
-            lngStart = add.getLongitude();
-
-
+                String locality = add.getLocality();
+            if (!this.PRECISE_COORDS) {
+                latStart = add.getLatitude();
+                lngStart = add.getLongitude();
+            } else {
+                latStart = this.preciseStartLat;
+                lngStart = this.preciseStartLng;
+            }
 
 
             /*
@@ -267,14 +284,18 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo, DBCon
             et = (EditText) findViewById(R.id.destinationAddress);
             String destination = et.getText().toString();
 
+            //System.out.println("DESTINATION = "+destination);
 
-            list = gc.getFromLocationName(destination, 1);
+                list = gc.getFromLocationName(destination, 1);
 
-            add2 = list.get(0);
-            locality = add.getLocality();
-
-            latDest = add2.getLatitude();
-            lngDest = add2.getLongitude();
+                add2 = list.get(0);
+            if (!this.PRECISE_COORDS) {
+                latDest = add2.getLatitude();
+                lngDest = add2.getLongitude();
+            } else {
+                latDest = this.preciseDestLat;
+                lngDest = this.preciseDestLng;
+            }
 
 
             experienceSpinner = (Spinner) findViewById(R.id.ExperienceSpinner);
