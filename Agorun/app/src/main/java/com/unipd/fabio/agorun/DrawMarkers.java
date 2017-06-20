@@ -83,7 +83,6 @@ public class DrawMarkers extends AsyncTask<ListIterator, Void, Void> {
     protected void onProgressUpdate(Void... params) {
         //System.out.println("RICHIAMO!!!!");
 
-// <<<<<<< Updated upstream
         int i = 0;
         for (LatLng latLng : map.keySet()) {
 
