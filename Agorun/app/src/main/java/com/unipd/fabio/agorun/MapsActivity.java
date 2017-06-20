@@ -850,6 +850,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     latSouthWest = southWest.latitude;
                     lngSouthWest = southWest.longitude;
 
+                    // Salvo i marker già scaricati per non riscaricarli
                     for (Map.Entry<Marker,String> ms : markersMap.entrySet()) {
                         String value = ms.getValue();
                         Log.d("key,value",ms.getKey() + "/" + ms.getValue());
@@ -980,7 +981,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             return;
         }
 
-        String query = ls.remove(0);
+        String query = ls.remove(0); // Usata perché ho query diverse nella stessa classe: mi dice il tipo di query
 
         //Log.d("LINE",ls.get(0));
 

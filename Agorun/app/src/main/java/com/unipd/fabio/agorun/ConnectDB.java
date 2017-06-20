@@ -17,6 +17,14 @@ import javax.net.ssl.HttpsURLConnection;
  * Created by riccardo on 13/05/17.
  */
 
+/* Classe per la connessione al Database
+ * Prende una lista di stringhe (param) in cui il primo elemento è il tipo di query
+ * Ritorna una lista di stringhe contenenti tutte le righe emesse dalla query al database
+ *
+ * Ogni classe che voglia fare una query al DB deve implementare l'interfaccia DBConnection
+ */
+
+
 public class ConnectDB extends AsyncTask<String, Void, ArrayList<String>> {
 
     private static String user;        /////  INSERITO DALL'UTENTE

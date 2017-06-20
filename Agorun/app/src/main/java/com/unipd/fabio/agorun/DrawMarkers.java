@@ -88,16 +88,7 @@ public class DrawMarkers extends AsyncTask<ListIterator, Void, Void> {
 
             Marker marker = mapsActivity.addMarkerToMap(false, sids.get(i), latLng.latitude, latLng.longitude, map.get(latLng), "", "", "");
             i++;
-/*
-=======
-        for (int i=0; i<sids.size(); i++) {
-            Marker marker = mapsActivity.addMarkerToMap(
-                    false,
-                    sids.get(i),
-                    map.keySet().list.get(i).latitude,
-                    list.get(i).longitude,
-                    map.get(), "", "", "");
->>>>>>> Stashed changes  */
+
             if (mapsActivity.getTempMarker() == null) {
 
                 if (session_point.length == 4) {
