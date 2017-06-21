@@ -145,6 +145,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private OnSwipeTouchListener GestureManager;
 
+    private List<String> points = new ArrayList<String>();
+
 
 
 
@@ -449,6 +451,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapClick(LatLng latLng) {
         progressBar.setVisibility(View.GONE);
         disableDestinationMarkers();
+
+        new GetPointsFromApi(this).execute(); // TODO: METTERLO NEL PUNTO GIUSTO
+        // Mando i punti all'Api, poi mi ritornerà le linee lungo la strada
+    }
+
+    public void drawLines (List<LatLng[]> list) {
+        for (LatLng[] latLngs : list) {
+            Polyline line = mMap.addPolyline(new PolylineOptions().add(latLngs));
+        }
+    }
+
+    public List<String> getPoints() {
+        return points;
     }
 
     private Marker tempMarker;
@@ -737,6 +752,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             recordPosition(location);
                             drawTrack(location);
                             updateWithNewLocation(location);
+
+                            double lat = location.getLatitude();
+                            double lng = location.getLongitude();
+
+                            points.add(lat+","+lng);    // Salvo la posizione corrente (Verificare se posso usare recordPosition)
+                            // Toast.makeText(getApplicationContext(),Arrays.toString(points.toArray()),Toast.LENGTH_LONG).show();
                         //}
                         // Poi faccio l'update della posizione del marker.
 
@@ -985,10 +1006,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //Log.d("LINE",ls.get(0));
 
-        if (query.equals("getruns")) {
-            try {
-                ListIterator it = ls.listIterator();
-                //this.positionsIterator = ls.listIterator();
+        switch (query) {
+            case "getruns":
+                try {
+                    ListIterator it = ls.listIterator();
+                    //this.positionsIterator = ls.listIterator();
                 /*while (it.hasNext()) {
                     result = result + (it.next());
                     if (result.equals("Problems selecting activities")) {
@@ -1035,53 +1057,55 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     }
                 }*/
 
-                if (mMap != null) {
-                    DrawMarkers drawMarkers = new DrawMarkers();
-                    drawMarkers.execute(it, null, null);
-                    //System.out.println("***************dopo la chiamata**********");
+                    if (mMap != null) {
+                        DrawMarkers drawMarkers = new DrawMarkers();
+                        drawMarkers.execute(it, null, null);
+                        //System.out.println("***************dopo la chiamata**********");
+                    }
+
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
                 }
+                progressBar.setVisibility(View.GONE);
+                break;
 
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-            }
-            progressBar.setVisibility(View.GONE);
-        } else {
-            ListIterator it = ls.listIterator();
+            case "getinforun":
+                ListIterator it = ls.listIterator();
 
-            while (it.hasNext()) {
-                result = result + it.next();
-                session_info = result.split(";");
+                while (it.hasNext()) {
+                    result = result + it.next();
+                    session_info = result.split(";");
 
-                if (session_info[0].equals("ok")) {
+                    if (session_info[0].equals("ok")) {
 
-                    Log.d("result", result);
-                    //TODO: Controllare che tutte le if-else serve a qualcosa
-                    //Giulio mod.
-                    //mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+                        Log.d("result", result);
+                        //TODO: Controllare che tutte le if-else serve a qualcosa
+                        //Giulio mod.
+                        //mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
 
-                    // Use default InfoWindow frame
+                        // Use default InfoWindow frame
                      /*   @Override
                         public View getInfoWindow(Marker arg0) {
                             return null;
                         }*/
 
-                    // Defines the contents of the InfoWindow
-                    // @Override
-                    //public View getInfoContents(Marker arg0) {
-                    Marker arg0 = markerclicked;
-                    connections = 0;
+                        // Defines the contents of the InfoWindow
+                        // @Override
+                        //public View getInfoContents(Marker arg0) {
+                        Marker arg0 = markerclicked;
+                        connections = 0;
 
-                    // Getting view from the layout file info_window_layout
-                    View v = getLayoutInflater().inflate(R.layout.acitivityuser_info, null);
+                        // Getting view from the layout file info_window_layout
+                        View v = getLayoutInflater().inflate(R.layout.acitivityuser_info, null);
 
-                    // Getting the position from the marker
-                    LatLng latLng = arg0.getPosition();
+                        // Getting the position from the marker
+                        LatLng latLng = arg0.getPosition();
 
 
-                    // Utilizzare il Tag per identificare il Marker.
-                    arg0.setTag(Integer.valueOf(tag));
+                        // Utilizzare il Tag per identificare il Marker.
+                        arg0.setTag(Integer.valueOf(tag));
 
-                    // Getting reference to the TextView to set latitude
+                        // Getting reference to the TextView to set latitude
                            /* TextView tvLat = (TextView) v.findViewById(R.id.act_start);
 
                             // Getting reference to the TextView to set longitude
@@ -1091,117 +1115,128 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                             TextView experience = (TextView) v.findViewById(R.id.act_exp);*/
 
-                    if (markersMap.containsKey(arg0)) {
-                        String details = markersMap.get(arg0);
-                        String[] strings = details.split("_");
-                        String sid = strings[0];
+                        if (markersMap.containsKey(arg0)) {
+                            String details = markersMap.get(arg0);
+                            String[] strings = details.split("_");
+                            String sid = strings[0];
 
-                        double endlat = Double.parseDouble(session_info[1]);
-                        double endlng = Double.parseDouble(session_info[2]);
-                        String length = session_info[3];
-                        String difficulty = session_info[4];
-                        String datetime = session_info[5];
-                        String name = session_info[6];
-                        int numOfJoins = Integer.parseInt(session_info[7]);
-                        int medlevel = Integer.parseInt(session_info[8]);
+                            double endlat = Double.parseDouble(session_info[1]);
+                            double endlng = Double.parseDouble(session_info[2]);
+                            String length = session_info[3];
+                            String difficulty = session_info[4];
+                            String datetime = session_info[5];
+                            String name = session_info[6];
+                            int numOfJoins = Integer.parseInt(session_info[7]);
+                            int medlevel = Integer.parseInt(session_info[8]);
 
-                        //*sid+"_"+addrS+"_"+addrD+"_"+km+"_"+experience)*//*
-
-
-                        String[] gotFromHashMap = markersMap.get(arg0).split("_");
-                        if (gotFromHashMap.length > 2) {
-                            String string = markersMap.get(arg0);
-                            String concat = string + "_" + datetime + "_" + name;
-                            markersMap.put(arg0, concat);
+                            //*sid+"_"+addrS+"_"+addrD+"_"+km+"_"+experience)*//*
 
 
-                            //tvLat.setText("Indirizzo di partenza: " + gotFromHashMap[1]);
-
-                            String[] startParsed = gotFromHashMap[1].split(",");
-                            String[] newStart = Arrays.copyOf(startParsed, startParsed.length-1);
-                            start = TextUtils.join(",", newStart);
-
-                            //tvLng.setText("Indirizzo di arrivo: " + gotFromHashMap[2]);
-                            String[] stopParsed = gotFromHashMap[2].split(",");
-                            String[] newStop = Arrays.copyOf(stopParsed, stopParsed.length-1);
-                            stop = TextUtils.join(",", newStop);
-                            //km.setText("Km: " + getLengthRange(gotFromHashMap[3]));
-                            km = gotFromHashMap[3];
-                            //experience.setText("Experience: " + getDifficultyRange(gotFromHashMap[4]));
-                            exp = gotFromHashMap[4];
-                            this.twoMarkersZoom(arg0);
-
-                        } else {
-                            Geocoder gc = new Geocoder(mact);
-                            try {
-                                // Traduco latitudine e longitudine del punto di arrivo.
-                                List<Address> list = null;
-                                list = gc.getFromLocation(endlat, endlng, 1);
-                                Address add = list.get(0);
-                                String dest = add.getAddressLine(0) + ", " + add.getLocality();
-
+                            String[] gotFromHashMap = markersMap.get(arg0).split("_");
+                            if (gotFromHashMap.length > 2) {
                                 String string = markersMap.get(arg0);
-                                String putData = string + "_" + dest + "_" + length + "_" + difficulty;
-                                markersMap.put(arg0, putData);
-                                //System.out.println("PUT DATA: " + putData);
+                                String concat = string + "_" + datetime + "_" + name;
+                                markersMap.put(arg0, concat);
+
 
                                 //tvLat.setText("Indirizzo di partenza: " + gotFromHashMap[1]);
+
                                 String[] startParsed = gotFromHashMap[1].split(",");
-                                String[] newStart = Arrays.copyOf(startParsed, startParsed.length-1);
+                                String[] newStart = Arrays.copyOf(startParsed, startParsed.length - 1);
                                 start = TextUtils.join(",", newStart);
 
-
-                                //tvLng.setText("Indirizzo di arrivo: " + dest);
-                                String[] stopParsed = dest.split(",");
-                                String[] newStop = Arrays.copyOf(stopParsed, stopParsed.length-1);
+                                //tvLng.setText("Indirizzo di arrivo: " + gotFromHashMap[2]);
+                                String[] stopParsed = gotFromHashMap[2].split(",");
+                                String[] newStop = Arrays.copyOf(stopParsed, stopParsed.length - 1);
                                 stop = TextUtils.join(",", newStop);
-                                //       km.setText("Km: " + strings[3]);
-                                //km.setText("Km: " + getLengthRange(length));
-                                km = getLengthRange(length);
-                                //experience.setText("Experience: " + getDifficultyRange(difficulty));
-                                exp = getDifficultyRange(difficulty);
+                                //km.setText("Km: " + getLengthRange(gotFromHashMap[3]));
+                                km = gotFromHashMap[3];
+                                //experience.setText("Experience: " + getDifficultyRange(gotFromHashMap[4]));
+                                exp = gotFromHashMap[4];
                                 this.twoMarkersZoom(arg0);
-                            } catch (Exception e) {
-                                System.out.println("Geolocalizzazione fallita.");
+
+                            } else {
+                                Geocoder gc = new Geocoder(mact);
+                                try {
+                                    // Traduco latitudine e longitudine del punto di arrivo.
+                                    List<Address> list = null;
+                                    list = gc.getFromLocation(endlat, endlng, 1);
+                                    Address add = list.get(0);
+                                    String dest = add.getAddressLine(0) + ", " + add.getLocality();
+
+                                    String string = markersMap.get(arg0);
+                                    String putData = string + "_" + dest + "_" + length + "_" + difficulty;
+                                    markersMap.put(arg0, putData);
+                                    //System.out.println("PUT DATA: " + putData);
+
+                                    //tvLat.setText("Indirizzo di partenza: " + gotFromHashMap[1]);
+                                    String[] startParsed = gotFromHashMap[1].split(",");
+                                    String[] newStart = Arrays.copyOf(startParsed, startParsed.length - 1);
+                                    start = TextUtils.join(",", newStart);
+
+
+                                    //tvLng.setText("Indirizzo di arrivo: " + dest);
+                                    String[] stopParsed = dest.split(",");
+                                    String[] newStop = Arrays.copyOf(stopParsed, stopParsed.length - 1);
+                                    stop = TextUtils.join(",", newStop);
+                                    //       km.setText("Km: " + strings[3]);
+                                    //km.setText("Km: " + getLengthRange(length));
+                                    km = getLengthRange(length);
+                                    //experience.setText("Experience: " + getDifficultyRange(difficulty));
+                                    exp = getDifficultyRange(difficulty);
+                                    this.twoMarkersZoom(arg0);
+                                } catch (Exception e) {
+                                    System.out.println("Geolocalizzazione fallita.");
+                                }
                             }
+
                         }
+                        tag++;
 
+
+                        fragment1 = new Fragment1();
+
+                        Bundle args = new Bundle();
+                        args.putString("start", start);
+                        args.putString("stop", stop);
+                        args.putString("km", km);
+                        args.putString("exp", exp);
+
+
+                        fragment1.setArguments(args);
+                        moveToFragment(fragment1);
+
+
+                        // Returning the view containing InfoWindow contents
+
+                        //      infowindow = v;
+
+                        //return v;
+
+                        // }
+
+                        //  });
+                        //   markerclicked.showInfoWindow();
+
+                        // Giulio Mod.
+                        progressBar.setVisibility(View.GONE);
+                    } else {
+                        connections++;
+                        result = "";
+                        connect("getinforun", sidclicked);
                     }
-                    tag++;
-
-
-                    fragment1 = new Fragment1();
-
-                    Bundle args = new Bundle();
-                    args.putString("start", start);
-                    args.putString("stop", stop);
-                    args.putString("km", km);
-                    args.putString("exp", exp);
-
-
-                    fragment1.setArguments(args);
-                    moveToFragment(fragment1);
-
-
-                    // Returning the view containing InfoWindow contents
-
-                    //      infowindow = v;
-
-                    //return v;
-
-                    // }
-
-                    //  });
-                    //   markerclicked.showInfoWindow();
-
-                    // Giulio Mod.
-                    progressBar.setVisibility(View.GONE);
-                } else {
-                    connections++;
-                    result = "";
-                    connect("getinforun", sidclicked);
                 }
-            }
+
+                break;
+
+            case "settrack":
+                if (ls.get(0).equals("Success")) {
+                    Toast.makeText(getApplicationContext(),"Track sent",Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getApplicationContext(),"Track error",Toast.LENGTH_SHORT).show();
+                }
+
+                break;
         }
 /*
                 session_info = result.split(";");

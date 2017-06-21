@@ -192,37 +192,79 @@ public class ConnectDB extends AsyncTask<String, Void, ArrayList<String>> {
                     break;
                 ////  TODO: da togliere forse!!!
                 case "uploadimage":
-                    url = new URL(urldb + "uploadimage.php?user=" + user);
-                    conn = (HttpsURLConnection) url.openConnection();
-                    conn.setDoOutput(true);
-                    conn.setRequestProperty("charset", "UTF-8");
-                    conn.setUseCaches(false);
 
-                    OutputStream wr = conn.getOutputStream();
-                    wr.write(("encodedstring=" + param[1])
-                            .getBytes());
-                    wr.flush();
-                    wr.close();
-
-                    int responseCode = conn.getResponseCode();
-
-                    if (responseCode == HttpURLConnection.HTTP_OK) {
-                        BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-
-                        String line;
-
-                        while ((line = in.readLine()) != null) {
-                            output.add(line);
-                        }
-                        in.close();
+                    if (param.length != 1) {
+                        output.add("La send dell'immagine richiede 1 parametro");
                     } else {
-                        output.add("Post connection failed");
+                        url = new URL(urldb + "uploadimage.php?user=" + user);
+                        conn = (HttpsURLConnection) url.openConnection();
+                        conn.setDoOutput(true);
+                        conn.setRequestProperty("charset", "UTF-8");
+                        conn.setUseCaches(false);
+
+                        OutputStream wr = conn.getOutputStream();
+                        wr.write(("encodedstring=" + param[1])
+                                .getBytes());
+                        wr.flush();
+                        wr.close();
+
+                        int responseCode = conn.getResponseCode();
+
+                        if (responseCode == HttpURLConnection.HTTP_OK) {
+                            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+
+                            String line;
+
+                            while ((line = in.readLine()) != null) {
+                                output.add(line);
+                            }
+                            in.close();
+                        } else {
+                            output.add("Post connection failed");
+                        }
                     }
                     break;
 
                 case "getimage":
                     url = new URL(urldb + "getimage.php?user=" + user);
                     break;
+
+                case "settrack":
+
+                    if (param.length != 3) {
+                        output.add("La set della track richiede 3 parametri");
+                        return output;
+                    } else {
+                        output.add("settrack");
+                        url = new URL(urldb + "settrack.php?sid=" + param[1]);
+
+                        conn = (HttpsURLConnection) url.openConnection();
+                        conn.setDoOutput(true);
+                        conn.setRequestProperty("charset", "UTF-8");
+                        conn.setUseCaches(false);
+
+                        OutputStream wr = conn.getOutputStream();
+                        wr.write(("track=" + param[2])
+                                .getBytes());
+                        wr.flush();
+                        wr.close();
+
+                        int responseCode = conn.getResponseCode();
+
+                        if (responseCode == HttpURLConnection.HTTP_OK) {
+                            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+
+                            String line;
+
+                            while ((line = in.readLine()) != null) {
+                                output.add(line);
+                            }
+                            in.close();
+                        } else {
+                            output.add("Post connection failed");
+                        }
+                    }
+                    return output;
             }
 
             conn = (HttpsURLConnection) url.openConnection();
