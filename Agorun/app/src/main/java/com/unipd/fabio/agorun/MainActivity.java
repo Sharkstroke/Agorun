@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -82,17 +83,18 @@ public class MainActivity extends AppCompatActivity implements
         btnSignIn.setSize(SignInButton.SIZE_STANDARD);
         btnSignIn.setScopes(gso.getScopeArray());
 
+
         prefs = getSharedPreferences("UserData", 0);
         String username = prefs.getString("username","");
         String pwd = prefs.getString("password","");
         if(!pwd.equals("")) {
-
 
             ConnectDB.setUser(username);
             Intent myIntent = new Intent(MainActivity.this, MapsActivity.class);
             //myIntent.putExtra("key", value); //Optional parameters
             MainActivity.this.startActivity(myIntent);
         }
+
     }
 
 

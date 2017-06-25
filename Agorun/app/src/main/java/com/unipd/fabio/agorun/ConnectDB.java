@@ -265,6 +265,15 @@ public class ConnectDB extends AsyncTask<String, Void, ArrayList<String>> {
                         }
                     }
                     return output;
+
+                case "getmessage":
+                    if (param.length != 1) {
+                        output.add("Richiedere il messaggio richiede 1 parametro");
+                        return output;
+                    } else {
+                        output.add("getmessage");
+                        url = new URL(urldb + "getmessage.php?user=" + user);
+                    }
             }
 
             conn = (HttpsURLConnection) url.openConnection();
