@@ -150,6 +150,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
+<<<<<<< HEAD
+=======
+
+        new ConnectDB(this).execute("getmessage");
+        // Mod Riccardo
+        Intent intent = getIntent();
+        if (intent.hasExtra("message")) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Delete entry")
+                    .setMessage(intent.getExtras().getString("message"))
+                    .setCancelable(true)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
+        }
+
+>>>>>>> 8149ac66358c025069dda416a0e811532465e9d2
         timer = new Timer();
 
         // Setting an instance of this class in order to use its methods from the outside.
@@ -1210,6 +1226,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
 
                 break;
+
+            case "getmessage":
+                if (!ls.get(0).equals("Error") && !ls.get(0).equals("No messages")) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle("Messages by Agorun")
+                            .setMessage(ls.get(0).replace("\\n","\n"))
+                            .setCancelable(true)
+                            .setIcon(R.mipmap.ic_launcher)
+                            .show();
+                }
         }
 /*
                 session_info = result.split(";");
