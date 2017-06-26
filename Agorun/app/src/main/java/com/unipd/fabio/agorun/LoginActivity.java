@@ -10,7 +10,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -27,6 +26,7 @@ public class LoginActivity extends AppCompatActivity implements DBConnection, Vi
     private SharedPreferences prefs;
     private EditText editlog;
     private EditText editpass;
+
 
 
     @Override
@@ -110,11 +110,23 @@ public class LoginActivity extends AppCompatActivity implements DBConnection, Vi
         } else if (result.equals("Login avvenuto con successo")) {;
 
 
-            prefs = getSharedPreferences("UserData", 0);
+            /*prefs = getSharedPreferences("UserData", 0);
             SharedPreferences.Editor editor = prefs.edit();
             editor.putString("username", editlog.getText().toString());
             editor.putString("password", editpass.getText().toString());
-            editor.commit();
+            editor.commit();*/
+
+            MySharedPreferencesHandler.putSharedPreferencesInt( getApplicationContext(),
+                                                                MySharedPreferencesHandler.MyPreferencesKeys.userData,
+                                                                0 );
+
+            MySharedPreferencesHandler.putSharedPreferencesString(  getApplicationContext(),
+                                                                    MySharedPreferencesHandler.MyPreferencesKeys.username,
+                                                                    editlog.getText().toString());
+            MySharedPreferencesHandler.putSharedPreferencesString(  getApplicationContext(),
+                                                                    MySharedPreferencesHandler.MyPreferencesKeys.password,
+                                                                    editpass.getText().toString());
+
             startAccountActivity();
             if (progressDialog.isShowing()) {
                 progressDialog.dismiss();

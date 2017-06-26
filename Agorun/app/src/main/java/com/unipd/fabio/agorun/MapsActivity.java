@@ -2,6 +2,8 @@ package com.unipd.fabio.agorun; /**
  * package com.unipd.fabio.provamaps;
  */
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -88,6 +90,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Button stopMonitoring;
     private Button startMonitoring;
 
+
     private static final int THRESHOLD_HOUR = 19;
     private static final int POSITION_FREQUENCY = 1500;
 
@@ -95,16 +98,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     private LocationListener locationListener;
-
-    private LatLng latlng1 = new LatLng(45.407126, 11.889635);
-    private LatLng latlng2 = new LatLng(45.407192, 11.889117);
-    private LatLng latlng3 = new LatLng(45.407426, 11.887964);
-    private LatLng latlng4 = new LatLng(45.407658, 11.886083);
-    private LatLng latlng5 = new LatLng(45.408934, 11.886866);
-    private LatLng latlng6 = new LatLng(45.409209, 11.887740);
-    private LatLng latlng7 = new LatLng(45.408676, 11.891422);
-    private LatLng latlng8 = new LatLng(45.407302, 11.891325);
-    private List<LatLng> listCoords = new LinkedList<>();
 
     private List<LatLng> routePoints = new LinkedList<>();
 
@@ -130,6 +123,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private LatLng northEast;
     private LatLng southWest;
 
+    // Coordinates at top right and bottom left of the screen: used for selecting and showing the visible activities only.
     private double latNorthEast;
     private double lngNorthEast;
     private double latSouthWest;
@@ -142,6 +136,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private String stop;
     private String km;
     private String exp;
+    private String hour;
 
     private OnSwipeTouchListener GestureManager;
 
@@ -155,15 +150,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-
-
         timer = new Timer();
 
+        // Setting an instance of this class in order to use its methods from the outside.
         mact = this;
 
         String svcName = Context.LOCATION_SERVICE;
         locationManager = (LocationManager) getSystemService(svcName);
 
+        // Setting all the necessary to look for a matching provider with our preferences.
         Criteria criteria = new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_FINE);
         criteria.setPowerRequirement(Criteria.POWER_LOW);
@@ -173,14 +168,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         criteria.setCostAllowed(true);
         provider = locationManager.getBestProvider(criteria, true);
 
-        listCoords.add(latlng1);
-        listCoords.add(latlng2);
-        listCoords.add(latlng3);
-        listCoords.add(latlng4);
-        listCoords.add(latlng5);
-        listCoords.add(latlng6);
-        listCoords.add(latlng7);
-        listCoords.add(latlng8);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -205,10 +192,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });*/
          /*Giulio mod.*/
+
+        // Creating a listener for the search bar: once the user launches the search, this onClick method is callled.
         search_tw.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
+                    // Creating the new intent to which we pass the static instance of the class.
                     Intent intent = new PlaceAutocomplete
                             .IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)
                             .build(mact);
@@ -278,21 +268,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
 
+        boolean alarm = (PendingIntent.getBroadcast(this, 0, new Intent("ALARM"), PendingIntent.FLAG_NO_CREATE) == null);
 
-
+        if(alarm){
+            Intent itAlarm = new Intent("ALARM");
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(this,0,itAlarm,0);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(System.currentTimeMillis());
+            calendar.add(Calendar.SECOND, 3);
+            AlarmManager alarme = (AlarmManager) getSystemService(ALARM_SERVICE);
+            alarme.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),60000, pendingIntent);
+        }
 
     }
 
-
-
-    public List<LatLng> getListCoords() {
-        return this.listCoords;
-    }
-
+    // Static method used to get the static instance of this class previously created.
     public static MapsActivity getMapsData() {
         return mact;
     }
 
+    // In the onResume we're going to geolocalize the user again.
     @Override
     protected void onResume() {
         super.onResume();
@@ -310,6 +305,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //setUpMapIfNeeded();
     }
 
+    // Method called automatically when the search ends. It allows to see the results and to move the camera to the specified
+    // point.
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 1) {
@@ -334,23 +331,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    // Method returning a LatLng object from a Location one.
     public static LatLng fromLocationToLatLng(Location location) {
         return new LatLng(location.getLatitude(), location.getLongitude());
 
     }
 
+    // Method called whenever the phone changes its location.
     private void updateWithNewLocation(Location location) {
         if (location != null) {
-            // Assegno alla posizione "precedente" la posizione corrente: in questo modo, quando vado a colorare il percorso, viene
-            // colorata la parte da questo punto all'ultimo registrato.
+            // Update of the former position with the current one: by doing so, we can refer to it and to draw the track.
             formerPos.setPosition(location);
             // Update the map location.
 
             LatLng latlng = fromLocationToLatLng(location);
 
             if (mMap != null) {
+                // Update of the camera position.
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latlng, 17));
-
             }
 
             if (whereAmI != null) {
@@ -362,6 +360,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             double latitude = location.getLatitude();
             double longitude = location.getLongitude();
+
+            // Translation of the latitude and longitude of the current position into an address.
             Geocoder gc = new Geocoder(this, Locale.getDefault());
 
             try {
@@ -383,7 +383,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    // Coloro il pezzo di strada che va dalla posizione precedentemente registrata a quella attuale.
+    // Drawing the track.
     private void drawTrack(Location location) {
         /*mMap.addPolyline((new PolylineOptions().add(new LatLng(formerPos.getPosition().getLatitude(), formerPos.getPosition().getLongitude()),
                 new LatLng(location.getLatitude(), location.getLongitude())
@@ -400,10 +400,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.addPolyline(new PolylineOptions().add(ll1, ll2).width(7).color(Color.RED).geodesic(true));
     }
 
+    // Recording the new position
     private void recordPosition(Location location) {
         positionsRecorded.put(location.getLatitude(), location.getLongitude());
         routePoints.add(new LatLng(location.getLatitude(), location.getLongitude()));
-        System.out.println("HO CAMBIATO LA MIA POSIZIONE");
     }
 
     /**
@@ -444,9 +444,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      * <p/>
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
-    private void setUpMap() {
-    }
+    private void setUpMap() {}
 
+    // Method called when the user taps on the map.
     @Override
     public void onMapClick(LatLng latLng) {
         progressBar.setVisibility(View.GONE);
@@ -473,13 +473,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private LatLng startLatLng;
     private LatLng destLatLng;
 
+    // Method called during long-time click.
     @Override
     public void onMapLongClick(LatLng latLng) {
         disableDestinationMarkers();
+
+        // Getting the latitude and longitude of the point where the user has pressed.
         double latitude = latLng.latitude;
         double longitude = latLng.longitude;
+
+        // Starting geocoding and translating the latitude and longitude into an address.
         Geocoder gc = new Geocoder(this);
         try {
+            // If this is the first long-time click, it means we're setting the starting point.
             if (tempMarker == null) {
                 List<Address> list = null;
                 list = gc.getFromLocation(latitude, longitude, 1);
@@ -488,9 +494,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 startingAdd = add.getAddressLine(0) + ", " + add.getLocality();
                 startingAddressTop.setText("Starting point: " + startingAdd);
                 tempMarker = mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker()).flat(false));
+
+                // Adding the tempMarker object to the markersMap map, with an empty String value associated since we just need
+                // this marker as a reference when we'll use it for creating the activity. For now, we don't have any information
+                // tho.
                 markersMap.put(tempMarker, "");
                 startLatLng = latLng;
             } else {
+                // If we're here, it means we're now setting the destination point.
                 List<Address> list = null;
                 list = gc.getFromLocation(latitude, longitude, 1);
                 Address add = list.get(0);
@@ -501,6 +512,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 destinationAddressTop.setText("Destination address: " + destinationAdd);
                 //mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)).flat(false));
 
+                // I launch a new AddActivity Intent, to which I'm passing parameters such as start address destination address,
+                // start and destination latitude and longitude.
                 Intent newActivity = new Intent(MapsActivity.this, AddActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putString("StartingAddress", new String(startingAdd + "_" + destinationAdd + "_" +
@@ -508,6 +521,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                                 destLatLng.latitude + "_" + destLatLng.longitude));
                 newActivity.putExtras(bundle);
                 startActivity(newActivity);
+                // Removing the tempMarker object from the google map.
                 tempMarker.remove();
                 tempMarker = null;
                 startingAdd = "";
@@ -519,6 +533,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //mMap.addMarker(new MarkerOptions().position(latLng).title("Lat = "+latLng.latitude+", Long = "+latLng.longitude));
     }
 
+    
     @Override
     public boolean onMarkerClick(Marker marker) {
         disableDestinationMarkers();
@@ -903,6 +918,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private String addrS;
     private String addrD;
+    private String dateAndTime;
+    private String creatorName;
+    private String averageExp;
 
 
     // Metodi per l'aggiunta di Markers nella mappa --> le posizioni di questi veranno get-tati dal DB.
@@ -928,10 +946,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return marker;
     }
 
-    public Marker addMarkerToMap(boolean isMyActivity, String sid, double latS, double longitS, String addrS, String addrD, String km, String experience) {
+    public Marker addMarkerToMap(boolean isMyActivity, String sid, double latS,
+                                 double longitS, String addrS, String addrD,
+                                 String km, String experience, String dateAndTime,
+                                 String creatorName, String averageExp) {
         this.addrS = addrS;
         this.addrD = addrD;
-        //System.out.println("ADDR-D = "+addrD);
+        this.dateAndTime = dateAndTime;
+        this.creatorName = creatorName;
+        this.averageExp = averageExp;
+
         return this.addMarkerToMap(isMyActivity, sid, new LatLng(latS, longitS), km, experience);
     }
 
@@ -1010,52 +1034,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             case "getruns":
                 try {
                     ListIterator it = ls.listIterator();
-                    //this.positionsIterator = ls.listIterator();
-                /*while (it.hasNext()) {
-                    result = result + (it.next());
-                    if (result.equals("Problems selecting activities")) {
-                        Toast.makeText(getApplicationContext(), "Here there are no activities!", Toast.LENGTH_SHORT).show();
-                    } else if (!(result.charAt(0) == 'C')) {  // Connection failed
-                        Log.d("result", result);
-
-                        connections = 0;
-
-                        String[] session_point = result.split(";");
-                        String sid = session_point[0];
-
-                        //                Log.d("sid", sid);
-
-                        double lat = Double.parseDouble(session_point[1]);
-                        double lng = Double.parseDouble(session_point[2]);
-
-                        Geocoder gc = new Geocoder(this);
-                        try {
-                            if (tempMarker == null) {
-                                List<Address> list = null;
-                                list = gc.getFromLocation(lat, lng, 1);
-
-                                Address addS = list.get(0);
-                                String startingAddress = addS.getAddressLine(0) + ", " + addS.getLocality();
-
-                                //Marker marker = addMarkerToMap(false, sid, lat, lng, startingAddress, "", "", "");
-
-                                if (session_point.length == 4) {
-                                    marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-                                    Log.d("Green", sid);
-                                }
-                            }
-                        } catch (Exception e) {
-                            Log.d("Error Localization", e.getMessage());
-                        }
-
-                        result = "";
-                    } else {
-                        Log.d("result", result);
-                        connections++;
-                        result = "";
-                        connect("getruns", null);
-                    }
-                }*/
 
                     if (mMap != null) {
                         DrawMarkers drawMarkers = new DrawMarkers();
@@ -1080,51 +1058,39 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                         Log.d("result", result);
                         //TODO: Controllare che tutte le if-else serve a qualcosa
-                        //Giulio mod.
-                        //mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
 
-                        // Use default InfoWindow frame
-                     /*   @Override
-                        public View getInfoWindow(Marker arg0) {
-                            return null;
-                        }*/
-
-                        // Defines the contents of the InfoWindow
-                        // @Override
-                        //public View getInfoContents(Marker arg0) {
                         Marker arg0 = markerclicked;
                         connections = 0;
 
                         // Getting view from the layout file info_window_layout
                         View v = getLayoutInflater().inflate(R.layout.acitivityuser_info, null);
 
-                        // Getting the position from the marker
                         LatLng latLng = arg0.getPosition();
 
 
-                        // Utilizzare il Tag per identificare il Marker.
                         arg0.setTag(Integer.valueOf(tag));
 
-                        // Getting reference to the TextView to set latitude
-                           /* TextView tvLat = (TextView) v.findViewById(R.id.act_start);
-
-                            // Getting reference to the TextView to set longitude
-                            TextView tvLng = (TextView) v.findViewById(R.id.act_dest);
-
-                            TextView km = (TextView) v.findViewById(R.id.act_km);
-
-                            TextView experience = (TextView) v.findViewById(R.id.act_exp);*/
 
                         if (markersMap.containsKey(arg0)) {
                             String details = markersMap.get(arg0);
                             String[] strings = details.split("_");
                             String sid = strings[0];
 
+                            // Parametri della attività.
                             double endlat = Double.parseDouble(session_info[1]);
                             double endlng = Double.parseDouble(session_info[2]);
                             String length = session_info[3];
                             String difficulty = session_info[4];
                             String datetime = session_info[5];
+
+
+                            ///// Parso la data e l'ora separatamente /////
+
+                            String[] date = datetime.split(" ");
+                            hour = date[1];
+
+                            /////                                   /////
+                            System.out.println("DATA ED ORA: "+datetime);
                             String name = session_info[6];
                             int numOfJoins = Integer.parseInt(session_info[7]);
                             int medlevel = Integer.parseInt(session_info[8]);
@@ -1136,22 +1102,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             if (gotFromHashMap.length > 2) {
                                 String string = markersMap.get(arg0);
                                 String concat = string + "_" + datetime + "_" + name;
+                                System.out.println("CONCATENO: "+concat);
                                 markersMap.put(arg0, concat);
 
 
                                 //tvLat.setText("Indirizzo di partenza: " + gotFromHashMap[1]);
 
+                                // Tolgo la città dalla stringa relativa al punto di partenza dopo aver cliccato su un marker, da mostrare nel summary.
                                 String[] startParsed = gotFromHashMap[1].split(",");
                                 String[] newStart = Arrays.copyOf(startParsed, startParsed.length - 1);
                                 start = TextUtils.join(",", newStart);
 
-                                //tvLng.setText("Indirizzo di arrivo: " + gotFromHashMap[2]);
+                                // Tolgo la città dalla stringa relativa al punto di destinazione dopo aver cliccato su un marker, da mostrare nel summary.
                                 String[] stopParsed = gotFromHashMap[2].split(",");
                                 String[] newStop = Arrays.copyOf(stopParsed, stopParsed.length - 1);
                                 stop = TextUtils.join(",", newStop);
-                                //km.setText("Km: " + getLengthRange(gotFromHashMap[3]));
+
+
+
                                 km = gotFromHashMap[3];
-                                //experience.setText("Experience: " + getDifficultyRange(gotFromHashMap[4]));
+
                                 exp = gotFromHashMap[4];
                                 this.twoMarkersZoom(arg0);
 
@@ -1167,24 +1137,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     String string = markersMap.get(arg0);
                                     String putData = string + "_" + dest + "_" + length + "_" + difficulty;
                                     markersMap.put(arg0, putData);
-                                    //System.out.println("PUT DATA: " + putData);
 
-                                    //tvLat.setText("Indirizzo di partenza: " + gotFromHashMap[1]);
+                                    // Tolgo la città dall'indirizzo di partenza nel summary.
                                     String[] startParsed = gotFromHashMap[1].split(",");
                                     String[] newStart = Arrays.copyOf(startParsed, startParsed.length - 1);
                                     start = TextUtils.join(",", newStart);
 
-
-                                    //tvLng.setText("Indirizzo di arrivo: " + dest);
+                                    // Tolgo la città dall'indirizzo di destinazione nel summary.
                                     String[] stopParsed = dest.split(",");
                                     String[] newStop = Arrays.copyOf(stopParsed, stopParsed.length - 1);
                                     stop = TextUtils.join(",", newStop);
-                                    //       km.setText("Km: " + strings[3]);
-                                    //km.setText("Km: " + getLengthRange(length));
+
+                                    // Traduco il chilometraggio.
                                     km = getLengthRange(length);
-                                    //experience.setText("Experience: " + getDifficultyRange(difficulty));
+
+                                    // Traduco l'esperienza.
                                     exp = getDifficultyRange(difficulty);
+
+                                    // Zoom sui due markers.
                                     this.twoMarkersZoom(arg0);
+
                                 } catch (Exception e) {
                                     System.out.println("Geolocalizzazione fallita.");
                                 }
@@ -1201,6 +1173,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         args.putString("stop", stop);
                         args.putString("km", km);
                         args.putString("exp", exp);
+                        args.putString("hour", hour);
 
 
                         fragment1.setArguments(args);

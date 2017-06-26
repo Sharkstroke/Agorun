@@ -357,7 +357,8 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo, DBCon
                     new String(add.getAddressLine(0)+", "+add.getLocality()),
                     new String(add2.getAddressLine(0)+ ", "+add2.getLocality()),
                     trackLength.getSelectedItem().toString(),
-                    experienceSpinner.getSelectedItem().toString());
+                    experienceSpinner.getSelectedItem().toString(),
+                    timePar, "Pippo", "0"); // "Pippo" e "0" sono inseriti come valori dummy.
         } else {
             Toast.makeText(this, "Creation of the activity failed", Toast.LENGTH_SHORT).show();
         }

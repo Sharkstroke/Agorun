@@ -8,17 +8,11 @@ package com.unipd.fabio.agorun;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
-import android.view.FocusFinder;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.bumptech.glide.load.model.ImageVideoWrapper;
-
-import static android.R.attr.fragment;
 
 
 /**
@@ -30,6 +24,7 @@ public class Fragment1 extends Fragment {
     private  static String stop;
     private  static String km;
     private  static String exp;
+    private String hour;
     private View view;
     private Fragment3 fragment3;
 
@@ -54,6 +49,8 @@ public class Fragment1 extends Fragment {
         return km;
     }
 
+    public String getHour() { return hour; }
+
     public static void setExp(String exp) {
         Fragment1.exp = exp;
     }
@@ -69,6 +66,8 @@ public class Fragment1 extends Fragment {
     public static void setStop(String stop) {
         Fragment1.stop = stop;
     }
+
+    public void setHour(String hour) { this.hour = hour; }
 
 
     @Override
@@ -139,6 +138,10 @@ public class Fragment1 extends Fragment {
 
         getFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_to_top, R.anim.slide_down)
                 .add(R.id.map, fragment, "second").addToBackStack(null).commit();
+
+    }
+
+    public void joinActivity(View view) {
 
     }
 

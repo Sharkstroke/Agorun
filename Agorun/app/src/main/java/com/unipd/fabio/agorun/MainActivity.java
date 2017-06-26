@@ -82,9 +82,22 @@ public class MainActivity extends AppCompatActivity implements
         btnSignIn.setSize(SignInButton.SIZE_STANDARD);
         btnSignIn.setScopes(gso.getScopeArray());
 
-        prefs = getSharedPreferences("UserData", 0);
+        /*prefs = getSharedPreferences("UserData", 0);
         String username = prefs.getString("username","");
-        String pwd = prefs.getString("password","");
+
+        String pwd = prefs.getString("password","");*/
+
+        MySharedPreferencesHandler.getMySharedPreferencesInt( getApplicationContext(), "UserData", 0);
+
+        String username = MySharedPreferencesHandler.getMySharedPreferencesString( getApplicationContext(),
+                                                                                    "username",
+                                                                                    "");
+
+        String pwd = MySharedPreferencesHandler.getMySharedPreferencesString(   getApplicationContext(),
+                                                                                "password",
+                                                                                "");
+
+
         if(!pwd.equals("")) {
 
 
