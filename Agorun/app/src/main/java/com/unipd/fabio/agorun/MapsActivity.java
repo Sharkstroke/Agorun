@@ -80,7 +80,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private LocationManager m_locationManager;
     private Location l;
     private String provider;
-    private ImageButton HamburgerMenu;
+    private ImageButton hamburgerMenu;
     private TextView search_tw;
     private TextView startingAddressTop;
     private TextView destinationAddressTop;
@@ -161,8 +161,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     .show();
         }
 
-        timer = new Timer();
-
         // Setting an instance of this class in order to use its methods from the outside.
         mact = this;
 
@@ -170,6 +168,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         locationManager = (LocationManager) getSystemService(svcName);
 
         // Setting all the necessary to look for a matching provider with our preferences.
+        //setCriteria();
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+
+        setGraphicalObjects();
+
+        // Creating a listener for the search bar: once the user launches the search, this onClick method is callled.
+        setSearchListener(search_tw);
+
+         /*Giulio mod.*/
+        setHamburgerMenuListener(hamburgerMenu);
+         /*Giulio mod.*/
+
+        setGestureManagerListener();
+
+    }
+
+    // Setto i criteri per la localizzazione.
+    private void setCriteria() {
         Criteria criteria = new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_FINE);
         criteria.setPowerRequirement(Criteria.POWER_LOW);
@@ -178,33 +196,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         criteria.setSpeedRequired(false);
         criteria.setCostAllowed(true);
         provider = locationManager.getBestProvider(criteria, true);
+    }
 
-
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-
-        //AutoCompleteTextView actv = (AutoCompleteTextView) findViewById(R.id.findPlace);
-        //Button actv = (Button) findViewById(R.id.findPlace);
-
-        search_tw = (TextView) findViewById(R.id.search_bar);
+    private void setGraphicalObjects() {
+        this.search_tw = (TextView) findViewById(R.id.search_bar);
         this.startingAddressTop = (TextView) findViewById(R.id.startingPointInMain);
         this.destinationAddressTop = (TextView) findViewById(R.id.destinationPointInMain);
         this.stopMonitoring = (Button) findViewById(R.id.stopMonitoring);
         this.startMonitoring = (Button) findViewById(R.id.startMonitorButton);
+        this.hamburgerMenu = (ImageButton) findViewById(R.id.button1);
+        progressBar = (ProgressBar) findViewById(R.id.loading);
+        progressBar.setVisibility(View.GONE);
+    }
 
-        /*Giulio mod.*/
-       /* Button newActivity = (Button) findViewById(R.id.newActivity);*/
-
-       /* newActivity.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), AddActivity.class);
-                startActivity(intent);
-            }
-        });*/
-         /*Giulio mod.*/
-
-        // Creating a listener for the search bar: once the user launches the search, this onClick method is callled.
+    private void setSearchListener(TextView search_tw) {
         search_tw.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -221,17 +226,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             }
         });
+    }
 
-         /*Giulio mod.*/
-        HamburgerMenu = (ImageButton) findViewById(R.id.button1);
-
-        HamburgerMenu.setOnClickListener(new View.OnClickListener() {
+    private void setHamburgerMenuListener(final ImageButton hamburgerMenu) {
+        hamburgerMenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
 
-                PopupMenu popup = new PopupMenu(MapsActivity.this, HamburgerMenu);
+                PopupMenu popup = new PopupMenu(MapsActivity.this, hamburgerMenu);
                 //Inflating the Popup using xml file
                 popup.getMenuInflater()
                         .inflate(R.menu.popup_maps, popup.getMenu());
@@ -257,11 +261,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
 
         });
-         /*Giulio mod.*/
+    }
 
-        progressBar = (ProgressBar) findViewById(R.id.loading);
-        progressBar.setVisibility(View.GONE);
-
+    private void setGestureManagerListener() {
         GestureManager = (new OnSwipeTouchListener(MapsActivity.this) {
             public void onSwipeTop() {
                 Toast.makeText(MapsActivity.this, "top", Toast.LENGTH_SHORT).show();
@@ -277,10 +279,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
 
         });
-
-
-
-
     }
 
     // Static method used to get the static instance of this class previously created.
@@ -738,7 +736,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             builder.setMessage(
                     "You need to activate location service to use this feature. Please turn on network or GPS mode in location settings")
-                    .setTitle("LostyFound")
+                    .setTitle("Localization disabled!")
                     .setCancelable(false)
                     .setPositiveButton("Settings",
                             new DialogInterface.OnClickListener() {
@@ -760,23 +758,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         // Richiedo update di posizione continuamente
-        locationManager.requestLocationUpdates(provider, POSITION_FREQUENCY, 5,
+        /*locationManager.requestLocationUpdates(provider, POSITION_FREQUENCY, 5,
                 new LocationListener() {
                     public void onLocationChanged(Location location) {
-                        // Prima disegno il percorso, passando la nuova posizione rilevata.
-                        //if (!IS_MONITORING) {
-                            recordPosition(location);
-                            drawTrack(location);
+                            //recordPosition(location);
+                            //drawTrack(location);
                             updateWithNewLocation(location);
 
                             double lat = location.getLatitude();
                             double lng = location.getLongitude();
 
-                            points.add(lat+","+lng);    // Salvo la posizione corrente (Verificare se posso usare recordPosition)
-                            // Toast.makeText(getApplicationContext(),Arrays.toString(points.toArray()),Toast.LENGTH_LONG).show();
-                        //}
-                        // Poi faccio l'update della posizione del marker.
-
+                            points.add(lat+","+lng);
                     }
 
                     public void onProviderDisabled(String provider) {
@@ -789,7 +781,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                 Bundle extras) {
                     }
                 }
-        );
+        );*/
 
 
         // InfoWindow viene usata per customizzare le finestre di info che appaiono al click su un Marker.
