@@ -10,25 +10,41 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 
 
 public class MyNotificationManager extends BroadcastReceiver {
+
+
     @Override
     public void onReceive(Context context, Intent intent) {
         try {
-            String yourDate = "24/06/2017";
-            String yourHour = "23:08";
+
+            //String yourDate = "30/06/2017";
+            //String yourHour = "23:08";
+            String myFullHour = MySharedPreferencesHandler.getMySharedPreferencesString(context, MySharedPreferencesHandler.MyPreferencesKeys.joinedActivityHour, "");
+            String myDate = MySharedPreferencesHandler.getMySharedPreferencesString(context, MySharedPreferencesHandler.MyPreferencesKeys.joinActivityDate, "");
+
+            // Parso l'orario così da togliere i secondi e tenere soltando l'ora ed i minuti.
+            String[] startParsed = myFullHour.split(":");
+            String[] newHour = Arrays.copyOf(startParsed, startParsed.length - 1);
+            String myHour = TextUtils.join(":", newHour);
+            //String modifiedDate = new StringBuilder(myDate).reverse().toString();
+            //modifiedDate = modifiedDate.replaceAll("-","/");
+
+            System.out.println(myDate);
+
             Date d = new Date();
-            SimpleDateFormat date = new SimpleDateFormat("dd/MM/yyyy");
+            SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
             SimpleDateFormat hour = new SimpleDateFormat("HH:mm");
-            if (yourDate.equals(date.format(d)) && yourHour.equals(hour.format(d))){
-                System.out.println("SONO DENTRO L' IF!");
+            if (myDate.equals(date.format(d)) && myHour.equals(hour.format(d))){
                 Intent it =  new Intent(context, MainActivity.class);
-                createNotification(context, it, "new mensage", "body!", "this is a mensage");
+                createNotification(context, it, "Agorun - Activity Reminder", "Agorun - Time to get ready!", "It's almost time! Get ready for your activity!");
             }
         }catch (Exception e){
             Log.i("date","error == "+e.getMessage());

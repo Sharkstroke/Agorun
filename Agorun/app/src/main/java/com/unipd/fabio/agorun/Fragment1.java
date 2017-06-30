@@ -5,14 +5,21 @@ package com.unipd.fabio.agorun;
  */
 
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.Calendar;
 
 
 /**
@@ -20,11 +27,15 @@ import android.widget.Toast;
  */
 public class Fragment1 extends Fragment {
 
+    private ImageButton joinActivity;
+
     private  static String start;
     private  static String stop;
     private  static String km;
     private  static String exp;
     private String hour;
+    private String date;
+
     private View view;
     private Fragment3 fragment3;
 
@@ -50,6 +61,10 @@ public class Fragment1 extends Fragment {
     }
 
     public String getHour() { return hour; }
+
+    public String getDate() { return date; }
+
+    public void setDate(String date) { this.date = date; }
 
     public static void setExp(String exp) {
         Fragment1.exp = exp;
@@ -79,17 +94,42 @@ public class Fragment1 extends Fragment {
         this.stop =  getArguments().getString("stop");
         this.km =  getArguments().getString("km");
         this.exp =  getArguments().getString("exp");
+        this.hour = getArguments().getString("hour");
+        this.date = getArguments().getString("date");
 
-      view = inflater.inflate(R.layout.fragment_fragment1, container,  false);
+        view = inflater.inflate(R.layout.fragment_fragment1, container,  false);
 
         TextView txtview1  = (TextView) view.findViewById(R.id.act_start);
         TextView txtview2  = (TextView) view.findViewById(R.id.act_dest);
         TextView txtview3  = (TextView) view.findViewById(R.id.act_exp);
         TextView txtview4  = (TextView) view.findViewById(R.id.act_km);
+
+        this.joinActivity = (ImageButton) view.findViewById(R.id.act_join);
+
         txtview1.setText(this.start);
         txtview2.setText(this.stop);
         txtview3.setText(this.exp);
         txtview4.setText(this.km);
+
+        joinActivity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MySharedPreferencesHandler.putSharedPreferencesString(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivityHour, hour);
+                MySharedPreferencesHandler.putSharedPreferencesString(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinActivityDate, date);
+
+                boolean alarm = (PendingIntent.getBroadcast(MapsActivity.getMapsData(), 0, new Intent("ALARM"), PendingIntent.FLAG_NO_CREATE) == null);
+
+                if(alarm){
+                    Intent itAlarm = new Intent("ALARM");
+                    PendingIntent pendingIntent = PendingIntent.getBroadcast(MapsActivity.getMapsData(),0,itAlarm,0);
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTimeInMillis(System.currentTimeMillis());
+                    calendar.add(Calendar.SECOND, 3);
+                    AlarmManager alarme = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+                    alarme.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),60000, pendingIntent);
+                }
+            }
+        });
 
         view.setOnTouchListener(new OnSwipeTouchListener(getContext()) {
 
@@ -124,13 +164,7 @@ public class Fragment1 extends Fragment {
             }*/
         });
 
-
-
-
-
         return view;
-
-
 
     }
 
@@ -140,9 +174,4 @@ public class Fragment1 extends Fragment {
                 .add(R.id.map, fragment, "second").addToBackStack(null).commit();
 
     }
-
-    public void joinActivity(View view) {
-
-    }
-
 }

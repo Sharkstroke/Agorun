@@ -2,8 +2,6 @@ package com.unipd.fabio.agorun; /**
  * package com.unipd.fabio.provamaps;
  */
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -137,6 +135,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private String km;
     private String exp;
     private String hour;
+    private String date;
 
     private OnSwipeTouchListener GestureManager;
 
@@ -150,9 +149,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-<<<<<<< HEAD
-=======
-
         new ConnectDB(this).execute("getmessage");
         // Mod Riccardo
         Intent intent = getIntent();
@@ -165,7 +161,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     .show();
         }
 
->>>>>>> 8149ac66358c025069dda416a0e811532465e9d2
         timer = new Timer();
 
         // Setting an instance of this class in order to use its methods from the outside.
@@ -284,17 +279,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
 
-        boolean alarm = (PendingIntent.getBroadcast(this, 0, new Intent("ALARM"), PendingIntent.FLAG_NO_CREATE) == null);
 
-        if(alarm){
-            Intent itAlarm = new Intent("ALARM");
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(this,0,itAlarm,0);
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(System.currentTimeMillis());
-            calendar.add(Calendar.SECOND, 3);
-            AlarmManager alarme = (AlarmManager) getSystemService(ALARM_SERVICE);
-            alarme.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),60000, pendingIntent);
-        }
 
     }
 
@@ -549,7 +534,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //mMap.addMarker(new MarkerOptions().position(latLng).title("Lat = "+latLng.latitude+", Long = "+latLng.longitude));
     }
 
-    
+
     @Override
     public boolean onMarkerClick(Marker marker) {
         disableDestinationMarkers();
@@ -940,7 +925,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     // Metodi per l'aggiunta di Markers nella mappa --> le posizioni di questi veranno get-tati dal DB.
-    public Marker addMarkerToMap(boolean isMyActivity, String sid, LatLng latLng, String km, String experience) {
+    public Marker addMarkerToMap(boolean isMyActivity, String sid, LatLng latLng, String km, String experience, String dateAndTime, String creatorName, String averageExp) {
         MapsActivity.trackKm = km;
         trackExperience = experience;
         //mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
@@ -954,10 +939,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         /*Marker newMarker = mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker( // Al posto dell'argomento di icon, passare BitmapDescriptorFactory.fromResource(R.drawable.FILEIMMAGINE)));
                 BitmapDescriptorFactory.HUE_AZURE)).flat(false)); */
-        if (addrD == "" && km == "" && experience == "") {
+        if (addrD == "") {
             markersMap.put(marker, new String(sid + "_" + addrS));
         } else {
-            markersMap.put(marker, new String(sid + "_" + addrS + "_" + addrD + "_" + km + "_" + experience));
+            markersMap.put(marker, new String(sid + "_" + addrS + "_" + addrD + "_" + km + "_" + experience + "_" + dateAndTime + "_" + creatorName + "_" + averageExp));
         }
         return marker;
     }
@@ -972,7 +957,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         this.creatorName = creatorName;
         this.averageExp = averageExp;
 
-        return this.addMarkerToMap(isMyActivity, sid, new LatLng(latS, longitS), km, experience);
+        return this.addMarkerToMap(isMyActivity, sid, new LatLng(latS, longitS), km, experience, dateAndTime, creatorName, averageExp);
     }
 
     private void connect(String mode, String sid) {
@@ -1098,24 +1083,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             String length = session_info[3];
                             String difficulty = session_info[4];
                             String datetime = session_info[5];
-
-
-                            ///// Parso la data e l'ora separatamente /////
-
-                            String[] date = datetime.split(" ");
-                            hour = date[1];
-
-                            /////                                   /////
-                            System.out.println("DATA ED ORA: "+datetime);
                             String name = session_info[6];
                             int numOfJoins = Integer.parseInt(session_info[7]);
                             int medlevel = Integer.parseInt(session_info[8]);
 
-                            //*sid+"_"+addrS+"_"+addrD+"_"+km+"_"+experience)*//*
+                            ///// Parso la data e l'ora separatamente /////
 
+                            String[] fullDate = datetime.split(" ");
+                            this.date = fullDate[0];
+                            hour = fullDate[1];
+
+                            /////                                   /////
+                            System.out.println("DATA ED ORA: "+datetime);
+
+                            //*sid+"_"+addrS+"_"+addrD+"_"+km+"_"+experience)*//*
 
                             String[] gotFromHashMap = markersMap.get(arg0).split("_");
                             if (gotFromHashMap.length > 2) {
+                                // TODO: da sistemare, in quanto concatena continuamente dateTime e name.
                                 String string = markersMap.get(arg0);
                                 String concat = string + "_" + datetime + "_" + name;
                                 System.out.println("CONCATENO: "+concat);
@@ -1135,10 +1120,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 stop = TextUtils.join(",", newStop);
 
 
-
                                 km = gotFromHashMap[3];
-
                                 exp = gotFromHashMap[4];
+
                                 this.twoMarkersZoom(arg0);
 
                             } else {
@@ -1190,6 +1174,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         args.putString("km", km);
                         args.putString("exp", exp);
                         args.putString("hour", hour);
+                        args.putString("date", date);
 
 
                         fragment1.setArguments(args);
@@ -1247,6 +1232,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         result = "";
     }
 
+    public void sendNotification(View view) {
+        //System.out.println("HO SALVATOOOO: "+MySharedPreferencesHandler.getMySharedPreferencesString(getApplicationContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivityHour, ""));
+
+        /*boolean alarm = (PendingIntent.getBroadcast(this, 0, new Intent("ALARM"), PendingIntent.FLAG_NO_CREATE) == null);
+
+
+        if(alarm){
+            Intent itAlarm = new Intent("ALARM");
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(this,0,itAlarm,0);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(System.currentTimeMillis());
+            calendar.add(Calendar.SECOND, 3);
+            AlarmManager alarme = (AlarmManager) getSystemService(ALARM_SERVICE);
+            alarme.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),60000, pendingIntent);
+        }*/
+
+    }
 
 }
 
