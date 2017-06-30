@@ -659,22 +659,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        Calendar cal = Calendar.getInstance();
-        int currentHour = cal.get(Calendar.HOUR_OF_DAY);
-        boolean success = false;
-        if (currentHour <= THRESHOLD_HOUR) {
-            success = mMap.setMapStyle(
-                    MapStyleOptions.loadRawResourceStyle(
-                            this, R.raw.day_style_json));
-        } else {
-            success = mMap.setMapStyle(
-                    MapStyleOptions.loadRawResourceStyle(
-                            this, R.raw.night_style_json));
-        }
 
-        if (!success) {
-            System.out.println("JSON parsing non funzionante.");
-        }
+        customMapStyle();
+
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
@@ -682,79 +669,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         int height = size.y;
 
         // Codice per la personalizzazione dei controlli sulla mappa
-        mMap.setMyLocationEnabled(true);
-        mMap.getUiSettings().setZoomGesturesEnabled(true);
-        mMap.getUiSettings().setZoomControlsEnabled(false);
-        mMap.getUiSettings().setCompassEnabled(false);
+        setMapOptions();
+
+        setLocationListener();
+
         // Personalizzazione pulsante My Location
         View locationButton = ((View) findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
         RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
-// position on right bottom
+        // position on right bottom
         rlp.addRule(RelativeLayout.ALIGN_PARENT_TOP, 0);
         rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.ALIGN_BOTTOM);
         rlp.setMargins(0, 180, 180, 0);
 
-        mMap.setOnMapClickListener(this);
-        mMap.setOnMapLongClickListener(this);
-        mMap.setOnMarkerClickListener(this);
-        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        setLocalizationMethods();
 
-        locationListener = new LocationListener() {
-            public void onLocationChanged(Location location) {
-                // Prima disegno il percorso, passando la nuova posizione rilevata.
-                //drawTrack(location);
-                // Poi faccio l'update della posizione del marker.
-                //updateWithNewLocation(location);
-            }
-
-            public void onProviderDisabled(String provider) {
-            }
-
-            public void onProviderEnabled(String provider) {
-            }
-
-            public void onStatusChanged(String provider, int status,
-                                        Bundle extras) {
-            }
-        };
-
-        l = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        if (l == null) {
-            locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, locationListener, null);
-            l = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        } else {
-            locationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, locationListener, null);
-        }
         if (l != null) {
-            LatLng latlng = fromLocationToLatLng(l);
-            //googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latlng,
-            //      17));
             updateWithNewLocation(l);
 
         } else {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-            builder.setMessage(
-                    "You need to activate location service to use this feature. Please turn on network or GPS mode in location settings")
-                    .setTitle("Localization disabled!")
-                    .setCancelable(false)
-                    .setPositiveButton("Settings",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    Intent intent = new Intent(
-                                            Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                                    startActivity(intent);
-                                    alert.dismiss();
-                                }
-                            })
-                    .setNegativeButton("Cancel",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int id) {
-                                    alert.dismiss();
-                                }
-                            });
-            alert = builder.create();
-            alert.show();
+            createLocalizationErrorAlert();
         }
 
         // Richiedo update di posizione continuamente
@@ -784,57 +717,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         );*/
 
 
-        // InfoWindow viene usata per customizzare le finestre di info che appaiono al click su un Marker.
-        // La customizzazione qui avviene tramite un Adapter.
+        setInfoFragmentListener();
 
-
-        mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
-            @Override
-            public void onInfoWindowClick(Marker marker) {
-                //Intent activitySummary = new Intent(MapsActivity.this.get, ActivitySummary.class);
-                Intent newActivity = new Intent(MapsActivity.this, ActivitySummary.class);
-                if (markersMap.containsKey(marker)) {
-                    String data = markersMap.get(marker);
-                    Bundle bundle = new Bundle();
-                    bundle.putString("ActivityData", data);
-                    newActivity.putExtras(bundle);
-                    startActivity(newActivity);
-                }
-            }
-        });
-
-        /***
-         *
-         * Setto un listener per la telecamera così da consentire la registrazione del movimento ed il successivo
-         * download delle attività nella zona.
-         */
-        mMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
-            long delay = 460;
-
-            @Override
-            public void onCameraMove() {
-                if (timer != null) {
-                    timer.cancel();
-                }
-                if (mMap.getCameraPosition().zoom >= 14.50) {
-                    timer = new Timer();
-                    timer.schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            this.cancel();
-                            // TODO: invio al DB per calcolare attività in zona.
-                            setCoordinates();
-                            //System.out.println("lat="+mMap.getCameraPosition().target.latitude+", lng = "+mMap.getCameraPosition().target.longitude);
-                        }
-                    }, delay);
-                }
-            }
-        });
-
-
-        // addMarkerToMap(40.1111,11.1111,"","","","");
-
-        //connect("getruns",null);
+        setCameraMover();
 
     }
 
@@ -855,6 +740,133 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 */
+
+    private void setLocationListener() {
+        locationListener = new LocationListener() {
+            public void onLocationChanged(Location location) {
+                // Prima disegno il percorso, passando la nuova posizione rilevata.
+                //drawTrack(location);
+                // Poi faccio l'update della posizione del marker.
+                //updateWithNewLocation(location);
+            }
+
+            public void onProviderDisabled(String provider) {
+            }
+
+            public void onProviderEnabled(String provider) {
+            }
+
+            public void onStatusChanged(String provider, int status,
+                                        Bundle extras) {
+            }
+        };
+    }
+
+    // Mano a mano che mi sposto sulla mappa, dopo un tot di ms scarico le attiità nell'area visibile su schermo.
+    private void setCameraMover() {
+        mMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
+            long delay = 460;
+
+            @Override
+            public void onCameraMove() {
+                if (timer != null) {
+                    timer.cancel();
+                }
+                if (mMap.getCameraPosition().zoom >= 14.50) {
+                    timer = new Timer();
+                    timer.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            this.cancel();
+                            // TODO: invio al DB per calcolare attività in zona.
+                            setCoordinates();
+                        }
+                    }, delay);
+                }
+            }
+        });
+    }
+
+    // Metodo per customizzare il tema di sfondo della mappa in base all'orario corrente.
+    private void customMapStyle() {
+        Calendar cal = Calendar.getInstance();
+        int currentHour = cal.get(Calendar.HOUR_OF_DAY);
+        boolean success = false;
+        if (currentHour <= THRESHOLD_HOUR) {
+            success = mMap.setMapStyle(
+                    MapStyleOptions.loadRawResourceStyle(
+                            this, R.raw.day_style_json));
+        } else {
+            success = mMap.setMapStyle(
+                    MapStyleOptions.loadRawResourceStyle(
+                            this, R.raw.night_style_json));
+        }
+    }
+
+    // Setto le opzioni generali della mappa.
+    private void setMapOptions() {
+        mMap.setMyLocationEnabled(true);
+        mMap.getUiSettings().setZoomGesturesEnabled(true);
+        mMap.getUiSettings().setZoomControlsEnabled(false);
+        mMap.getUiSettings().setCompassEnabled(false);
+        mMap.setOnMapClickListener(this);
+        mMap.setOnMapLongClickListener(this);
+        mMap.setOnMarkerClickListener(this);
+        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+    }
+
+    private void createLocalizationErrorAlert() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setMessage(
+                "You need to activate location service to use this feature. Please turn on network or GPS mode in location settings")
+                .setTitle("Localization disabled!")
+                .setCancelable(false)
+                .setPositiveButton("Settings",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                Intent intent = new Intent(
+                                        Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                                startActivity(intent);
+                                alert.dismiss();
+                            }
+                        })
+                .setNegativeButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                alert.dismiss();
+                            }
+                        });
+        alert = builder.create();
+        alert.show();
+    }
+
+    private void setLocalizationMethods() {
+        l = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        if (l == null) {
+            locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, locationListener, null);
+            l = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        } else {
+            locationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, locationListener, null);
+        }
+    }
+
+    private void setInfoFragmentListener() {
+        mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+                //Intent activitySummary = new Intent(MapsActivity.this.get, ActivitySummary.class);
+                Intent newActivity = new Intent(MapsActivity.this, ActivitySummary.class);
+                if (markersMap.containsKey(marker)) {
+                    String data = markersMap.get(marker);
+                    Bundle bundle = new Bundle();
+                    bundle.putString("ActivityData", data);
+                    newActivity.putExtras(bundle);
+                    startActivity(newActivity);
+                }
+            }
+        });
+    }
 
     public Marker getTempMarker() {
         return this.tempMarker;

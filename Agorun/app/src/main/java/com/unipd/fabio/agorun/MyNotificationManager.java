@@ -87,5 +87,6 @@ public class MyNotificationManager extends BroadcastReceiver {
         }
 
         timeForNotification = currentH + ":" + currentM;
+        System.out.println(timeForNotification);
     }
 }
