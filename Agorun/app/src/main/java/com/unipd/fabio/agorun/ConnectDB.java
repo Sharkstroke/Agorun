@@ -40,7 +40,7 @@ public class ConnectDB extends AsyncTask<String, Void, ArrayList<String>> {
         return user;
     }
 
-    public static  void setUser(String email) {
+    public static void setUser(String email) {
         user = email;
     }
 
@@ -274,6 +274,15 @@ public class ConnectDB extends AsyncTask<String, Void, ArrayList<String>> {
                         output.add("getmessage");
                         url = new URL(urldb + "getmessage.php?user=" + user);
                     }
+                    break;
+
+                case "getinfouser":
+                    if (param.length != 1) {
+                        output.add("Richiedere info sull'utente richiede 1 parametro");
+                    } else {
+                        url = new URL(urldb + "getinfouser.php?user=" + user);
+                    }
+                    break;
             }
 
             conn = (HttpsURLConnection) url.openConnection();

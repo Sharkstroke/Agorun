@@ -47,6 +47,7 @@ public class ImageProva extends AppCompatActivity implements DBConnection{
         } else if (ls.get(0).equals("Image not found")) {
             Toast.makeText(getApplicationContext(),ls.get(0),Toast.LENGTH_LONG).show();
         } else {
+
             String encodedString = ls.get(0);
 
             byte[] b = Base64.decode(encodedString,Base64.DEFAULT);
@@ -55,6 +56,7 @@ public class ImageProva extends AppCompatActivity implements DBConnection{
             ImageView mImg;
             mImg = (ImageView) findViewById(R.id.imageview);
             mImg.setImageBitmap(image);
+
         }
     }
 }
