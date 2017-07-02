@@ -158,7 +158,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             builder.setTitle("Delete entry")
                     .setMessage(intent.getExtras().getString("message"))
                     .setCancelable(true)
-                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setIcon(R.mipmap.ic_launcher)
                     .show();
         }
 
