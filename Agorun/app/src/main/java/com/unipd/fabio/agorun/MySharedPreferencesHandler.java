@@ -11,6 +11,7 @@ public class MySharedPreferencesHandler {
         public static final String userData = "UserData";
         public static final String username = "username";
         public static final String password = "password";
+        public static final String joinedActivityMarkerId = "joinedActivityMarkerId";
         public static final String joinedActivityHour = "joinedActivityHour";
         public static final String joinActivityDate = "joinedActivityDate";
     }

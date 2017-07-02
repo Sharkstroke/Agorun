@@ -20,7 +20,7 @@ import java.util.Date;
 public class MyNotificationManager extends BroadcastReceiver {
 
     private static final int TIMER = 10;
-
+    
     private String timeForNotification;
 
     @Override
@@ -80,13 +80,16 @@ public class MyNotificationManager extends BroadcastReceiver {
         if (currentM > 9) {
             currentM -= TIMER;
         } else {
-            int temp = 69;
+            int temp = 60 + currentM;
             temp -= TIMER;
             currentM = temp;
             currentH -= 1;
         }
 
         timeForNotification = currentH + ":" + currentM;
-        System.out.println(timeForNotification);
+    }
+
+    public static MyNotificationManager getNewInstance() {
+        return new MyNotificationManager();
     }
 }

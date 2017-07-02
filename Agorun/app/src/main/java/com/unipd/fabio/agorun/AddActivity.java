@@ -69,31 +69,21 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo, DBCon
         super.onCreate(savedInstanceState);
         setContentView(R.layout.new_track);
 
-        startAddress = (EditText) findViewById(R.id.startAddress);
-        destinationAddress = (EditText) findViewById(R.id.destinationAddress);
-        trackLength = (Spinner) findViewById(R.id.trackLength);
-        experienceSpinner = (Spinner) findViewById(R.id.ExperienceSpinner);
-        createActivity = (Button) findViewById(R.id.createActivityButton);
+        calendar = Calendar.getInstance();
+        setGraphicalObjects();
 
         if (getIntent().getExtras() != null) {
             String startAddressPassed = getIntent().getExtras().getString("StartingAddress");
 
             if (startAddressPassed != null) {
                 this.PRECISE_COORDS = true;
-                //startAddress.setText(startAddressPassed);
-                String[] addresses = startAddressPassed.split("_");
-                this.startAddress.setText(addresses[0]);
-                this.destinationAddress.setText(addresses[1]);
-                this.preciseStartLat = Double.parseDouble(addresses[2]);
-                this.preciseStartLng = Double.parseDouble(addresses[3]);
-                this.preciseDestLat = Double.parseDouble(addresses[4]);
-                this.preciseDestLng = Double.parseDouble(addresses[5]);
 
+                String[] addresses = startAddressPassed.split("_");
+                parseFullAddress(addresses);
 
                 String addressStartFixed = startAddress.getText().toString().replaceAll("\\s", "");
                 String addressDestinationFixed = destinationAddress.getText().toString().replaceAll("\\s", "");
                 String url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins=" + addressStartFixed + "&destinations=" + addressDestinationFixed + "&mode=driving&language=fr-FR&avoid=tolls&key=AIzaSyCW_gvTeNeb_Gzxv8kphisyTr-PZX58djQ";
-                System.out.println("Start address wrong: "+url);
                 startSearch(url);
             }
         }
@@ -106,55 +96,107 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo, DBCon
 
 
         // Controllo quando l'utente smette di digitare l'indirizzo di destinazione, avendo già completato quello di partenza.
+        setDestinationAddressListener();
+
+        // Controllo quando l'utente smette di digitare l'indirizzo di partenza, avendo già completato quello di destinazione.
+        setStartAddressListener();
+
+        // Setto la data di oggi
+
+
+        int yyyy = calendar.get(Calendar.YEAR);
+        int mm   = calendar.get(Calendar.MONTH) + 1;
+        int dd   = calendar.get(Calendar.DAY_OF_MONTH);
+
+        datePar = yyyy + "-" + mm + "-" + dd;
+
+        // setto l'ora corrente
+        int hour   = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+
+        timeview.setText(checkHourMinute(hour,minute));
+        timePar = checkHourMinute(hour,minute);
+
+        dateTimePar = datePar + "%20" + timePar;
+
+        Toast.makeText(getApplicationContext(),dateTimePar,Toast.LENGTH_LONG).show();
+
+    }
+
+    private void parseFullAddress(String[] addresses) {
+        this.startAddress.setText(addresses[0]);
+        this.destinationAddress.setText(addresses[1]);
+        this.preciseStartLat = Double.parseDouble(addresses[2]);
+        this.preciseStartLng = Double.parseDouble(addresses[3]);
+        this.preciseDestLat = Double.parseDouble(addresses[4]);
+        this.preciseDestLng = Double.parseDouble(addresses[5]);
+    }
+
+    private void setGraphicalObjects() {
+        startAddress = (EditText) findViewById(R.id.startAddress);
+        destinationAddress = (EditText) findViewById(R.id.destinationAddress);
+        trackLength = (Spinner) findViewById(R.id.trackLength);
+        experienceSpinner = (Spinner) findViewById(R.id.ExperienceSpinner);
+        createActivity = (Button) findViewById(R.id.createActivityButton);
+        dateview = (TextView) findViewById(R.id.datetextview);
+        dateview.setTypeface(null, Typeface.BOLD);
+        DateFormat df = DateFormat.getDateInstance();
+        dateview.setText(df.format(calendar.getTime()));
+        timeview = (TextView) findViewById(R.id.timetextview);
+        timeview.setTypeface(null, Typeface.BOLD);
+    }
+
+    private void setDestinationAddressListener() {
         destinationAddress.addTextChangedListener(
                 new TextWatcher() {
                     boolean isTyping = false;
                     Timer timer = new Timer();
                     long delay = 1000;
-                      @Override
-                      public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-                      }
+                    }
 
-                      @Override
-                      public void onTextChanged(CharSequence s, int start, int before, int count) {
-                          createActivity.setEnabled(false);
-                      }
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        createActivity.setEnabled(false);
+                    }
 
-                      @Override
-                      public void afterTextChanged(Editable s) {
-                          createActivity.setEnabled(false);
-                          if (!isTyping) {
-                              isTyping = true;
-                          }
-                          timer.cancel();
-                          timer = new Timer();
-                          timer.schedule(new TimerTask() {
-                              @Override
-                              public void run() {
-                                  isTyping = false;
-                                  if (startAddress != null && startAddress.getText().toString().trim().length() > 0) {
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        createActivity.setEnabled(false);
+                        if (!isTyping) {
+                            isTyping = true;
+                        }
+                        timer.cancel();
+                        timer = new Timer();
+                        timer.schedule(new TimerTask() {
+                            @Override
+                            public void run() {
+                                isTyping = false;
+                                if (startAddress != null && startAddress.getText().toString().trim().length() > 0) {
 
-                                      // Elimino gli spazi tra le parole per passare gli indirizzi come url in modo corretto
-                                      String addressStartFixed = startAddress.getText().toString().replaceAll("\\s", "");
-                                      String addressDestinationFixed = destinationAddress.getText().toString().replaceAll("\\s", "");
+                                    // Elimino gli spazi tra le parole per passare gli indirizzi come url in modo corretto
+                                    String addressStartFixed = startAddress.getText().toString().replaceAll("\\s", "");
+                                    String addressDestinationFixed = destinationAddress.getText().toString().replaceAll("\\s", "");
 
-                                      // Lancio l'url passandogli gli indirizzi e la API key.
-                                      String url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins=" + addressStartFixed + "&destinations=" + addressDestinationFixed + "&mode=driving&language=fr-FR&avoid=tolls&key=AIzaSyCW_gvTeNeb_Gzxv8kphisyTr-PZX58djQ";
-                                      System.out.println("Destination address wrong: "+url);
+                                    // Lancio l'url passandogli gli indirizzi e la API key.
+                                    String url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins=" + addressStartFixed + "&destinations=" + addressDestinationFixed + "&mode=driving&language=fr-FR&avoid=tolls&key=AIzaSyCW_gvTeNeb_Gzxv8kphisyTr-PZX58djQ";
+                                    System.out.println("Destination address wrong: "+url);
 
-                                      // Avvio il parsing ed il calcolo dei km.
-                                      //new GeoTask(AddActivity.this).execute(url);
-                                      this.cancel();
-                                      startSearch(url);
-                                  }
-                              }
-                          }, delay);
-                      }
+                                    // Avvio il parsing ed il calcolo dei km.
+                                    //new GeoTask(AddActivity.this).execute(url);
+                                    this.cancel();
+                                    startSearch(url);
+                                }
+                            }
+                        }, delay);
+                    }
                 }
         );
+    }
 
-        // Controllo quando l'utente smette di digitare l'indirizzo di partenza, avendo già completato quello di destinazione.
+    private void setStartAddressListener() {
         startAddress.addTextChangedListener(
                 new TextWatcher() {
                     boolean isTyping = false;
@@ -202,39 +244,6 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo, DBCon
                     }
                 }
         );
-
-        // Setto la data di oggi
-
-        calendar = Calendar.getInstance();
-
-        dateview = (TextView) findViewById(R.id.datetextview);
-        dateview.setTypeface(null, Typeface.BOLD);
-
-
-        DateFormat df = DateFormat.getDateInstance();
-        dateview.setText(df.format(calendar.getTime()));
-
-        int yyyy = calendar.get(Calendar.YEAR);
-        int mm   = calendar.get(Calendar.MONTH) + 1;
-        int dd   = calendar.get(Calendar.DAY_OF_MONTH);
-
-        datePar = yyyy + "-" + mm + "-" + dd;
-
-        // setto l'ora corrente
-
-        timeview = (TextView) findViewById(R.id.timetextview);
-        timeview.setTypeface(null, Typeface.BOLD);
-
-        int hour   = calendar.get(Calendar.HOUR_OF_DAY);
-        int minute = calendar.get(Calendar.MINUTE);
-
-        timeview.setText(checkHourMinute(hour,minute));
-        timePar = checkHourMinute(hour,minute);
-
-        dateTimePar = datePar + "%20" + timePar;
-
-        Toast.makeText(getApplicationContext(),dateTimePar,Toast.LENGTH_LONG).show();
-
     }
 
     public void startSearch(final String url) {
@@ -256,7 +265,6 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo, DBCon
             // Ottengo le coordinate geografiche del punto di partenza così da disegnare il Marker.
             EditText et = (EditText) findViewById(R.id.startAddress);
             String start = et.getText().toString();
-            System.out.println("STARTADDRESS=" + start);
             Geocoder gc = new Geocoder(this);
         try {
             List<Address> list = null;
@@ -277,10 +285,6 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo, DBCon
             }
 
 
-            /*
-                // Questa parte dovrà essere sotituita dal caricamento delle coordinate sul database, non dovrebbe essere necessario disegnare un Marker in corrispondenza
-                // anche del punto di arrivo.
-            */
             et = (EditText) findViewById(R.id.destinationAddress);
             String destination = et.getText().toString();
 

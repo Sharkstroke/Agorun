@@ -126,25 +126,10 @@
         android:id="@+id/startMonitorButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="startMonitoringPressed"
         android:text="@string/startMonitoring"
-        android:layout_alignParentBottom="true"
-        android:layout_toLeftOf="@+id/stopMonitoring"
-        android:layout_toStartOf="@+id/stopMonitoring"
         android:visibility="invisible"
-        android:layout_marginRight="43dp"
-        android:layout_marginEnd="43dp" />
-
-    <Button
-        android:id="@+id/stopMonitoring"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="startMonitoringPressed"
-        android:text="@string/stopMonitorButton"
         android:layout_alignParentBottom="true"
-        android:visibility="invisible"
-        android:layout_toLeftOf="@+id/button1"
-        android:layout_toStartOf="@+id/button1" />
+        android:layout_centerHorizontal="true" />
 
     <Button
         android:layout_width="wrap_content"

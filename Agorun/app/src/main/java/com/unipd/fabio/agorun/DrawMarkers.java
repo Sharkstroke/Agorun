@@ -58,18 +58,7 @@ public class DrawMarkers extends AsyncTask<ListIterator, Void, Void> {
                     addrS = mapsActivity.geoLocateStart(lat, lng);
                     map.put(new LatLng(lat, lng), addrS);
 
-                    //Geocoder gc = new Geocoder(mapsActivity);
-                    //try {
-
-                    /*} catch (Exception e) {
-                        System.out.println("ERRORACCIO");
-                        //Log.d("Error Localization", e.getMessage());
-                    }*/
-
                     result = "";
-              //      System.out.println("SONO DENTRO AL CICLOOOOO");
-              //      publishProgress();
-
                 }
             }
         }

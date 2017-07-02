@@ -53,9 +53,11 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -85,7 +87,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private TextView startingAddressTop;
     private TextView destinationAddressTop;
     private ProgressBar progressBar;
-    private Button stopMonitoring;
     private Button startMonitoring;
 
 
@@ -182,6 +183,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setHamburgerMenuListener(hamburgerMenu);
          /*Giulio mod.*/
 
+        setStartMonitoringListener(startMonitoring);
+
         setGestureManagerListener();
 
     }
@@ -202,11 +205,40 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         this.search_tw = (TextView) findViewById(R.id.search_bar);
         this.startingAddressTop = (TextView) findViewById(R.id.startingPointInMain);
         this.destinationAddressTop = (TextView) findViewById(R.id.destinationPointInMain);
-        this.stopMonitoring = (Button) findViewById(R.id.stopMonitoring);
         this.startMonitoring = (Button) findViewById(R.id.startMonitorButton);
         this.hamburgerMenu = (ImageButton) findViewById(R.id.button1);
         progressBar = (ProgressBar) findViewById(R.id.loading);
         progressBar.setVisibility(View.GONE);
+    }
+
+    private void setStartMonitoringListener(final Button startMonitoring) {
+        startMonitoring.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO: inizio monitoraggio attività dell'utente.
+                if (IS_MONITORING) {
+                    startMonitoring.setText("START");
+                    IS_MONITORING = false;
+                } else {
+                    startMonitoring.setText("STOP");
+                    IS_MONITORING = true;
+                    String joinedActivityMarkerId = MySharedPreferencesHandler.getMySharedPreferencesString(getApplicationContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivityMarkerId, "");
+                    for (Marker m : markersMap.keySet()) {
+                        if (!m.getId().equals(joinedActivityMarkerId)) {
+                            m.setVisible(!m.isVisible());
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    public void setStartMonitoringVisibility(boolean isTime) {
+        if (isTime) {
+            startMonitoring.setVisibility(View.VISIBLE);
+        } else {
+            startMonitoring.setVisibility(View.INVISIBLE);
+        }
     }
 
     private void setSearchListener(TextView search_tw) {
@@ -290,18 +322,38 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onResume() {
         super.onResume();
-
         if (mMap != null) {
             if (l == null) {
                 l = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             } else {
                 l = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             }
-           /* if (l != null) {
-                updateWithNewLocation(l);
-            }*/
+
+            if (isTimeForMonitoring()) {
+                startMonitoring.setVisibility(View.VISIBLE);
+            }
         }
-        //setUpMapIfNeeded();
+    }
+
+    public boolean isTimeForMonitoring() {
+        Date date = new Date();
+
+        SimpleDateFormat hour = new SimpleDateFormat("HH");
+        SimpleDateFormat minutes = new SimpleDateFormat("mm");
+        String currentHour = hour.format(date);
+        String currentMinutes = minutes.format(date);
+
+        String myFullHour = MySharedPreferencesHandler.getMySharedPreferencesString(getApplicationContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivityHour, "");
+        if (myFullHour != null) {
+            String[] startParsed = myFullHour.split(":");
+            String[] newHour = Arrays.copyOf(startParsed, startParsed.length - 1);
+
+            if (newHour[0].equals(currentHour)) {
+                return (currentMinutes.equals(newHour[1]) || Integer.parseInt(currentMinutes) > Integer.parseInt(newHour[1]));
+            }
+            return false;
+        }
+        return false;
     }
 
     // Method called automatically when the search ends. It allows to see the results and to move the camera to the specified
@@ -578,27 +630,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    public void startMonitoringPressed(View view) {
-        // TODO: ottenimento sid dell'attività session_info[0].equals("ok")ata e che si sta per avviare In base al sid eccetera, identificare i due marker di partenza e di arrivo
-        // TODO: e rendere invisibili tutti i marker sulla mappa tranne questi due.
-        for (Marker m : markersMap.keySet()) {
-            m.setVisible(!m.isVisible());
-        }
-
-        stopMonitoring.setVisibility(View.VISIBLE);
-        // Inizio il monitoring
-        IS_MONITORING = true;
-
-       // System.out.println("MAP SIZE=" + positionsRecorded.size());
-
-    }
-
-    public void stopMonitoring(View view) {
-        // TODO: fornire opzioni per fare il resume o per concludere l'attività.
-        IS_MONITORING = false;
-
-
-    }
 
     int radius = 10;
 
@@ -1098,7 +1129,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             hour = fullDate[1];
 
                             /////                                   /////
-                            System.out.println("DATA ED ORA: "+datetime);
+                            System.out.println("DATA ED ORA: " + datetime);
 
                             //*sid+"_"+addrS+"_"+addrD+"_"+km+"_"+experience)*//*
 
@@ -1107,7 +1138,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 // TODO: da sistemare, in quanto concatena continuamente dateTime e name.
                                 String string = markersMap.get(arg0);
                                 String concat = string + "_" + datetime + "_" + name;
-                                System.out.println("CONCATENO: "+concat);
+
                                 markersMap.put(arg0, concat);
 
 
@@ -1179,7 +1210,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         args.putString("exp", exp);
                         args.putString("hour", hour);
                         args.putString("date", date);
-
+                        args.putString("markerId", markerclicked.getId());
+                        System.out.println("ID DEL MARKER PRIMA: "+markerclicked.getId());
 
                         fragment1.setArguments(args);
                         moveToFragment(fragment1);
@@ -1209,9 +1241,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             case "settrack":
                 if (ls.get(0).equals("Success")) {
-                    Toast.makeText(getApplicationContext(),"Track sent",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Track sent", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(getApplicationContext(),"Track error",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Track error", Toast.LENGTH_SHORT).show();
                 }
 
                 break;
@@ -1220,7 +1252,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if (!ls.get(0).equals("Error") && !ls.get(0).equals("No messages")) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(this);
                     builder.setTitle("Messages by Agorun")
-                            .setMessage(ls.get(0).replace("\\n","\n"))
+                            .setMessage(ls.get(0).replace("\\n", "\n"))
                             .setCancelable(true)
                             .setIcon(R.mipmap.ic_launcher)
                             .show();
@@ -1235,24 +1267,5 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }*/
         result = "";
     }
-
-    public void sendNotification(View view) {
-        //System.out.println("HO SALVATOOOO: "+MySharedPreferencesHandler.getMySharedPreferencesString(getApplicationContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivityHour, ""));
-
-        /*boolean alarm = (PendingIntent.getBroadcast(this, 0, new Intent("ALARM"), PendingIntent.FLAG_NO_CREATE) == null);
-
-
-        if(alarm){
-            Intent itAlarm = new Intent("ALARM");
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(this,0,itAlarm,0);
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(System.currentTimeMillis());
-            calendar.add(Calendar.SECOND, 3);
-            AlarmManager alarme = (AlarmManager) getSystemService(ALARM_SERVICE);
-            alarme.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),60000, pendingIntent);
-        }*/
-
-    }
-
 }
 
