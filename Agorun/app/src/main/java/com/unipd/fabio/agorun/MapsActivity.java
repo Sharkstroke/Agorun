@@ -284,6 +284,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         if (item.getItemId() == R.id.one) {
                             Intent intent = new Intent(MapsActivity.this, AddActivity.class);
                             startActivity(intent);
+                        } else if (item.getItemId() == R.id.popularTracks) {
+                            Intent intent = new Intent(MapsActivity.this, VotedTracks.class);
+                            startActivity(intent);
                         }
                         return true;
                     }
@@ -344,7 +347,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         String currentMinutes = minutes.format(date);
 
         String myFullHour = MySharedPreferencesHandler.getMySharedPreferencesString(getApplicationContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivityHour, "");
-        if (myFullHour != null) {
+        if (!myFullHour.isEmpty()) {
             String[] startParsed = myFullHour.split(":");
             String[] newHour = Arrays.copyOf(startParsed, startParsed.length - 1);
 

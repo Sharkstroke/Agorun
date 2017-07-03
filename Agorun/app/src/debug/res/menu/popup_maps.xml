@@ -14,11 +14,11 @@
     <item
         android:id="@+id/Profile"
         android:layoutDirection="rtl"
-        android:title="Two"/>
+        android:title="two"/>
 
     <item
-        android:id="@+id/three"
+        android:id="@+id/popularTracks"
         android:layoutDirection="rtl"
-        android:title="Three"/>
+        android:title="PopularTracks"/>
 
 </menu>

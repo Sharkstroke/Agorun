@@ -72,8 +72,14 @@
             android:label="@string/title_activity_signi__in_activity"
             android:theme="@style/AppTheme" />
 
+        <activity
+            android:name=".VotedTracks"
+            android:label="@string/popularTracks"
+            android:theme="@style/AppTheme" />
+
         <!-- Giulio mod. -->
         <activity android:name=".ImageProva"></activity>
+
 
         <receiver
             android:name=".MyNotificationManager"
