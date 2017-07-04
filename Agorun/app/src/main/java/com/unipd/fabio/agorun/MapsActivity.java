@@ -166,8 +166,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mact = this;
 
         String svcName = Context.LOCATION_SERVICE;
-        locationManager = (LocationManager) getSystemService(svcName);
 
+        locationManager = (LocationManager) getSystemService(svcName);
+        //setLocalizationMethods();
         // Setting all the necessary to look for a matching provider with our preferences.
         //setCriteria();
 
@@ -188,6 +189,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setGestureManagerListener();
 
     }
+
 
     // Setto i criteri per la localizzazione.
     private void setCriteria() {
@@ -325,11 +327,29 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onResume() {
         super.onResume();
+        int i = 0;
+        float accuracy = 0.0f;
         if (mMap != null) {
             if (l == null) {
-                l = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                do{
+                    locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, locationListener, null);
+                    l = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                    if (l != null) {
+                        accuracy = l.getAccuracy();
+                    }
+                    i++;
+                } while (l == null && accuracy == 0.0 && accuracy > 20.0 && i < 3);
             } else {
-                l = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                i = 0;
+                accuracy = 0.0f;
+                do {
+                    locationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, locationListener, null);
+                    l = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                    if (l != null) {
+                        accuracy = l.getAccuracy();
+                    }
+                    i++;
+                } while(l == null && accuracy == 0.0 && accuracy > 20.0 && i < 3);
             }
 
             if (isTimeForMonitoring()) {
@@ -876,12 +896,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void setLocalizationMethods() {
+        int i = 0;
+        float accuracy = 0.0f;
         l = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
         if (l == null) {
-            locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, locationListener, null);
-            l = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            do {
+                i++;
+                locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, locationListener, null);
+                l = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                //System.out.println("Sono nel primo if." + l.getAccuracy() );
+                if (l != null) {
+                    accuracy = l.getAccuracy();
+                }
+            } while (l == null && accuracy == 0.0 && accuracy > 20.0 && i < 3);
         } else {
-            locationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, locationListener, null);
+            i = 0;
+            accuracy = 0.0f;
+            do {
+                i++;
+                locationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, locationListener, null);
+                if (l != null) {
+                    accuracy = l.getAccuracy();
+                }
+                //\System.out.println("Sono nell'else." + l.getAccuracy() );
+            } while(l == null && accuracy == 0.0 && accuracy > 20.0 && i < 3);
         }
     }
 

@@ -9,7 +9,7 @@
     <item
         android:id="@+id/one"
         android:layoutDirection="rtl"
-        android:title="New Acitvity"/>
+        android:title="New Activity"/>
 
     <item
         android:id="@+id/Profile"
@@ -19,6 +19,6 @@
     <item
         android:id="@+id/popularTracks"
         android:layoutDirection="rtl"
-        android:title="PopularTracks"/>
+        android:title="Popular Tracks"/>
 
 </menu>
