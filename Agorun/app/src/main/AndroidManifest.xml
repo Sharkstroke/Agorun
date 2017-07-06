@@ -76,6 +76,15 @@
             android:name=".VotedTracks"
             android:label="@string/popularTracks"
             android:theme="@style/AppTheme" />
+        <activity
+            android:name=".ProfileActivity"
+            android:label="Profile Activity"
+            android:theme="@style/AppTheme" />
+
+        <activity
+            android:name=".LeaderboardActivity"
+            android:label="Profile Activity"
+            android:theme="@style/AppTheme" />
 
         <!-- Giulio mod. -->
         <activity android:name=".ImageProva"></activity>

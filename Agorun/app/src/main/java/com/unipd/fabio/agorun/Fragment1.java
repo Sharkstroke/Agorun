@@ -99,7 +99,7 @@ public class Fragment1 extends Fragment {
         this.date = getArguments().getString("date");
         this.markerId = getArguments().getString("markerId");
 
-        view = inflater.inflate(R.layout.fragment_fragment1, container,  false);
+        view = inflater.inflate(R.layout.fragment_fragment_new1, container,  false);
 
         TextView txtview1  = (TextView) view.findViewById(R.id.act_start);
         TextView txtview2  = (TextView) view.findViewById(R.id.act_dest);

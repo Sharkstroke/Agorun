@@ -286,8 +286,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         if (item.getItemId() == R.id.one) {
                             Intent intent = new Intent(MapsActivity.this, AddActivity.class);
                             startActivity(intent);
-                        } else if (item.getItemId() == R.id.popularTracks) {
+                        } if (item.getItemId() == R.id.popularTracks) {
                             Intent intent = new Intent(MapsActivity.this, VotedTracks.class);
+                            startActivity(intent);
+                        } if (item.getItemId() == R.id.profile) {
+                            Intent intent = new Intent(MapsActivity.this, ProfileActivity.class);
+                            startActivity(intent);
+                        } if (item.getItemId() == R.id.leaderboard) {
+                            Intent intent = new Intent(MapsActivity.this, LeaderboardActivity.class);
                             startActivity(intent);
                         }
                         return true;
