@@ -36,7 +36,7 @@ public class ConnectDB extends AsyncTask<String, Void, ArrayList<String>> {
         this.user = user;
     }
 
-    public String getUser() {
+    public static String getUser() {
         return user;
     }
 

@@ -75,7 +75,7 @@ public class DrawMarkers extends AsyncTask<ListIterator, Void, Void> {
         int i = 0;
         for (LatLng latLng : map.keySet()) {
 
-            Marker marker = mapsActivity.addMarkerToMap(false, sids.get(i), latLng.latitude, latLng.longitude, map.get(latLng), "", "", "", "", "", "");
+            Marker marker = mapsActivity.addMarkerToMap(false, sids.get(i), latLng.latitude, latLng.longitude, map.get(latLng), "");
             i++;
 
             if (mapsActivity.getTempMarker() == null) {

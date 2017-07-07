@@ -1087,9 +1087,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     // Metodi per l'aggiunta di Markers nella mappa --> le posizioni di questi veranno get-tati dal DB.
-    public Marker addMarkerToMap(boolean isMyActivity, String sid, LatLng latLng, String km, String experience, String dateAndTime, String creatorName, String averageExp) {
+    public Marker addMarkerToMap(boolean isMyActivity, String sid, LatLng latLng) {
         MapsActivity.trackKm = km;
-        trackExperience = experience;
+        //trackExperience = experience;
         //mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17));
 
         Marker marker = mMap.addMarker(new MarkerOptions().position(latLng));
@@ -1105,22 +1105,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             markersMap.put(marker, new String(sid + "_" + addrS));
         } else {
             System.out.println("INDIRIZZO DI DESTINAZIONE DEFINITIVO: "+addrD);
-            markersMap.put(marker, new String(sid + "_" + addrS + "_" + addrD + "_" + km + "_" + experience + "_" + dateAndTime + "_" + creatorName + "_" + averageExp));
+            //markersMap.put(marker, new String(sid + "_" + addrS + "_" + addrD + "_" + km + "_" + experience + "_" + dateAndTime + "_" + creatorName + "_" + averageExp));
+            markersMap.put(marker, new String(sid + "_" + addrS + "_" + addrD));
         }
         return marker;
     }
 
     public Marker addMarkerToMap(boolean isMyActivity, String sid, double latS,
-                                 double longitS, String addrS, String addrD,
-                                 String km, String experience, String dateAndTime,
-                                 String creatorName, String averageExp) {
+                                 double longitS, String addrS, String addrD) {
         this.addrS = addrS;
         this.addrD = addrD;
-        this.dateAndTime = dateAndTime;
-        this.creatorName = creatorName;
-        this.averageExp = averageExp;
 
-        return this.addMarkerToMap(isMyActivity, sid, new LatLng(latS, longitS), km, experience, dateAndTime, creatorName, averageExp);
+        return this.addMarkerToMap(isMyActivity, sid, new LatLng(latS, longitS));
+        //return this.addMarkerToMap(isMyActivity, sid, new LatLng(latS, longitS), km, experience, dateAndTime, creatorName, averageExp);
     }
 
     private void connect(String mode, String sid) {
@@ -1319,8 +1316,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 stop = TextUtils.join(",", newStop);
 
 
-                                km = gotFromHashMap[3];
-                                exp = gotFromHashMap[4];
+                                //km = gotFromHashMap[3];
+                                //exp = gotFromHashMap[4];
+
+                                // Traduco il chilometraggio.
+                                km = getLengthRange(length);
+
+                                // Traduco l'esperienza.
+                                exp = getDifficultyRange(difficulty);
 
                                 this.twoMarkersZoom(arg0);
 
@@ -1397,21 +1400,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         fragment1.setArguments(args);
                         moveToFragment(fragment1);
 
-                        //createCircle();
-                        //checkIfPointReached();
-
-                        // Returning the view containing InfoWindow contents
-
-                        //      infowindow = v;
-
-                        //return v;
-
-                        // }
-
-                        //  });
-                        //   markerclicked.showInfoWindow();
-
-                        // Giulio Mod.
                         progressBar.setVisibility(View.GONE);
                     } else {
                         connections++;
