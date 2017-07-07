@@ -283,6 +283,15 @@ public class ConnectDB extends AsyncTask<String, Void, ArrayList<String>> {
                         url = new URL(urldb + "getinfouser.php?user=" + user);
                     }
                     break;
+
+                case "getnamerank":
+                    if (param.length != 1) {
+                        output.add("Richiedere dati per la leaderboard richiede 1 parametro");
+                        return output;
+                    } else {
+                        url = new URL(urldb + "getnamerank.php");
+                    }
+                    break;
             }
 
             conn = (HttpsURLConnection) url.openConnection();

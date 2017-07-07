@@ -51,6 +51,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.maps.model.StreetViewPanoramaCamera;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -137,6 +138,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private String exp;
     private String hour;
     private String date;
+
 
     private OnSwipeTouchListener GestureManager;
 
@@ -286,8 +288,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         if (item.getItemId() == R.id.one) {
                             Intent intent = new Intent(MapsActivity.this, AddActivity.class);
                             startActivity(intent);
-                        } else if (item.getItemId() == R.id.popularTracks) {
+                        } if (item.getItemId() == R.id.popularTracks) {
                             Intent intent = new Intent(MapsActivity.this, VotedTracks.class);
+                            startActivity(intent);
+                        } if (item.getItemId() == R.id.profile) {
+                            Intent intent = new Intent(MapsActivity.this, ProfileActivity.class);
+                            startActivity(intent);
+                        } if (item.getItemId() == R.id.leaderboard) {
+                            Intent intent = new Intent(MapsActivity.this, LeaderboardActivity.class);
                             startActivity(intent);
                         }
                         return true;
@@ -1182,6 +1190,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                 markersMap.put(arg0, concat);
 
+                                //name = this.name;
+
 
                                 //tvLat.setText("Indirizzo di partenza: " + gotFromHashMap[1]);
 
@@ -1251,6 +1261,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         args.putString("exp", exp);
                         args.putString("hour", hour);
                         args.putString("date", date);
+                        args.putString("name", session_info[6]);
+                        args.putString("noj", session_info[7]);
+                        args.putString("medlevel", session_info[8]);
                         args.putString("markerId", markerclicked.getId());
                         System.out.println("ID DEL MARKER PRIMA: "+markerclicked.getId());
 

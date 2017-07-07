@@ -33,9 +33,11 @@ public class Fragment1 extends Fragment {
     private  static String stop;
     private  static String km;
     private  static String exp;
+    private  static String name;
     private String hour;
     private String date;
     private String markerId;
+
 
     private View view;
     private Fragment3 fragment3;
@@ -95,16 +97,21 @@ public class Fragment1 extends Fragment {
         this.stop =  getArguments().getString("stop");
         this.km =  getArguments().getString("km");
         this.exp =  getArguments().getString("exp");
+        this.name =  getArguments().getString("name");
         this.hour = getArguments().getString("hour");
         this.date = getArguments().getString("date");
         this.markerId = getArguments().getString("markerId");
 
-        view = inflater.inflate(R.layout.fragment_fragment1, container,  false);
+        view = inflater.inflate(R.layout.fragment_fragment_new1, container,  false);
 
         TextView txtview1  = (TextView) view.findViewById(R.id.act_start);
         TextView txtview2  = (TextView) view.findViewById(R.id.act_dest);
         TextView txtview3  = (TextView) view.findViewById(R.id.act_exp);
         TextView txtview4  = (TextView) view.findViewById(R.id.act_km);
+        TextView txtview5  = (TextView) view.findViewById(R.id.Creator);
+        TextView txtview6  = (TextView) view.findViewById(R.id.act_hour);
+        TextView txtview7  = (TextView) view.findViewById(R.id.act_date);
+
 
         this.joinActivity = (ImageButton) view.findViewById(R.id.act_join);
 
@@ -112,6 +119,9 @@ public class Fragment1 extends Fragment {
         txtview2.setText(this.stop);
         txtview3.setText(this.exp);
         txtview4.setText(this.km);
+        txtview5.setText(this.name);
+        txtview6.setText(this.hour);
+        txtview7.setText(this.date);
 
         joinActivity.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -140,6 +150,21 @@ public class Fragment1 extends Fragment {
                 Toast.makeText(getContext(), "top", Toast.LENGTH_SHORT).show();
                 Log.d("top","top");
                 fragment3 = new Fragment3();
+
+                Bundle args = new Bundle();
+                args.putString("name" , name);
+                args.putString("start" , start);
+                args.putString("stop",stop);
+                args.putString("km", km);
+                args.putString("exp", exp);
+                args.putString("hour", hour);
+                args.putString("date", date);
+                args.putString("noj", getArguments().getString("noj"));
+                args.putString("medlevel",  getArguments().getString("medlevel"));
+
+
+
+                fragment3.setArguments(args);
                 moveToFragment(fragment3);
 
 
@@ -172,6 +197,8 @@ public class Fragment1 extends Fragment {
     }
 
     private void moveToFragment(Fragment fragment) {
+
+
 
         getFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_to_top, R.anim.slide_down)
                 .add(R.id.map, fragment, "second").addToBackStack(null).commit();
