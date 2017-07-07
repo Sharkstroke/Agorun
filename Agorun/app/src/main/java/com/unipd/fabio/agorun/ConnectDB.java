@@ -182,7 +182,7 @@ public class ConnectDB extends AsyncTask<String, Void, ArrayList<String>> {
                                 "lngsw=" + param[4] + "&" +
                                 "sids="  + param[5]);
                         output.add("getruns");
-                        System.out.println("PATH = " + url.toString());
+                        //System.out.println("PATH = " + url.toString());
                     }
                     break;
 
@@ -283,6 +283,17 @@ public class ConnectDB extends AsyncTask<String, Void, ArrayList<String>> {
                         url = new URL(urldb + "getinfouser.php?user=" + user);
                     }
                     break;
+
+                case "increaserank":
+                    if (param.length != 1) {
+                        output.add("Incrementare il rank richiede 1 parametro");
+                        return output;
+                    } else {
+                        url = new URL(urldb + "increaserank.php?user=" + user);
+                        output.add("increaserank");
+                    }
+                    break;
+
             }
 
             conn = (HttpsURLConnection) url.openConnection();
@@ -293,7 +304,7 @@ public class ConnectDB extends AsyncTask<String, Void, ArrayList<String>> {
             String line;
 
             while ((line = in.readLine()) != null) {
-                System.out.println("LINE: "+line);
+                //System.out.println("LINE: "+line);
                 output.add(line);
             }
             in.close();
@@ -311,7 +322,7 @@ public class ConnectDB extends AsyncTask<String, Void, ArrayList<String>> {
     public void print(ArrayList<String> ls) {
         ListIterator it = ls.listIterator();
         while (it.hasNext()) {
-            System.out.println(it.next());
+            //System.out.println(it.next());
         }
     }
 }

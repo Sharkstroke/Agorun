@@ -74,19 +74,22 @@ public class MyNotificationManager extends BroadcastReceiver {
 
     // Metodo che controlla e setta il tempo per la ricezione della notifica. Questa verrà mandata 10 minuti prima dell'inizio dell'attività, per cui si controllano i minuti per un eventuale cambio d'ora.
     private void setNotificationTime(String[] newHour) {
-        int currentH = Integer.parseInt(newHour[0]);
-        int currentM = Integer.parseInt(newHour[1]);
+        int activityHour = Integer.parseInt(newHour[0]);
+        int activityM = Integer.parseInt(newHour[1]);
 
-        if (currentM > 9) {
-            currentM -= TIMER;
-        } else {
-            int temp = 60 + currentM;
+        if (activityM > 9 && activityM <= 59) {
+            activityM -= TIMER;
+        } else if (activityM >= 0 && activityM <= 9) {
+            int temp = 60 + activityM;
             temp -= TIMER;
-            currentM = temp;
-            currentH -= 1;
+            activityM = temp;
+            activityHour--;
         }
 
-        timeForNotification = currentH + ":" + currentM;
+
+        timeForNotification = activityHour + ":" + activityM;
+
+        
     }
 
     public static MyNotificationManager getNewInstance() {

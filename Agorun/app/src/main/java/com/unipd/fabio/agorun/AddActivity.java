@@ -232,7 +232,7 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo, DBCon
 
                                     // Lancio l'url passandogli gli indirizzi e la API key.
                                     String url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins=" + addressStartFixed + "&destinations=" + addressDestinationFixed + "&mode=driving&language=fr-FR&avoid=tolls&key=AIzaSyCW_gvTeNeb_Gzxv8kphisyTr-PZX58djQ";
-                                    System.out.println("Start address wrong: "+url);
+                                    //System.out.println("Start address wrong: "+url);
 
                                     // Avvio il parsing ed il calcolo dei km.
                                     //new GeoTask(AddActivity.this).execute(url);
@@ -273,12 +273,13 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo, DBCon
                 list = gc.getFromLocationName(start, 1);
 
                 add = list.get(0);
-                System.out.println("ADDRESS: " + add.getAddressLine(0)+", "+add.getLocality());
+                //System.out.println("ADDRESS: " + add.getAddressLine(0)+", "+add.getLocality());
 
                 String locality = add.getLocality();
             if (!this.PRECISE_COORDS) {
                 latStart = add.getLatitude();
                 lngStart = add.getLongitude();
+                System.out.println("LAT Start = "+latStart+", LNG Start = "+lngStart);
             } else {
                 latStart = this.preciseStartLat;
                 lngStart = this.preciseStartLng;
@@ -293,9 +294,11 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo, DBCon
                 list = gc.getFromLocationName(destination, 1);
 
                 add2 = list.get(0);
+                //System.out.println("L'INDIRIZZO COMPLETO E': "+add2.getAddressLine(0) + ", "+add2.getLocality());
             if (!this.PRECISE_COORDS) {
                 latDest = add2.getLatitude();
                 lngDest = add2.getLongitude();
+                System.out.println("LAT Dest  = "+latDest+", LNG Dest = "+lngDest);
             } else {
                 latDest = this.preciseDestLat;
                 lngDest = this.preciseDestLng;
