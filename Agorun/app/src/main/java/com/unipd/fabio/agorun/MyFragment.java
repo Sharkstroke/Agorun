@@ -29,9 +29,12 @@ public class MyFragment extends Fragment implements OnMapReadyCallback {
     private String destinationToShow = "destinationP";
     private String kmToShow = "kmP";
 
+    private boolean liked;
+
     MapView m;
     GoogleMap map;
 
+    // Ritorno una istanza di questa classe passando come argomenti i dettagli sul percorso che sto per andare a presentare.
     public MyFragment newInstance(int sectionNumber, String starting, String destination, String totKm) {
         MyFragment fragment = new MyFragment();
         Bundle args = new Bundle();
@@ -46,35 +49,55 @@ public class MyFragment extends Fragment implements OnMapReadyCallback {
 
     private static View view;
 
+    // Faccio l'inflate dell'XML per la rappresentazione della mappa nella metà superiore del display e dei dettagli di un percorso nella metà inferiore.
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         try {
             view = inflater.inflate(R.layout.my_layout, container, false);
-            //View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            //TextView textView = (TextView) view.findViewById(R.id.section_label);
+
             TextView start  = (TextView) view.findViewById(R.id.startMyFragment);
             TextView destination = (TextView) view.findViewById(R.id.destinationMyFragment);
             TextView km = (TextView) view.findViewById(R.id.kmMyFragment);
             FloatingActionButton likeTrack = (FloatingActionButton) view.findViewById(R.id.fab);
 
-            System.out.println("TROVATO:" +((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.mapMyLayout)));
+            // Avvio il caricamento asincrono della mappa.
             ((SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.mapMyLayout)).getMapAsync(this);
 
 
+            // Setto il testo nelle TextViews.
             start.setText(getArguments().getString(startToShow));
             destination.setText(getArguments().getString(destinationToShow));
 
             km.setText(getArguments().getString(kmToShow));
 
+            setLikeTrackListener(likeTrack);
         } catch (InflateException e) {
         /* map is already there, just return view as it is */
         }
         return view;
     }
 
+    // Quando la mappa è pronta, vado ad effettuare il focus sul percorso. Questo metodo viene richiamato automaticamente.
     @Override
     public void onMapReady(GoogleMap googleMap) {
         myMap = googleMap;
         myMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(43.1, 23.2), 17));
+    }
+
+    private void setLikeTrackListener(final FloatingActionButton likeButton) {
+        likeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!liked) {
+                    likeButton.setImageResource(R.drawable.thumbs_up_hand_symbol);
+                    liked = true;
+                    System.out.println("Sono in !liked");
+                } else {
+                    likeButton.setImageResource(R.drawable.thumbs_up);
+                    liked = false;
+                    System.out.println("Sono in liked");
+                }
+            }
+        });
     }
 }

@@ -36,7 +36,7 @@ public class Fragment1 extends Fragment {
     private  static String name;
     private String hour;
     private String date;
-    private String markerId;
+    private String activitySid;
 
 
     private View view;
@@ -100,7 +100,7 @@ public class Fragment1 extends Fragment {
         this.name =  getArguments().getString("name");
         this.hour = getArguments().getString("hour");
         this.date = getArguments().getString("date");
-        this.markerId = getArguments().getString("markerId");
+        this.activitySid = getArguments().getString("activitySid");
 
         view = inflater.inflate(R.layout.fragment_fragment_new1, container,  false);
 
@@ -126,7 +126,8 @@ public class Fragment1 extends Fragment {
         joinActivity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MySharedPreferencesHandler.putSharedPreferencesString(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivityMarkerId, markerId);
+                MySharedPreferencesHandler.putSharedPreferencesString(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivitySid, activitySid);
+                System.out.println("Just added: "+MySharedPreferencesHandler.getMySharedPreferencesString(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivitySid, ""));
                 MySharedPreferencesHandler.putSharedPreferencesString(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivityHour, hour);
                 MySharedPreferencesHandler.putSharedPreferencesString(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinActivityDate, date);
 

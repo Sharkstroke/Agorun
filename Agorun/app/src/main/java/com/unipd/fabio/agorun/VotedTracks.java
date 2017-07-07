@@ -23,7 +23,7 @@ public class VotedTracks extends AppCompatActivity {
 
     private ViewPager mViewPager;
 
-    private static boolean liked;
+    private static final int PAGES_TO_SAVE_STATE = 10;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,10 +38,24 @@ public class VotedTracks extends AppCompatActivity {
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
+
+        /** PAGES_TO_SAVE_STATE indica il numero di pagine (schede) di cui si deve mantenere lo stato.
+         * Per il nostro caso, è bene tenere lo stato di un numero di pagine secondo me compreso tra 5 e 7.
+          */
+        mViewPager.setOffscreenPageLimit(PAGES_TO_SAVE_STATE);
         mViewPager.setAdapter(mSectionsPagerAdapter);
     }
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
+
+        /* TODO: Anziché start1, dest1 e così via, occorrerà mettere un collegamento con il DB per avere le info:
+        * TODO: 1) Indirizzo di partenza
+        * TODO: 2) Indirizzo di destinazione
+        * TODO: 3) Km totali del percorso
+        * TODO: 4) Difficoltà del percorso
+        *
+        * TODO: Bisognerà anche passare un parametro per impostare lo zoom in modo appropriato per ogni scheda.
+        * */
 
         String start1 = "Via A 1";
         String dest1 = "Via A 1";
@@ -68,33 +82,20 @@ public class VotedTracks extends AppCompatActivity {
 
             switch(position) {
                 case 0:
-                    //Fragment fragment = PlaceholderFragment.newInstance(position+1, start1, dest1, km1);
-                    //PlaceholderFragment placeholderFragment1 = new PlaceholderFragment();
-                    //getSupportFragmentManager().beginTransaction().add(placeholderFragment1, placeholderFragment1.getTag());
                     Fragment myFragment = new MyFragment().newInstance(0, start1, dest1, km1);
                     getSupportFragmentManager().beginTransaction().add(myFragment, myFragment.getTag());
-                    System.out.println("Caso 0");
                     return myFragment;
                 case 1:
-                    //PlaceholderFragment placeholderFragment2 = new PlaceholderFragment();
-                    //getSupportFragmentManager().beginTransaction().add(placeholderFragment2, placeholderFragment2.getTag());
                     Fragment fragment2 = new MyFragment().newInstance(1, start2, dest2, km2);
                     getSupportFragmentManager().beginTransaction().add(fragment2, fragment2.getTag());
-                    System.out.println("Caso 1");
                     return fragment2;
-                    //Fragment fragment2 = new PlaceholderFragment();
-                    //return fragment2;
                 case 2:
-                    //PlaceholderFragment placeholderFragment3 = new PlaceholderFragment();
-                    //getSupportFragmentManager().beginTransaction().add(placeholderFragment3, placeholderFragment3.getTag());
                     Fragment fragment3 = new MyFragment().newInstance(2, "Via", "Mia", "3");
                     getSupportFragmentManager().beginTransaction().add(fragment3, fragment3.getTag());
-                    System.out.println("Caso 2");
                     return fragment3;
                 default:
                     return null;
             }
-            //return PlaceholderFragment.newInstance(position + 1);
         }
 
         @Override
@@ -107,11 +108,11 @@ public class VotedTracks extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "Pippo";
+                    return "Section 0";
                 case 1:
-                    return "Paperino";
+                    return "Section 1";
                 case 2:
-                    return "Topolino";
+                    return "Section 2";
             }
             return null;
         }
@@ -140,8 +141,6 @@ public class VotedTracks extends AppCompatActivity {
             }
             try {
                 view = inflater.inflate(R.layout.activity_truiton_map_fragment, container, false);
-                //MapFragment mapFragment = (MapFragment) view.findViewById(R.id.mapFragment);
-
             } catch (InflateException e) {
         /* map is already there, just return view as it is */
             }
@@ -149,79 +148,4 @@ public class VotedTracks extends AppCompatActivity {
         }
 
     }
-
-
-    /*public static class MyFragment extends Fragment {
-
-        private final String ARG_SECTION_NUMBER = "section_number";
-        private String startToShow = "startingP";
-        private String destinationToShow = "destinationP";
-        private String kmToShow = "kmP";
-
-        MapView m;
-        GoogleMap map;
-
-        public MyFragment newInstance(int sectionNumber, String starting, String destination, String totKm) {
-            MyFragment fragment = new MyFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            args.putString(startToShow, starting);
-            System.out.println("Ho appena messo starting: "+starting);
-            args.putString(destinationToShow, destination);
-            args.putString(kmToShow, totKm);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        private static View view;
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            try {
-                view = inflater.inflate(R.layout.my_layout, container, false);
-                //View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-                //TextView textView = (TextView) view.findViewById(R.id.section_label);
-                TextView start  = (TextView) view.findViewById(R.id.startMyFragment);
-                TextView destination = (TextView) view.findViewById(R.id.destinationMyFragment);
-                TextView km = (TextView) view.findViewById(R.id.kmMyFragment);
-                FloatingActionButton likeTrack = (FloatingActionButton) view.findViewById(R.id.fab);
-
-                SupportMapFragment mapFragment = (SupportMapFragment) getFragmentManager().findFragmentById(R.id.mapMyLayout);
-                if (mapFragment != null) {
-                    System.out.println("Non sono null");
-                } else {
-                    System.out.println("Sono null");
-                }
-
-                start.setText(getArguments().getString(startToShow));
-                destination.setText(getArguments().getString(destinationToShow));
-
-                km.setText(getArguments().getString(kmToShow));
-
-                setLikeTrackLlistener(likeTrack);
-            } catch (InflateException e) {
-            }
-            return view;
-        }
-
-        private void setLikeTrackLlistener(final FloatingActionButton likeTrack) {
-            likeTrack.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                    if (!liked) {
-                        // Caso in cui l'utente abbia appena messo Like.
-                        likeTrack.setImageResource(R.drawable.thumbs_up_hand_symbol);
-                        liked = true;
-                    } else {
-                        // Caso in cui l'utente abbia appena tolto Like.
-                        likeTrack.setImageResource(R.drawable.thumbs_up);
-                        liked = false;
-                    }
-
-                }
-            });
-        }
-
-    }*/
 }

@@ -10,15 +10,21 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
+
 import android.widget.Toast;
 
 import java.util.ArrayList;
+
 
 /**
  * Created by root on 06/07/17.
  */
 
+
 public class LeaderboardActivity  extends AppCompatActivity  implements DBConnection{
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +34,9 @@ public class LeaderboardActivity  extends AppCompatActivity  implements DBConnec
         new ConnectDB(this).execute("getnamerank");
 
       /*  LinearLayout layout = (LinearLayout ) findViewById(R.id.list);
+
+        LinearLayout layout = (LinearLayout ) findViewById(R.id.list);
+
         final int N = 50; // total number of textviews to add
 
         final LinearLayout[] myitem = new LinearLayout[N];
@@ -83,12 +92,13 @@ public class LeaderboardActivity  extends AppCompatActivity  implements DBConnec
             myitem[i] = rowItems;
 
 
+
         }
         */
 
-
-
     }
+
+
 
     @Override
     public  void onTaskCompleted (ArrayList <String> result)
@@ -148,5 +158,10 @@ public class LeaderboardActivity  extends AppCompatActivity  implements DBConnec
 
             }
         }
-    }
+
+        }
+
+
+
+
 }

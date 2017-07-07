@@ -37,13 +37,14 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
@@ -52,8 +53,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.StreetViewPanoramaCamera;
+import com.google.maps.android.SphericalUtil;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -63,7 +64,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -92,7 +92,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     private static final int THRESHOLD_HOUR = 19;
-    private static final int POSITION_FREQUENCY = 1500;
+    private static final int POSITION_FREQUENCY = 15000;
 
     private static boolean IS_MONITORING;
 
@@ -110,6 +110,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Map<Double, Double> positionsRecorded = new HashMap<>();
 
     private Map<Marker, Marker> destinationsMap = new HashMap<>();
+
+    private Map<String, Marker> destinationMarkersMap = new HashMap<>();
 
     private int connections = 0;
 
@@ -144,7 +146,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private List<String> points = new ArrayList<String>();
 
+    private Circle startArea;
+    private Circle endArea;
 
+    private static final int START = 0;
+    private static final int DESTINATION = 1;
 
 
     @Override
@@ -190,6 +196,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         setGestureManagerListener();
 
+        //createCircle();
+
     }
 
 
@@ -219,19 +227,64 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         startMonitoring.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String joinedActivitySid = MySharedPreferencesHandler.getMySharedPreferencesString(getApplicationContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivitySid, "");
                 // TODO: inizio monitoraggio attività dell'utente.
                 if (IS_MONITORING) {
-                    startMonitoring.setText("START");
+                    /** STO MONITORANDO: IL MONITORING STA PER ESSERE DISATTIVATO.*/
+                    // TODO doppia conferma.
                     IS_MONITORING = false;
+                    if (checkIfPointReached(DESTINATION)) {
+                        // TODO: Assegnazione punteggio.
+
+                        // Aumento del ranking.
+                        new ConnectDB(MapsActivity.this).execute("increaserank");
+
+                        GetPointsFromApi getPointsFromApi = new GetPointsFromApi(MapsActivity.this);
+                        getPointsFromApi.setActivitySid(joinedActivitySid);
+                        getPointsFromApi.execute();
+
+                    } else {
+                        // TODO: mostra doppia conferma.
+                    }
                 } else {
-                    startMonitoring.setText("STOP");
-                    IS_MONITORING = true;
-                    String joinedActivityMarkerId = MySharedPreferencesHandler.getMySharedPreferencesString(getApplicationContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivityMarkerId, "");
-                    for (Marker m : markersMap.keySet()) {
+                    /** NON STO ANCORA MONITORANDO: IL MONITORING INIZIA ORA.*/
+                    createCircle();
+                    if (checkIfPointReached(START)) {
+                        startMonitoring.setText("STOP");
+                        IS_MONITORING = true;
+                        hamburgerMenu.setClickable(false);
+                        hamburgerMenu.setEnabled(false);
+
+
+                        Marker startMarker; // TODO: valutare se serve.
+                        String[] parsed;
+
+                        for (Marker m : markersMap.keySet()) {
+                            parsed = markersMap.get(m).split("_");
+                            if (parsed[0].equals(joinedActivitySid)) {
+                                startMarker = m;
+                            } else {
+                                m.setVisible(false);
+                            }
+                        }
+
+                        /** Rendo visibile il marker di destinazione.*/
+                        if (destinationMarkersMap.containsKey(joinedActivitySid)) {
+                            Marker destMarker = destinationMarkersMap.get(joinedActivitySid);
+                            destMarker.setVisible(true);
+
+                            createDestinationCircle(destMarker.getPosition());
+
+                        }
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Go closer to the starting point!", Toast.LENGTH_SHORT).show();
+                    }
+
+                    /*for (Marker m : markersMap.keySet()) {
                         if (!m.getId().equals(joinedActivityMarkerId)) {
                             m.setVisible(!m.isVisible());
                         }
-                    }
+                    }*/
                 }
             }
         });
@@ -360,6 +413,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 } while(l == null && accuracy == 0.0 && accuracy > 20.0 && i < 3);
             }
 
+            //createCircle();
+            //checkIfPointReached();
+            // TODO: inserire check periodico dell'orario.
             if (isTimeForMonitoring()) {
                 startMonitoring.setVisibility(View.VISIBLE);
             }
@@ -397,7 +453,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 Place place = PlaceAutocomplete.getPlace(this, data);
                 search_tw.setText(place.getAddress().toString());
-                Log.e("Tag", "Place: " + place.getAddress() + place.getPhoneNumber());
+                //Log.e("Tag", "Place: " + place.getAddress() + place.getPhoneNumber());
 
                 LatLng latLngFound = place.getLatLng();
 
@@ -444,7 +500,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             double longitude = location.getLongitude();
 
             // Translation of the latitude and longitude of the current position into an address.
-            Geocoder gc = new Geocoder(this, Locale.getDefault());
+            /*Geocoder gc = new Geocoder(this, Locale.getDefault());
 
             try {
                 List<Address> addresses = gc.getFromLocation(latitude, longitude, 1);
@@ -461,21 +517,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             } catch (IOException e) {
                 Log.d("Exception", "IO Exception", e);
-            }
+            }*/
         }
     }
 
     // Drawing the track.
     private void drawTrack(Location location) {
-        /*mMap.addPolyline((new PolylineOptions().add(new LatLng(formerPos.getPosition().getLatitude(), formerPos.getPosition().getLongitude()),
+        mMap.addPolyline((new PolylineOptions().add(new LatLng(formerPos.getPosition().getLatitude(), formerPos.getPosition().getLongitude()),
                 new LatLng(location.getLatitude(), location.getLongitude())
-        )).width(5).color(Color.RED).geodesic(true));*/
-        Polyline route = mMap.addPolyline(new PolylineOptions()
-                .width(5)
+        )).width(5).color(Color.RED).geodesic(true));
+        /*Polyline route = mMap.addPolyline(new PolylineOptions()
+                .width(15)
                 .color(Color.GREEN)
                 .geodesic(true)
         );
-        route.setPoints(routePoints);
+        route.setPoints(routePoints);*/
     }
 
     private void drawTrack(LatLng ll1, LatLng ll2) {
@@ -535,6 +591,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         disableDestinationMarkers();
 
         new GetPointsFromApi(this).execute(); // TODO: METTERLO NEL PUNTO GIUSTO
+
+        //Toast.makeText(getApplicationContext(), ""+ checkIfPointReached(), Toast.LENGTH_SHORT).show();
         // Mando i punti all'Api, poi mi ritornerà le linee lungo la strada
     }
 
@@ -558,61 +616,64 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     // Method called during long-time click.
     @Override
     public void onMapLongClick(LatLng latLng) {
-        disableDestinationMarkers();
+        //disableDestinationMarkers();
 
-        // Getting the latitude and longitude of the point where the user has pressed.
-        double latitude = latLng.latitude;
-        double longitude = latLng.longitude;
+        if (!IS_MONITORING) {
 
-        // Starting geocoding and translating the latitude and longitude into an address.
-        Geocoder gc = new Geocoder(this);
-        try {
-            // If this is the first long-time click, it means we're setting the starting point.
-            if (tempMarker == null) {
-                List<Address> list = null;
-                list = gc.getFromLocation(latitude, longitude, 1);
+            // Getting the latitude and longitude of the point where the user has pressed.
+            double latitude = latLng.latitude;
+            double longitude = latLng.longitude;
 
-                Address add = list.get(0);
-                startingAdd = add.getAddressLine(0) + ", " + add.getLocality();
-                startingAddressTop.setText("Starting point: " + startingAdd);
-                tempMarker = mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker()).flat(false));
+            // Starting geocoding and translating the latitude and longitude into an address.
+            Geocoder gc = new Geocoder(this);
+            try {
+                // If this is the first long-time click, it means we're setting the starting point.
+                if (tempMarker == null) {
+                    List<Address> list = null;
+                    list = gc.getFromLocation(latitude, longitude, 1);
 
-                // Adding the tempMarker object to the markersMap map, with an empty String value associated since we just need
-                // this marker as a reference when we'll use it for creating the activity. For now, we don't have any information
-                // tho.
-                markersMap.put(tempMarker, "");
-                startLatLng = latLng;
-            } else {
-                // If we're here, it means we're now setting the destination point.
-                List<Address> list = null;
-                list = gc.getFromLocation(latitude, longitude, 1);
-                Address add = list.get(0);
-                destinationAdd = add.getAddressLine(0) + ", " + add.getLocality();
+                    Address add = list.get(0);
+                    startingAdd = add.getAddressLine(0) + ", " + add.getLocality();
+                    startingAddressTop.setText("Starting point: " + startingAdd);
+                    tempMarker = mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker()).flat(false));
 
-                destLatLng = latLng;
+                    // Adding the tempMarker object to the markersMap map, with an empty String value associated since we just need
+                    // this marker as a reference when we'll use it for creating the activity. For now, we don't have any information
+                    // tho.
+                    markersMap.put(tempMarker, "");
+                    startLatLng = latLng;
+                } else {
+                    // If we're here, it means we're now setting the destination point.
+                    List<Address> list = null;
+                    list = gc.getFromLocation(latitude, longitude, 1);
+                    Address add = list.get(0);
+                    destinationAdd = add.getAddressLine(0) + ", " + add.getLocality();
 
-                destinationAddressTop.setText("Destination address: " + destinationAdd);
-                //mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)).flat(false));
+                    destLatLng = latLng;
 
-                // I launch a new AddActivity Intent, to which I'm passing parameters such as start address destination address,
-                // start and destination latitude and longitude.
-                Intent newActivity = new Intent(MapsActivity.this, AddActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putString("StartingAddress", new String(startingAdd + "_" + destinationAdd + "_" +
-                                                                startLatLng.latitude + "_" + startLatLng.longitude + "_" +
-                                                                destLatLng.latitude + "_" + destLatLng.longitude));
-                newActivity.putExtras(bundle);
-                startActivity(newActivity);
-                // Removing the tempMarker object from the google map.
-                tempMarker.remove();
-                tempMarker = null;
-                startingAdd = "";
-                destinationAdd = "";
+                    destinationAddressTop.setText("Destination address: " + destinationAdd);
+                    //mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)).flat(false));
+
+                    // I launch a new AddActivity Intent, to which I'm passing parameters such as start address destination address,
+                    // start and destination latitude and longitude.
+                    Intent newActivity = new Intent(MapsActivity.this, AddActivity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putString("StartingAddress", new String(startingAdd + "_" + destinationAdd + "_" +
+                            startLatLng.latitude + "_" + startLatLng.longitude + "_" +
+                            destLatLng.latitude + "_" + destLatLng.longitude));
+                    newActivity.putExtras(bundle);
+                    startActivity(newActivity);
+                    // Removing the tempMarker object from the google map.
+                    tempMarker.remove();
+                    tempMarker = null;
+                    startingAdd = "";
+                    destinationAdd = "";
+                }
+            } catch (Exception e) {
+                Log.i("GG", e.toString());
             }
-        } catch (Exception e) {
-            Log.i("GG", e.toString());
+            //mMap.addMarker(new MarkerOptions().position(latLng).title("Lat = "+latLng.latitude+", Long = "+latLng.longitude));
         }
-        //mMap.addMarker(new MarkerOptions().position(latLng).title("Lat = "+latLng.latitude+", Long = "+latLng.longitude));
     }
 
 
@@ -628,7 +689,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //     marker.showInfoWindow();//////////// Mod riccardo
         connections = 0;
         markerclicked = marker;
-        Log.d("Marker clicked", "fadlk");
+        //Log.d("Marker clicked", "fadlk");
         if (markersMap.containsKey(marker)) {
             String details = markersMap.get(marker);
             String[] strings = details.split("_");
@@ -664,17 +725,45 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     int radius = 10;
 
-    // TODO: il metodo deve ritornare un booleano e deve controllare se l'utente si trova nel rettangolo attorno al punto di destinazione oppure se la distanza
-    // TODO: tra l'utente ed il punto di destinazione è minore del raggio definito come campo.
-    public void checkDestinationReached() {
-        //double distance = SphericalUtil.computeDistanceBetween(mMarkerA.getPosition(), mMarkerB.getPosition());
-        //mTextView.setText("The markers are " + formatNumber(distance) + " apart.");
-        //Bounds bounds = new Bounds(l.getLatitude()-10, l.getLatitude()+10, l.getLongitude()-5, l.getLongitude()+5);
-        //return bounds.contains(l.getLatitude(), l.getLongitude());
+    public boolean checkIfPointReached(final int point) {
+        if (point == START){
+            if (startArea == null || l == null) {
+                return false;
+            }
+            double distance = SphericalUtil.computeDistanceBetween(fromLocationToLatLng(l), startArea.getCenter());
+            Toast.makeText(getApplicationContext(),(distance< startArea.getRadius())+"",Toast.LENGTH_SHORT).show();
+            return distance < startArea.getRadius();
+        } else {
+            if (endArea == null || l == null) {
+                return false;
+            }
+            double distance = SphericalUtil.computeDistanceBetween(fromLocationToLatLng(l), endArea.getCenter());
+            Toast.makeText(getApplicationContext(),(distance< endArea.getRadius())+"",Toast.LENGTH_SHORT).show();
+            return distance < endArea.getRadius();
+        }
+
     }
 
     public void twoMarkersZoom(Marker marker) {
-        if (markersMap.containsKey(marker)) {
+        Geocoder gc = new Geocoder(this);
+        try {
+            String[] parsed = markersMap.get(marker).split("_");
+            String myDest = parsed[2];
+            List<Address> list = null;
+            list = gc.getFromLocationName(myDest, 1);
+
+            Address addS = list.get(0);
+
+            mMap.addMarker(new MarkerOptions().position(new LatLng(addS.getLatitude(), addS.getLongitude())).flat(false)).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
+        } catch (Exception e) {
+            System.out.println("ERRORACCIO");
+            //Log.d("Error Localization", e.getMessage());
+        }
+        /**
+         *
+         * !!!!!!!!!!!!!!!! CODICE NON FUNZIONANTE !!!!!!!!!!!!!!!!
+         *
+         * if (markersMap.containsKey(marker)) {
             if (!destinationsMap.containsKey(marker)) {
                 String[] parsed = markersMap.get(marker).split(",");
                 String destination = parsed[2];
@@ -711,7 +800,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
                 mMap.animateCamera(cu);
             }
-        }
+        }*/
     }
 
     int tag = 0;
@@ -753,17 +842,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         // Richiedo update di posizione continuamente
-        /*locationManager.requestLocationUpdates(provider, POSITION_FREQUENCY, 5,
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 20,
                 new LocationListener() {
                     public void onLocationChanged(Location location) {
                             //recordPosition(location);
-                            //drawTrack(location);
-                            updateWithNewLocation(location);
 
-                            double lat = location.getLatitude();
-                            double lng = location.getLongitude();
+                            if (IS_MONITORING) {
 
-                            points.add(lat+","+lng);
+                                updateWithNewLocation(location);
+
+                                drawTrack(location);
+
+                                double lat = location.getLatitude();
+                                double lng = location.getLongitude();
+
+                                points.add(lat + "," + lng);
+                            }
                     }
 
                     public void onProviderDisabled(String provider) {
@@ -776,32 +870,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                                 Bundle extras) {
                     }
                 }
-        );*/
+        );
 
 
         setInfoFragmentListener();
 
         setCameraMover();
 
-    }
 
-
-/*
-    private class TimerThread extends Thread {
-        @Override
-        public void run() {
-            while (true) {
-                try {
-                    //System.out.println("eccomi");
-                    Thread.sleep(3000);
-                    //System.out.println("*********POSITION: LAT = " + formerPos.getPosition().getLatitude() + ", LONG = " + formerPos.getPosition().getLongitude() + "*********");
-                } catch (Exception e) {
-                    System.out.println(e.toString());
-                }
-            }
-        }
+        //createCircle();
     }
-*/
 
     private void setLocationListener() {
         locationListener = new LocationListener() {
@@ -1023,9 +1101,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         /*Marker newMarker = mMap.addMarker(new MarkerOptions().position(latLng).icon(BitmapDescriptorFactory.defaultMarker( // Al posto dell'argomento di icon, passare BitmapDescriptorFactory.fromResource(R.drawable.FILEIMMAGINE)));
                 BitmapDescriptorFactory.HUE_AZURE)).flat(false)); */
-        if (addrD == "") {
+        if (addrD.isEmpty()) {
             markersMap.put(marker, new String(sid + "_" + addrS));
         } else {
+            System.out.println("INDIRIZZO DI DESTINAZIONE DEFINITIVO: "+addrD);
             markersMap.put(marker, new String(sid + "_" + addrS + "_" + addrD + "_" + km + "_" + experience + "_" + dateAndTime + "_" + creatorName + "_" + averageExp));
         }
         return marker;
@@ -1099,6 +1178,33 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     ListIterator positionsIterator;
 
+    private void createCircle() {
+        String activitySid = MySharedPreferencesHandler.getMySharedPreferencesString(getApplicationContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivitySid, "");
+        if (!activitySid.isEmpty()) {
+            Marker targetMarker = null;
+            String[] allParsedStrings;
+            for (Marker m : markersMap.keySet()) {
+                allParsedStrings = markersMap.get(m).split("_");
+                if (allParsedStrings[0].equals(activitySid)) {
+                    m.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
+                    targetMarker = m;
+                    //System.out.println("Il sid è: " + activitySid);
+                    break;
+                }
+            }
+
+            if (targetMarker != null) {
+                startArea = mMap.addCircle(new CircleOptions()
+                        .center(targetMarker.getPosition())
+                        .radius(50)
+                        .strokeColor(Color.RED));
+            }
+        }
+    }
+
+    private void createDestinationCircle(LatLng destLatLng) {
+        endArea = mMap.addCircle(new CircleOptions().center(destLatLng).radius(50).strokeColor(Color.GREEN));
+    }
 
     private List<LatLng> downloadedPositions = new ArrayList<>();
 
@@ -1171,6 +1277,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             int numOfJoins = Integer.parseInt(session_info[7]);
                             int medlevel = Integer.parseInt(session_info[8]);
 
+                            // Creo marker di destinazione e lo rendo invisibile.
+                            Marker destinationMarkerToAdd = mMap.addMarker(new MarkerOptions()
+                                    .position(new LatLng(endlat, endlng)).visible(false));
+
+                            // Aggiungo il marker di destinazione all'HashMap.
+                            destinationMarkersMap.put(sid, destinationMarkerToAdd);
+
                             ///// Parso la data e l'ora separatamente /////
 
                             String[] fullDate = datetime.split(" ");
@@ -1178,7 +1291,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             hour = fullDate[1];
 
                             /////                                   /////
-                            System.out.println("DATA ED ORA: " + datetime);
+                            ///System.out.println("DATA ED ORA: " + datetime);
 
                             //*sid+"_"+addrS+"_"+addrD+"_"+km+"_"+experience)*//*
 
@@ -1267,9 +1380,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         args.putString("markerId", markerclicked.getId());
                         System.out.println("ID DEL MARKER PRIMA: "+markerclicked.getId());
 
+                        // Parso la stringa corrispondente al marker cliccato.
+                        String[] parsedString = markersMap.get(arg0).split("_");
+
+                        // Salvo il sid dell'attività joinata.
+                        String activitySid = parsedString[0];
+
+                        //System.out.println("Dopo assegnamento: "+activitySid);
+                        // Passo il sid al Fragment.
+                        args.putString("activitySid", activitySid);
+                        //System.out.println("Ho salvato "+activitySid + "nel bundle");
+
+                        // Disegno il cerchio trasparente attorno al punto di partenza.
+
+
                         fragment1.setArguments(args);
                         moveToFragment(fragment1);
 
+                        //createCircle();
+                        //checkIfPointReached();
 
                         // Returning the view containing InfoWindow contents
 
@@ -1295,6 +1424,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             case "settrack":
                 if (ls.get(0).equals("Success")) {
+                    // TODO: rendere invisibile.
                     Toast.makeText(getApplicationContext(), "Track sent", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(getApplicationContext(), "Track error", Toast.LENGTH_SHORT).show();
@@ -1310,6 +1440,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             .setCancelable(true)
                             .setIcon(R.mipmap.ic_launcher)
                             .show();
+                }
+                break;
+
+            case "increaserank":
+                if(!ls.get(0).equals("Error")) {
+                    Toast.makeText(getApplicationContext(),"Rank Increased!!",Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getApplicationContext(),"Error",Toast.LENGTH_SHORT).show();
                 }
         }
 /*

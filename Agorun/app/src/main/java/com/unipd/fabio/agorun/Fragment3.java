@@ -98,6 +98,15 @@ public class Fragment3 extends Fragment implements View.OnClickListener {
 
 
 
+
+
+
+        img = (ImageView) view.findViewById(R.id.toprofile);
+        img.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.left_to_right));
+
+
+
+
         return view;
 
     }

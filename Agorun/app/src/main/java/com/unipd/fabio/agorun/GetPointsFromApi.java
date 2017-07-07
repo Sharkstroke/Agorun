@@ -28,6 +28,9 @@ public class GetPointsFromApi extends AsyncTask<Void,Void,List<LatLng[]>> {
     private MapsActivity mapsActivity;
     private String track;
 
+    private String sid;
+
+
     public GetPointsFromApi(MapsActivity mapsActivity) {
         this.mapsActivity = mapsActivity;
         track = "";
@@ -118,11 +121,15 @@ public class GetPointsFromApi extends AsyncTask<Void,Void,List<LatLng[]>> {
 
     }
 
+    public void setActivitySid(String sid) {
+        this.sid = sid;
+    }
+
     protected void onPostExecute (List<LatLng[]> list) {
         mapsActivity.drawLines(list);
         if(! track.isEmpty()) {
             // TODO: mapsActivity.setConnections(0); SID GIOCATTOLO!
-            new ConnectDB(mapsActivity).execute("settrack","54",track);
+            new ConnectDB(mapsActivity).execute("settrack", sid,track);
         }
     }
 
