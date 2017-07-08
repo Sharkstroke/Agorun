@@ -314,6 +314,10 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo, DBCon
 
             //mapsActivity.addMarkerToMap(latDest, lngDest, "DESTINATION");
             connect();
+            //MapsActivity.getMapsData().setStartMonitoringVisibility(1);
+            if (MapsActivity.getMapsData().isTimeForMonitoring()) {
+                MapsActivity.getMapsData().setStartMonitoringVisibility(1);
+            }
         } catch(Exception e) {
             System.out.println("Geolocalizzazione fallita.");
         }

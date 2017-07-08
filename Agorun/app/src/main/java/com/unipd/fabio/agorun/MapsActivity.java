@@ -14,6 +14,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -52,7 +53,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.android.gms.maps.model.StreetViewPanoramaCamera;
 import com.google.maps.android.SphericalUtil;
 
 import java.text.SimpleDateFormat;
@@ -120,6 +120,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private String sidclicked;
 
     Timer cameraSteadyTimer = new Timer();
+
+    Timer myTimer = new Timer();
 
 
     private LatLng northEast;
@@ -195,6 +197,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setStartMonitoringListener(startMonitoring);
 
         setGestureManagerListener();
+
+        if (isTimeForMonitoring()) {
+            startMonitoring.setVisibility(View.VISIBLE);
+        }
+
+        //new Thread(new MyTimer()).start();
+
+        //runOnUiThread(new MyTimer());
 
         //createCircle();
 
@@ -290,11 +300,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
     }
 
-    public void setStartMonitoringVisibility(boolean isTime) {
-        if (isTime) {
-            startMonitoring.setVisibility(View.VISIBLE);
-        } else {
-            startMonitoring.setVisibility(View.INVISIBLE);
+    public void setStartMonitoringVisibility(int toTurn) {
+        // 0 = false; 1 = true.
+        if (isTimeForMonitoring()) {
+            startMonitoring.setVisibility(toTurn);
+        }
+    }
+
+    private class MyTimer extends TimerTask {
+
+        @Override
+        public void run() {
+
+            while (!isTimeForMonitoring()) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (isTimeForMonitoring()) {
+                            System.out.println("Prima");
+                            startMonitoring.setVisibility(View.VISIBLE);
+                            System.out.println("Dopo");
+                        }
+                    }
+                });
+            }
         }
     }
 
@@ -423,19 +452,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public boolean isTimeForMonitoring() {
+        // Ottengo l'ora corrente.
         Date date = new Date();
-
         SimpleDateFormat hour = new SimpleDateFormat("HH");
         SimpleDateFormat minutes = new SimpleDateFormat("mm");
         String currentHour = hour.format(date);
         String currentMinutes = minutes.format(date);
 
+        // Ottengo l'orario dell'attività joinata.
         String myFullHour = MySharedPreferencesHandler.getMySharedPreferencesString(getApplicationContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivityHour, "");
         if (!myFullHour.isEmpty()) {
             String[] startParsed = myFullHour.split(":");
             String[] newHour = Arrays.copyOf(startParsed, startParsed.length - 1);
-
+            // Controllo se l'ora attuale corrisponde a quella dell'attività joinata.
             if (newHour[0].equals(currentHour)) {
+                // Controllo se il minuto corrente è maggiore od uguale al minuto corrispondente all'inzio dell'attività joinata.
                 return (currentMinutes.equals(newHour[1]) || Integer.parseInt(currentMinutes) > Integer.parseInt(newHour[1]));
             }
             return false;
@@ -807,6 +838,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     static AlertDialog alert;
 
+    public void callAsynchronousTask() {
+        final Handler handler = new Handler();
+        Timer timer = new Timer();
+        TimerTask doAsynchronousTask = new TimerTask() {
+            @Override
+            public void run() {
+                handler.post(new Runnable() {
+                    public void run() {
+                        try {
+                            MyTimerAsync performBackgroundTask = new MyTimerAsync();
+                            // PerformBackgroundTask this class is the class that extends AsynchTask
+                            performBackgroundTask.execute();
+                        } catch (Exception e) {
+                            // TODO Auto-generated catch block
+                        }
+                    }
+                });
+            }
+        };
+        timer.schedule(doAsynchronousTask, 0, 60000); //execute in every 50000 ms
+    }
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -877,6 +930,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         setCameraMover();
 
+        //runOnUiThread(new MyTimer());
+
+
+        //TimerTask myTimerTask = new MyTimer();
+        //myTimer.scheduleAtFixedRate(myTimerTask, 0, 5000);
+
+        callAsynchronousTask();
 
         //createCircle();
     }

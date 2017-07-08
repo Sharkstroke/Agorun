@@ -129,7 +129,10 @@
         android:text="@string/startMonitoring"
         android:visibility="invisible"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_alignRight="@+id/button1"
+        android:layout_alignEnd="@+id/button1"
+        android:layout_marginRight="46dp"
+        android:layout_marginEnd="46dp" />
 
 
 
