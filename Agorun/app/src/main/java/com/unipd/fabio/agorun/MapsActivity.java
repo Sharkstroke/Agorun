@@ -232,9 +232,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if (IS_MONITORING) {
                     /** STO MONITORANDO: IL MONITORING STA PER ESSERE DISATTIVATO.*/
                     // TODO doppia conferma.
-                    IS_MONITORING = false;
                     if (checkIfPointReached(DESTINATION)) {
                         // TODO: Assegnazione punteggio.
+
+                        IS_MONITORING = false;
 
                         // Aumento del ranking.
                         new ConnectDB(MapsActivity.this).execute("increaserank");

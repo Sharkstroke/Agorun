@@ -107,7 +107,7 @@ public class ConnectDB extends AsyncTask<String, Void, ArrayList<String>> {
                     } else {
 
                         user = param[4];
-                        url = new URL(urldb + "register_MODIFICA.php");
+                        url = new URL(urldb + "register.php");
                         conn = (HttpsURLConnection) url.openConnection();
                         conn.setDoOutput(true);
                         conn.setRequestProperty("charset", "UTF-8");

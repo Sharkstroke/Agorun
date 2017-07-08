@@ -33,7 +33,7 @@
         android:textColor="#FFFFFF"
         android:backgroundTint="#FFFFFF"
         android:inputType="textPersonName"
-        android:text="Username" />
+        android:hint="Name" />
 
     <EditText
         android:id="@+id/email_signin"
@@ -45,11 +45,11 @@
         android:textColor="#FFFFFF"
         android:backgroundTint="#FFFFFF"
         android:inputType="textEmailAddress"
-        android:text="Email" />
+        android:hint="Email" />
 
 
 
-    <EditText
+    <Spinner
         android:id="@+id/sex_signin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -59,9 +59,9 @@
         android:textColor="#FFFFFF"
         android:backgroundTint="#FFFFFF"
         android:inputType="textPersonName"
-        android:text="Altezza" />
+        android:entries="@array/sex" />
 
-    <EditText
+    <Spinner
         android:id="@+id/exp_signin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -71,7 +71,7 @@
         android:textColor="#FFFFFF"
         android:backgroundTint="#FFFFFF"
         android:inputType="textPersonName"
-        android:text="Peso" />
+        android:entries="@array/experience" />
 
 
     <EditText
@@ -84,7 +84,7 @@
         android:textColor="#FFFFFF"
         android:backgroundTint="#FFFFFF"
         android:inputType="textPassword"
-        android:text="Password" />
+        android:hint="Password" />
 
     <EditText
         android:id="@+id/pwd_signin_ver"
@@ -96,7 +96,7 @@
         android:textColor="#FFFFFF"
         android:backgroundTint="#FFFFFF"
         android:inputType="textPassword"
-        android:text="Confirm_Password" />
+        android:hint="Confirm_Password" />
 
     <Button
         android:id="@+id/btn_signin_check"
