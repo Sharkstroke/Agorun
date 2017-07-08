@@ -15,6 +15,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.PowerManager;
 import android.provider.Settings;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -26,6 +27,7 @@ import android.util.Log;
 import android.view.Display;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
@@ -154,6 +156,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final int START = 0;
     private static final int DESTINATION = 1;
 
+    PowerManager powerManager;
+    PowerManager.WakeLock wl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -201,6 +205,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (isTimeForMonitoring()) {
             startMonitoring.setVisibility(View.VISIBLE);
         }
+
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
 
         //new Thread(new MyTimer()).start();
 
@@ -254,12 +261,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         GetPointsFromApi getPointsFromApi = new GetPointsFromApi(MapsActivity.this);
                         getPointsFromApi.setActivitySid(joinedActivitySid);
                         getPointsFromApi.execute();
-
                     } else {
                         // TODO: mostra doppia conferma.
                     }
                 } else {
                     /** NON STO ANCORA MONITORANDO: IL MONITORING INIZIA ORA.*/
+
+
                     createCircle();
                     if (checkIfPointReached(START)) {
                         startMonitoring.setText("STOP");

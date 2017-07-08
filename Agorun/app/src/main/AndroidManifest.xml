@@ -45,6 +45,7 @@
 
         <activity
             android:name=".MainActivity"
+            android:screenOrientation="portrait"
             android:label="@string/title_activity_maps">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -52,42 +53,52 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".AddActivity" />
-        <activity android:name=".ActivitySummary" />
+        <activity android:name=".AddActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".ActivitySummary"
+            android:screenOrientation="portrait"/>
 
         <!-- Giulio mod. -->
         <activity
             android:name=".Account_Activity"
-            android:label="@string/app_name" />
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".LoginActivity"
             android:label="@string/title_activity_login"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".MapsActivity"
             android:label="@string/title_activity_login"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".Signi_In_activity"
             android:label="@string/title_activity_signi__in_activity"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"
+            android:screenOrientation="portrait"/>
 
         <activity
             android:name=".VotedTracks"
             android:label="@string/popularTracks"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".ProfileActivity"
             android:label="Profile Activity"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"
+            android:screenOrientation="portrait"/>
 
         <activity
             android:name=".LeaderboardActivity"
             android:label="Profile Activity"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"
+            android:screenOrientation="portrait"/>
 
         <!-- Giulio mod. -->
-        <activity android:name=".ImageProva"></activity>
+        <activity android:name=".ImageProva"
+            android:screenOrientation="portrait"/>
 
 
         <receiver
