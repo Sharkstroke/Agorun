@@ -11,13 +11,17 @@ import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /* ## TODO: citare nei crediti la fonte delle icone con il pollice. Da inserire: Icon made by http://www.flaticon.com/authors/dave-gandy from www.flaticon.com*/
 
-public class VotedTracks extends AppCompatActivity {
+public class VotedTracks extends AppCompatActivity implements DBConnection {
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
@@ -32,18 +36,38 @@ public class VotedTracks extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        new ConnectDB(this).execute("getbesttracks");
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        /*mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
 
-        /** PAGES_TO_SAVE_STATE indica il numero di pagine (schede) di cui si deve mantenere lo stato.
+        *//** PAGES_TO_SAVE_STATE indica il numero di pagine (schede) di cui si deve mantenere lo stato.
          * Per il nostro caso, è bene tenere lo stato di un numero di pagine secondo me compreso tra 5 e 7.
-          */
+          *//*
         mViewPager.setOffscreenPageLimit(PAGES_TO_SAVE_STATE);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
+        mViewPager.setAdapter(mSectionsPagerAdapter);*/
+    }
+
+    @Override
+    public void onTaskCompleted(ArrayList<String> result) {
+        if (result.get(0).equals("Error")) {
+            Toast.makeText(getApplicationContext(),"Error getting tracks",Toast.LENGTH_SHORT).show();
+        } else {
+            mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(),result);
+
+            // Set up the ViewPager with the sections adapter.
+            mViewPager = (ViewPager) findViewById(R.id.container);
+
+            /** PAGES_TO_SAVE_STATE indica il numero di pagine (schede) di cui si deve mantenere lo stato.
+             * Per il nostro caso, è bene tenere lo stato di un numero di pagine secondo me compreso tra 5 e 7.
+             */
+            mViewPager.setOffscreenPageLimit(PAGES_TO_SAVE_STATE);
+            mViewPager.setAdapter(mSectionsPagerAdapter);
+        }
     }
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
@@ -66,11 +90,37 @@ public class VotedTracks extends AppCompatActivity {
         String km2 = "Km 2";
 
         private int[] likedButtons;
+        private List<String> tracks;
 
 
-        public SectionsPagerAdapter(FragmentManager fm) {
+        public SectionsPagerAdapter(FragmentManager fm, ArrayList<String> tracks) {
             super(fm);
             this.likedButtons = new int[getCount()];
+            this.tracks = tracks;
+
+            /** Esempio di track: 239$45.92209263216224$12.735204845666884$45.92281540750679$12.735194116830826$0$0$mfhwGugvlA!mfhwGugvlAYJ!gghwGigvlAWJ!_hhwG}fvlAOiA!ohhwGgivlAK{@!$1"
+             *
+             * La stringa contiene 9 elementi, divisi dal $
+             *
+             * 1) sid
+             * 2) start lat
+             * 3) start lng
+             * 4) end lat
+             * 5) end lng
+             * 6) length
+             * 7) difficulty
+             * 8) path
+             * 9) likes
+             *
+             * Sotto c'è un ciclo che stampa tutti gli elementi di tutte le track (al momento nel db ce n'è una sola)
+             * Per decodificare il percorso usare il metodo PolyUtil.decode(path) e per disegnarlo usare il metodo drawLine di MapsActivity
+             */
+
+            for (String track : tracks) {     // track è la stringa che contiene le info del percorso
+                for (String trackinfo : track.split("\\$")) {  // trackinfo contiene una info
+                    Toast.makeText(getApplicationContext(), trackinfo, Toast.LENGTH_SHORT).show();
+                }
+            }
         }
 
         @Override
@@ -148,4 +198,5 @@ public class VotedTracks extends AppCompatActivity {
         }
 
     }
+
 }

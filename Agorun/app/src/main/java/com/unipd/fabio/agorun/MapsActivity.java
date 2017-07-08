@@ -931,7 +931,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 double lat = location.getLatitude();
                                 double lng = location.getLongitude();
 
-                                Toast.makeText(getApplicationContext(),"dsfajkl",Toast.LENGTH_SHORT).show();
+                        //        Toast.makeText(getApplicationContext(),"dsfajkl",Toast.LENGTH_SHORT).show();
 
                                 points.add(lat + "," + lng);
                             }

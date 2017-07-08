@@ -302,6 +302,26 @@ public class ConnectDB extends AsyncTask<String, Void, ArrayList<String>> {
                     }
                     break;
 
+                case "getbesttracks":
+                    if (param.length != 1) {
+                        output.add("Gettare le best tracks richiede 1 parametro");
+                        return output;
+                    } else {
+                        url = new URL(urldb + "getbesttracks.php");
+                    }
+                    break;
+
+                case "liketrack":
+                    if (param.length != 3) {
+                        output.add("Mettere like richiede 3 parametro");
+                        return output;
+                    } else {
+                        url = new URL(urldb + "liketrack.php?" +
+                                "sid=" + param[1] +"&" +
+                                "like=" + param[2]);
+                    }
+                    break;
+
             }
 
             conn = (HttpsURLConnection) url.openConnection();
