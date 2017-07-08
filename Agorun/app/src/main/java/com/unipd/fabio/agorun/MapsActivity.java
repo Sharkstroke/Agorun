@@ -232,6 +232,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if (IS_MONITORING) {
                     /** STO MONITORANDO: IL MONITORING STA PER ESSERE DISATTIVATO.*/
                     // TODO doppia conferma.
+                    Toast.makeText(getApplicationContext(),"ismonitoring",Toast.LENGTH_SHORT);
                     if (checkIfPointReached(DESTINATION)) {
                         // TODO: Assegnazione punteggio.
 
@@ -591,7 +592,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         progressBar.setVisibility(View.GONE);
         disableDestinationMarkers();
 
-        new GetPointsFromApi(this).execute(); // TODO: METTERLO NEL PUNTO GIUSTO
+        // new GetPointsFromApi(this).execute(); // TODO: METTERLO NEL PUNTO GIUSTO
 
         //Toast.makeText(getApplicationContext(), ""+ checkIfPointReached(), Toast.LENGTH_SHORT).show();
         // Mando i punti all'Api, poi mi ritornerà le linee lungo la strada
@@ -739,7 +740,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 return false;
             }
             double distance = SphericalUtil.computeDistanceBetween(fromLocationToLatLng(l), endArea.getCenter());
-            Toast.makeText(getApplicationContext(),(distance< endArea.getRadius())+"",Toast.LENGTH_SHORT).show();
+            /*Toast.makeText(getApplicationContext(),fromLocationToLatLng(l)+","+endArea.getCenter(),Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(),(distance < endArea.getRadius())+"",Toast.LENGTH_SHORT).show();
+
+            Toast.makeText(getApplicationContext(),distance - endArea.getRadius()+"",Toast.LENGTH_SHORT).show();*/
             return distance < endArea.getRadius();
         }
 
@@ -848,7 +852,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     public void onLocationChanged(Location location) {
                             //recordPosition(location);
 
-                            if (IS_MONITORING) {
+                        l = location;
+
+
+                        if (IS_MONITORING) {
 
                                 updateWithNewLocation(location);
 
@@ -856,6 +863,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                                 double lat = location.getLatitude();
                                 double lng = location.getLongitude();
+
+                                Toast.makeText(getApplicationContext(),"dsfajkl",Toast.LENGTH_SHORT).show();
 
                                 points.add(lat + "," + lng);
                             }
@@ -1050,29 +1059,33 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     latSouthWest = southWest.latitude;
                     lngSouthWest = southWest.longitude;
 
-                    // Salvo i marker già scaricati per non riscaricarli
-                    for (Map.Entry<Marker,String> ms : markersMap.entrySet()) {
-                        String value = ms.getValue();
-                        Log.d("key,value",ms.getKey() + "/" + ms.getValue());
-                        int limit = value.indexOf('_');
-                        if (limit != -1) {
-                            String sid = value.substring(0, limit);
-                            if (! Arrays.asList(sids.split(",")).contains(sid)) {
-                                sids += (sid + ",");
+                    if (! IS_MONITORING) {
+
+                        // Salvo i marker già scaricati per non riscaricarli
+                        for (Map.Entry<Marker, String> ms : markersMap.entrySet()) {
+                            String value = ms.getValue();
+                            Log.d("key,value", ms.getKey() + "/" + ms.getValue());
+                            int limit = value.indexOf('_');
+                            if (limit != -1) {
+                                String sid = value.substring(0, limit);
+                                if (!Arrays.asList(sids.split(",")).contains(sid)) {
+                                    sids += (sid + ",");
+                                }
                             }
                         }
+
+                        //System.out.println("NORTH EAST: " + latNorthEast + ", " + lngNorthEast);
+                        //System.out.println("SOUTH WEST: " + latSouthWest + ", " + lngSouthWest);
+
+                        //System.out.println("Lat: "+cameraCenterPointLatitude+"; Lon: "+cameraCenterPointLongitude);
+                        connections = 0;
+                        progressBar.setVisibility(View.VISIBLE);
+                        connect("getruns", null);
                     }
-
-                    //System.out.println("NORTH EAST: " + latNorthEast + ", " + lngNorthEast);
-                    //System.out.println("SOUTH WEST: " + latSouthWest + ", " + lngSouthWest);
-
-                    //System.out.println("Lat: "+cameraCenterPointLatitude+"; Lon: "+cameraCenterPointLongitude);
-                    connections = 0;
-                    progressBar.setVisibility(View.VISIBLE);
-                    connect("getruns", null);
                 } catch (Exception e) {
                     System.out.println(e.toString());
                 }
+
             }
         });
     }

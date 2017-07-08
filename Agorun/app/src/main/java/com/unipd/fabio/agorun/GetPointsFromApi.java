@@ -128,7 +128,7 @@ public class GetPointsFromApi extends AsyncTask<Void,Void,List<LatLng[]>> {
     protected void onPostExecute (List<LatLng[]> list) {
         mapsActivity.drawLines(list);
         if(! track.isEmpty()) {
-            // TODO: mapsActivity.setConnections(0); SID GIOCATTOLO!
+            // TODO: mapsActivity.setConnections(0);
             new ConnectDB(mapsActivity).execute("settrack", sid,track);
         }
     }
