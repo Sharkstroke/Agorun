@@ -40,4 +40,13 @@ public class MySharedPreferencesHandler {
         return preferences.getString(key, value);
     }
 
+    public static void removeMySharedPreferences(Context context, String... keys) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        Editor editor = preferences.edit();
+        for (String s : keys) {
+            editor.remove(s);
+        }
+        editor.commit();
+    }
+
 }

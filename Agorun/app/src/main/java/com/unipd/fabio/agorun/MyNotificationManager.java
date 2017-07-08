@@ -55,8 +55,9 @@ public class MyNotificationManager extends BroadcastReceiver {
         builder.setTicker(ticker);
         builder.setContentTitle(title);
         builder.setContentText(descricao);
-        builder.setSmallIcon(R.drawable.cast_ic_notification_small_icon);
+        builder.setSmallIcon(R.mipmap.ic_launcher);
         builder.setContentIntent(p);
+        builder.setPriority(Notification.PRIORITY_MAX);
         Notification n = builder.build();
         //create the notification
         n.vibrate = new long[]{150, 300, 150, 400};

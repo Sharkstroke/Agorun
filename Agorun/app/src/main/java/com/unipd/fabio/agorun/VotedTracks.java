@@ -1,5 +1,7 @@
 package com.unipd.fabio.agorun;
 
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -15,9 +17,13 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.PolyUtil;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /* ## TODO: citare nei crediti la fonte delle icone con il pollice. Da inserire: Icon made by http://www.flaticon.com/authors/dave-gandy from www.flaticon.com*/
 
@@ -81,22 +87,28 @@ public class VotedTracks extends AppCompatActivity implements DBConnection {
         * TODO: Bisognerà anche passare un parametro per impostare lo zoom in modo appropriato per ogni scheda.
         * */
 
-        String start1 = "Via A 1";
-        String dest1 = "Via A 1";
-        String km1 = "Km 1";
-
-        String start2 = "Via B 2";
-        String dest2 = "Via B 2";
-        String km2 = "Km 2";
+        String start;
+        String dest;
+        String km;
 
         private int[] likedButtons;
         private List<String> tracks;
+
+        private Map<Integer, String> map;
+
+        private List<LatLng[]> latLngList = new ArrayList<>();
+
 
 
         public SectionsPagerAdapter(FragmentManager fm, ArrayList<String> tracks) {
             super(fm);
             this.likedButtons = new int[getCount()];
             this.tracks = tracks;
+
+            map = new HashMap<>();
+            for (int i = 0; i < getCount(); i++) {
+                map.put(i, "");
+            }
 
             /** Esempio di track: 239$45.92209263216224$12.735204845666884$45.92281540750679$12.735194116830826$0$0$mfhwGugvlA!mfhwGugvlAYJ!gghwGigvlAWJ!_hhwG}fvlAOiA!ohhwGgivlAK{@!$1"
              *
@@ -115,11 +127,52 @@ public class VotedTracks extends AppCompatActivity implements DBConnection {
              * Sotto c'è un ciclo che stampa tutti gli elementi di tutte le track (al momento nel db ce n'è una sola)
              * Per decodificare il percorso usare il metodo PolyUtil.decode(path) e per disegnarlo usare il metodo drawLine di MapsActivity
              */
-
+            Geocoder gc = new Geocoder(MapsActivity.getMapsData());
+            String[] parsed;
+            String length;
+            int index = 0;
             for (String track : tracks) {     // track è la stringa che contiene le info del percorso
-                for (String trackinfo : track.split("\\$")) {  // trackinfo contiene una info
-                    Toast.makeText(getApplicationContext(), trackinfo, Toast.LENGTH_SHORT).show();
-                }
+                // Parso le singole stringh.e
+                parsed = track.split("\\$");
+                //for (String trackinfo : track.split("\\$")) {  // trackinfo contiene una info
+                    try {
+                        // Credo un nuovo oggetto LatLng in cui salvo latitudine e longitudine del punto di partenza.
+                        //LatLng latLng = new LatLng(Double.parseDouble(parsed[1]), Double.parseDouble(parsed[2]))
+
+                        // Operazioni per ottenere l'indirizzo di partenza.
+                        List<Address> list = null;
+                        list = gc.getFromLocation(Double.parseDouble(parsed[1]),Double.parseDouble(parsed[2]), 1);
+                        Address addS = list.get(0);
+                        String address = addS.getAddressLine(0);
+
+                        // Operazioni per ottenere l'indirizzo di destinazione.
+                        list = gc.getFromLocation(Double.parseDouble(parsed[3]), Double.parseDouble(parsed[4]), 1);
+                        Address addD = list.get(0);
+                        String destination = addD.getAddressLine(0);
+                        System.out.println("Destinazione: "+destination);
+
+                        // Parso la lunghezza del percorso.
+                        length = parsed[5];
+
+                        // Aggiungo all'HashMap.
+                        map.put(index, address+"_"+destination+"_"+MapsActivity.getMapsData().getDifficultyRange(length)+"_"+parsed[8]);
+
+                        // Parso il percorso.
+                        List<LatLng> polylist = PolyUtil.decode(parsed[7]);
+                        LatLng[] polyarray    = new LatLng[polylist.size()];
+                        polyarray = polylist.toArray(polyarray);
+                        latLngList.add(polyarray);
+                        System.out.println("LatLngList = "+latLngList.get(0));
+
+
+                        index++;
+                    } catch (Exception e) {
+                        System.out.println("ERRORACCIO");
+                        //Log.d("Error Localization", e.getMessage());
+                    }
+                    //Toast.makeText(getApplicationContext(), trackinfo, Toast.LENGTH_SHORT).show();
+                //}
+
             }
         }
 
@@ -132,15 +185,15 @@ public class VotedTracks extends AppCompatActivity implements DBConnection {
 
             switch(position) {
                 case 0:
-                    Fragment myFragment = new MyFragment().newInstance(0, start1, dest1, km1);
+                    Fragment myFragment = new MyFragment().newInstance(0, map.get(0), latLngList);
                     getSupportFragmentManager().beginTransaction().add(myFragment, myFragment.getTag());
                     return myFragment;
                 case 1:
-                    Fragment fragment2 = new MyFragment().newInstance(1, start2, dest2, km2);
+                    Fragment fragment2 = new MyFragment().newInstance(1, map.get(0), latLngList);
                     getSupportFragmentManager().beginTransaction().add(fragment2, fragment2.getTag());
                     return fragment2;
                 case 2:
-                    Fragment fragment3 = new MyFragment().newInstance(2, "Via", "Mia", "3");
+                    Fragment fragment3 = new MyFragment().newInstance(2, map.get(0), latLngList);
                     getSupportFragmentManager().beginTransaction().add(fragment3, fragment3.getTag());
                     return fragment3;
                 default:

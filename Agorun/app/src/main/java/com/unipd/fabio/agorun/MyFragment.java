@@ -16,6 +16,8 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.List;
+
 /**
  * Created by fabio on 04/07/17.
  */
@@ -28,6 +30,8 @@ public class MyFragment extends Fragment implements OnMapReadyCallback {
     private String startToShow = "startingP";
     private String destinationToShow = "destinationP";
     private String kmToShow = "kmP";
+
+    private List<LatLng[]> trackPoints;
 
     private boolean liked;
 
@@ -43,6 +47,30 @@ public class MyFragment extends Fragment implements OnMapReadyCallback {
         System.out.println("Ho appena messo starting: "+starting);
         args.putString(destinationToShow, destination);
         args.putString(kmToShow, totKm);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public MyFragment newInstance(int sectionNumber, String allData, List<LatLng[]> latLngList) {
+        MyFragment fragment = new MyFragment();
+        Bundle args = new Bundle();
+
+        String[] parsed = allData.split("_");
+        String starting = parsed[0];
+        String destination = parsed[1];
+        String totKm = parsed[2];
+
+        String likes = parsed[3];
+
+        args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+        args.putString(startToShow, starting);
+
+        args.putString(destinationToShow, destination);
+        args.putString(kmToShow, totKm);
+
+        trackPoints = latLngList;
+        System.out.println("Trackpoints: "+trackPoints);
+
         fragment.setArguments(args);
         return fragment;
     }
@@ -82,6 +110,9 @@ public class MyFragment extends Fragment implements OnMapReadyCallback {
     public void onMapReady(GoogleMap googleMap) {
         myMap = googleMap;
         myMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(43.1, 23.2), 17));
+
+        //MapsActivity.getMapsData().drawLines(this.trackPoints);
+
     }
 
     private void setLikeTrackListener(final FloatingActionButton likeButton) {

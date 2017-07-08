@@ -53,7 +53,6 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.SphericalUtil;
 
@@ -267,6 +266,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         GetPointsFromApi getPointsFromApi = new GetPointsFromApi(MapsActivity.this);
                         getPointsFromApi.setActivitySid(joinedActivitySid);
                         getPointsFromApi.execute();
+
+                        MySharedPreferencesHandler.removeMySharedPreferences(getApplicationContext(),
+                            MySharedPreferencesHandler.MyPreferencesKeys.joinedActivitySid,
+                            MySharedPreferencesHandler.MyPreferencesKeys.joinedActivityHour,
+                            MySharedPreferencesHandler.MyPreferencesKeys.joinActivityDate
+                        );
+
+                        startMonitoring.setVisibility(View.INVISIBLE);
+
+                        for (Marker m : markersMap.keySet()) {
+                            m.setVisible(true);
+                        }
+
+
                     } else {
                         // TODO: mostra doppia conferma.
                     }
@@ -644,8 +657,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void drawLines (List<LatLng[]> list) {
+        //Polyline line;
         for (LatLng[] latLngs : list) {
-            Polyline line = mMap.addPolyline(new PolylineOptions().add(latLngs));
+            mMap.addPolyline(new PolylineOptions().add(latLngs)).setColor(Color.RED);
         }
     }
 
