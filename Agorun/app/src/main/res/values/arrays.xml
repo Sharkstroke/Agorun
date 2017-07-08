@@ -13,4 +13,8 @@
         <item>@string/championTrack</item>
         <item>@string/godTrack</item>
     </string-array>
+    <string-array name="sex">
+        <item>M</item>
+        <item>F</item>
+    </string-array>
 </resources>

@@ -5,8 +5,10 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -54,8 +56,8 @@ public class Signi_In_activity extends AppCompatActivity implements DBConnection
         progressDialog.setMessage("Please Wait");
         progressDialog.show();
         connections = 0;
-        t = Toast.makeText(this, "Stica", Toast.LENGTH_SHORT);
-        t.show();
+    //    t = Toast.makeText(this, "Stica", Toast.LENGTH_SHORT);
+//        t.show();
 
         final EditText editpass = (EditText) findViewById(R.id.pwd_signin);
         final EditText editpass_ver = (EditText) findViewById(R.id.pwd_signin_ver);
@@ -78,17 +80,25 @@ public class Signi_In_activity extends AppCompatActivity implements DBConnection
         final EditText editpass = (EditText) findViewById(R.id.pwd_signin);
         final EditText editpass_ver = (EditText) findViewById(R.id.pwd_signin_ver);
         final EditText editemail = (EditText) findViewById(R.id.email_signin);
-        final EditText editsex = (EditText) findViewById(R.id.sex_signin);
-        final EditText editexp = (EditText) findViewById(R.id.exp_signin);
+        final Spinner spinnersex = (Spinner) findViewById(R.id.sex_signin);
+        final Spinner spinnerexp = (Spinner) findViewById(R.id.exp_signin);
+
+        ArrayAdapter<CharSequence> adapterSex = ArrayAdapter.createFromResource(this, R.array.sex, android.R.layout.simple_spinner_item);
+        adapterSex.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnersex.setAdapter(adapterSex);
+
+        ArrayAdapter<CharSequence> adapterExp = ArrayAdapter.createFromResource(this, R.array.experience, android.R.layout.simple_spinner_item);
+        adapterSex.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerexp.setAdapter(adapterExp);
 
 
         if (!editlog.getText().toString().equals("") && !editpass.getText().toString().equals("")
-                && !editsex.getText().toString().equals("")) {
+                && !editemail.getText().toString().equals("")) {
 
 
             new ConnectDB(this).execute("register", editlog.getText().toString(),
-                    editpass.getText().toString(), editsex.getText().toString(), editemail.getText().toString(),
-                    editexp.getText().toString());
+                    editpass.getText().toString(), spinnersex.getSelectedItem().toString(), editemail.getText().toString(),
+                    spinnerexp.getSelectedItemPosition()+"");
         } else {
             t = Toast.makeText(this, "Fill in the form", Toast.LENGTH_SHORT);
             t.show();
@@ -108,8 +118,8 @@ public class Signi_In_activity extends AppCompatActivity implements DBConnection
 
         ListIterator it = ls.listIterator();
         while (it.hasNext()) {
-            t = Toast.makeText(this, "Iterate " + result, Toast.LENGTH_SHORT);
-            t.show();
+      //      t = Toast.makeText(this, "Iterate " + result, Toast.LENGTH_SHORT);
+//            t.show();
             result = result + (it.next());
         }
 
