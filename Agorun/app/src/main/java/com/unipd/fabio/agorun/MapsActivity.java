@@ -248,8 +248,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 // TODO: inizio monitoraggio attività dell'utente.
                 if (IS_MONITORING) {
                     /** STO MONITORANDO: IL MONITORING STA PER ESSERE DISATTIVATO.*/
+
                     // TODO doppia conferma.
+
+                    startMonitoring.setText("START");
+                    hamburgerMenu.setClickable(true);
+                    hamburgerMenu.setEnabled(true);
                     Toast.makeText(getApplicationContext(),"ismonitoring",Toast.LENGTH_SHORT);
+                    
                     if (checkIfPointReached(DESTINATION)) {
                         // TODO: Assegnazione punteggio.
 
