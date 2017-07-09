@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -20,13 +21,14 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by fabio on 04/07/17.
  */
 
-public class MyFragment extends Fragment implements OnMapReadyCallback {
+public class MyFragment extends Fragment implements OnMapReadyCallback, DBConnection {
 
     GoogleMap myMap;
 
@@ -49,6 +51,7 @@ public class MyFragment extends Fragment implements OnMapReadyCallback {
     private List<LatLng[]> trackPoints;
 
     private boolean liked;
+    private FloatingActionButton likeButton;
 
     MapView m;
     GoogleMap map;
@@ -170,19 +173,37 @@ public class MyFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private void setLikeTrackListener(final FloatingActionButton likeButton) {
+        this.likeButton = likeButton;
         likeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!liked) {
                     likeButton.setImageResource(R.drawable.thumbs_up_hand_symbol);
                     liked = true;
+                    new ConnectDB(MyFragment.this).execute("liketrack",sid,"like");
                     System.out.println("Sono in !liked");
                 } else {
                     likeButton.setImageResource(R.drawable.thumbs_up);
                     liked = false;
+                    new ConnectDB(MyFragment.this).execute("liketrack",sid,"dislike");
                     System.out.println("Sono in liked");
                 }
             }
         });
+    }
+
+
+    @Override
+    public void onTaskCompleted(ArrayList<String> result) {
+        if (! result.get(0).equals("Success")) {
+            Toast.makeText(getContext(),"Like error",Toast.LENGTH_SHORT).show();
+            if (liked) {
+                liked = false;
+                likeButton.setImageResource(R.drawable.thumbs_up);
+            } else {
+                liked = true;
+                likeButton.setImageResource(R.drawable.thumbs_up_hand_symbol);
+            }
+        }
     }
 }

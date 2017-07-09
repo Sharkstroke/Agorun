@@ -23,6 +23,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.text.TextUtils;
 import android.util.Log;
@@ -248,14 +249,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         startMonitoring.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String joinedActivitySid = MySharedPreferencesHandler.getMySharedPreferencesString(getApplicationContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivitySid, "");
+                final String joinedActivitySid = MySharedPreferencesHandler.getMySharedPreferencesString(getApplicationContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivitySid, "");
                 // TODO: inizio monitoraggio attività dell'utente.
                 if (IS_MONITORING) {
                     /** STO MONITORANDO: IL MONITORING STA PER ESSERE DISATTIVATO.*/
 
                     // TODO doppia conferma.
 
-                    startMonitoring.setText("START");
+                    // startMonitoring.setText("START");
                     hamburgerMenu.setClickable(true);
                     hamburgerMenu.setEnabled(true);
                     Toast.makeText(getApplicationContext(),"ismonitoring",Toast.LENGTH_SHORT);
@@ -290,13 +291,45 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     } else {
                         // TODO: mostra doppia conferma.
+                        AlertDialog.Builder builder= new AlertDialog.Builder(MapsActivity.this);
+                        builder.setTitle("Are you sure?");
+                        builder.setMessage("It seems you're not arrived! Do you really want to stop?");
+                        builder.setCancelable(false);
+                        builder.setIcon(R.mipmap.ic_launcher);
+                        builder.setPositiveButton("Yes, I can't take it anymore",new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                new ConnectDB(MapsActivity.this).execute("disjoinrun",joinedActivitySid);
+                                IS_MONITORING = false;
+                                removeStartingCircled();
+                                removeDestinationCircle();
+
+                                MySharedPreferencesHandler.removeMySharedPreferences(getApplicationContext(),
+                                        MySharedPreferencesHandler.MyPreferencesKeys.joinedActivitySid,
+                                        MySharedPreferencesHandler.MyPreferencesKeys.joinedActivityHour,
+                                        MySharedPreferencesHandler.MyPreferencesKeys.joinActivityDate
+                                );
+                                startMonitoring.setVisibility(View.INVISIBLE);
+
+                                for (Marker m : markersMap.keySet()) {
+                                    m.setVisible(true);
+                                }
+                                dialog.dismiss();
+                            }
+                        });
+                        builder.setNegativeButton("No! I can do it!", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                        builder.show();
                     }
                 } else {
                     /** NON STO ANCORA MONITORANDO: IL MONITORING INIZIA ORA.*/
 
-
+                    createCircle();
                     if (checkIfPointReached(START)) {
-                        createCircle();
                         startMonitoring.setText("STOP");
                         IS_MONITORING = true;
                         hamburgerMenu.setClickable(false);

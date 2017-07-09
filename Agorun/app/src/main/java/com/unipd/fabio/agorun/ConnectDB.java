@@ -169,6 +169,17 @@ public class ConnectDB extends AsyncTask<String, Void, ArrayList<String>> {
                     }
                     break;
 
+                case "disjoinrun":
+                    if (param.length != 2) {
+                        output.add ("La disjoin di un'attività richiede 2 parametri");
+                        return output;
+                    } else {
+                        url = new URL(urldb + "disjoinrun.php?" +
+                                "user=" + user + "&" +
+                                "sid=" + param[1]);
+                    }
+                    break;
+
                 case "getruns":
                     if (param.length != 6) {
                         output.add("La get delle attività richiede 5 parametri");
