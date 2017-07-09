@@ -15,7 +15,9 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.List;
@@ -32,6 +34,17 @@ public class MyFragment extends Fragment implements OnMapReadyCallback {
     private String startToShow = "startingP";
     private String destinationToShow = "destinationP";
     private String kmToShow = "kmP";
+    private String startLatToPass = "startLat";
+    private String startLngToPass = "startLng";
+    private String endLatToPass = "endLat";
+    private String endLngToPass = "endLng";
+    private String activitySid = "activitySid";
+
+    private String startLat;
+    private String startLng;
+    private String endLat;
+    private String endLng;
+    private String sid;
 
     private List<LatLng[]> trackPoints;
 
@@ -58,20 +71,35 @@ public class MyFragment extends Fragment implements OnMapReadyCallback {
         Bundle args = new Bundle();
 
         String[] parsed = allData.split("_");
-        String starting = parsed[0];
-        String destination = parsed[1];
-        String totKm = parsed[2];
 
-        String likes = parsed[3];
+        this.startLat = parsed[1];
+        this.startLng = parsed[2];
+        this.endLat = parsed[3];
+        this.endLng = parsed[4];
+
+        String starting = parsed[5];
+        String destination = parsed[6];
+        String totKm = parsed[7];
+
+        String likes = parsed[8];
 
         args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+
+        // Passo il sid al bundle.
+        args.putString(activitySid, parsed[0]);
+
+        args.putString(startLatToPass, startLat);
+        args.putString(startLngToPass, startLng);
+        args.putString(endLatToPass, endLat);
+        args.putString(endLngToPass, endLng);
+
         args.putString(startToShow, starting);
 
         args.putString(destinationToShow, destination);
         args.putString(kmToShow, totKm);
 
         trackPoints = latLngList;
-        System.out.println("Trackpoints: "+trackPoints);
+        //System.out.println("Trackpoints: "+trackPoints);
 
         fragment.setArguments(args);
         return fragment;
@@ -101,6 +129,13 @@ public class MyFragment extends Fragment implements OnMapReadyCallback {
             km.setText(getArguments().getString(kmToShow));
 
             setLikeTrackListener(likeTrack);
+
+            this.startLat = getArguments().getString(startLatToPass);
+            this.startLng = getArguments().getString(startLngToPass);
+            this.endLat = getArguments().getString(endLatToPass);
+            this.endLng = getArguments().getString(endLngToPass);
+            this.sid = getArguments().getString(activitySid);
+
         } catch (InflateException e) {
         /* map is already there, just return view as it is */
         }
@@ -111,7 +146,17 @@ public class MyFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         myMap = googleMap;
-        myMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(43.1, 23.2), 17));
+
+        myMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(
+                                                        Double.parseDouble(this.startLat), Double.parseDouble(this.startLng)
+                                                        ), 17)
+        );
+
+        // Aggiungo un marker nel punto di partenza, di colore blu.
+        myMap.addMarker(new MarkerOptions().position(new LatLng(Double.parseDouble(this.startLat), Double.parseDouble(this.startLng))).flat(false)).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+
+        // Aggiungo un marker nel punto di destinazione, di colore rosso.
+        myMap.addMarker(new MarkerOptions().position(new LatLng(Double.parseDouble(this.endLat), Double.parseDouble(this.endLng))).flat(false)).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
 
         // drawLines(trackPoints);
 

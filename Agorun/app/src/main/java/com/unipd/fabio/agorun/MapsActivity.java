@@ -13,6 +13,8 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
@@ -207,6 +209,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
+        if (!isInternetAvailable()) {
+            createInternetAvailabilityErrorAlert();
+        }
 
         //new Thread(new MyTimer()).start();
 
@@ -279,6 +284,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             m.setVisible(true);
                         }
 
+                        // Tolgo i cerchi colorati una volta arrivato.
+                        removeStartingCircled();
+                        removeDestinationCircle();
 
                     } else {
                         // TODO: mostra doppia conferma.
@@ -287,8 +295,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     /** NON STO ANCORA MONITORANDO: IL MONITORING INIZIA ORA.*/
 
 
-                    createCircle();
                     if (checkIfPointReached(START)) {
+                        createCircle();
                         startMonitoring.setText("STOP");
                         IS_MONITORING = true;
                         hamburgerMenu.setClickable(false);
@@ -756,7 +764,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             String[] strings = details.split("_");
             sidclicked = strings[0];
             Toast.makeText(getApplicationContext(),sidclicked,Toast.LENGTH_LONG).show();
-            connect("getinforun", sidclicked);
+            if (isInternetAvailable()) {
+                connect("getinforun", sidclicked);
+            }
 
 
         }
@@ -891,6 +901,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         };
         timer.schedule(doAsynchronousTask, 0, 60000); //execute in every 50000 ms
+    }
+
+    private boolean isInternetAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        return networkInfo != null && networkInfo.isConnected();
     }
 
     @Override
@@ -1053,12 +1069,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
     }
 
+    // Creo l'alert per far attivare la geolocalizzazione.
     private void createLocalizationErrorAlert() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         builder.setMessage(
-                "You need to activate location service to use this feature. Please turn on network or GPS mode in location settings")
-                .setTitle("Localization disabled!")
+                "The Location service must be turned on in order to use Agorun properly. Click Settings and activate it.")
+                .setTitle("No connectivity!")
                 .setCancelable(false)
                 .setPositiveButton("Settings",
                         new DialogInterface.OnClickListener() {
@@ -1078,6 +1095,33 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         alert = builder.create();
         alert.show();
     }
+
+    private void createInternetAvailabilityErrorAlert() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setMessage(
+                "No connectivity. Turn on your mobile data or Wi-Fi in order to use Agorun properly!")
+                .setTitle("Localization disabled!")
+                .setCancelable(false)
+                .setPositiveButton("Settings",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                Intent intent = new Intent(
+                                        Settings.ACTION_WIFI_SETTINGS);
+                                startActivity(intent);
+                                alert.dismiss();
+                            }
+                        })
+                .setNegativeButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                alert.dismiss();
+                            }
+                        });
+        alert = builder.create();
+        alert.show();
+    }
+
 
     private void setLocalizationMethods() {
         int i = 0;
@@ -1132,6 +1176,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         this.connections = connections;
     }
 
+    // Starto la ricerca dei markers nella zona visibile dello schermo.
     private void setCoordinates() {
         this.runOnUiThread(new Runnable() {
             @Override
@@ -1162,13 +1207,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             }
                         }
 
-                        //System.out.println("NORTH EAST: " + latNorthEast + ", " + lngNorthEast);
-                        //System.out.println("SOUTH WEST: " + latSouthWest + ", " + lngSouthWest);
-
-                        //System.out.println("Lat: "+cameraCenterPointLatitude+"; Lon: "+cameraCenterPointLongitude);
                         connections = 0;
                         progressBar.setVisibility(View.VISIBLE);
-                        connect("getruns", null);
+                        if (isInternetAvailable()) {
+                            connect("getruns", null);
+                        } else {
+                            createInternetAvailabilityErrorAlert();
+                        }
                     }
                 } catch (Exception e) {
                     System.out.println(e.toString());
@@ -1303,6 +1348,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void createDestinationCircle(LatLng destLatLng) {
         endArea = mMap.addCircle(new CircleOptions().center(destLatLng).radius(50).strokeColor(Color.GREEN));
+    }
+
+    private void removeStartingCircled() {
+        if (startArea != null) {
+            startArea.remove();
+        }
+    }
+
+    private void removeDestinationCircle() {
+        if (endArea != null) {
+            endArea.remove();
+        }
     }
 
     private List<LatLng> downloadedPositions = new ArrayList<>();
@@ -1506,7 +1563,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     } else {
                         connections++;
                         result = "";
-                        connect("getinforun", sidclicked);
+                        if (isInternetAvailable()) {
+                            connect("getinforun", sidclicked);
+                        } else {
+                            createInternetAvailabilityErrorAlert();
+                        }
                     }
                 }
 

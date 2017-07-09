@@ -9,7 +9,6 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -142,12 +141,18 @@ public class VotedTracks extends AppCompatActivity implements DBConnection {
 
                         // Operazioni per ottenere l'indirizzo di partenza.
                         List<Address> list = null;
-                        list = gc.getFromLocation(Double.parseDouble(parsed[1]),Double.parseDouble(parsed[2]), 1);
+                        Double startLat = Double.parseDouble(parsed[1]);
+                        Double startLng = Double.parseDouble(parsed[2]);
+                        Double endLat = Double.parseDouble(parsed[3]);
+                        Double endLng = Double.parseDouble(parsed[4]);
+
+                        // Geolocalizzo il punto di partenza.
+                        list = gc.getFromLocation(startLat,startLng, 1);
                         Address addS = list.get(0);
                         String address = addS.getAddressLine(0);
 
                         // Operazioni per ottenere l'indirizzo di destinazione.
-                        list = gc.getFromLocation(Double.parseDouble(parsed[3]), Double.parseDouble(parsed[4]), 1);
+                        list = gc.getFromLocation(endLat, endLng, 1);
                         Address addD = list.get(0);
                         String destination = addD.getAddressLine(0);
                         System.out.println("Destinazione: "+destination);
@@ -156,7 +161,17 @@ public class VotedTracks extends AppCompatActivity implements DBConnection {
                         length = parsed[5];
 
                         // Aggiungo all'HashMap.
-                        map.put(index, address+"_"+destination+"_"+MapsActivity.getMapsData().getDifficultyRange(length)+"_"+parsed[8]);
+                        map.put(index,
+                                parsed[0]+"_"+
+                                startLat+"_"+
+                                startLng+"_"+
+                                endLat+"_"+
+                                endLng+"_"+
+                                address+"_"+
+                                destination+"_"+
+                                MapsActivity.getMapsData().getDifficultyRange(length)+"_"+
+                                parsed[8])
+                        ;
 
                         // Parso il percorso.
                         String[] encPolylines = parsed[7].split("!");
@@ -168,13 +183,6 @@ public class VotedTracks extends AppCompatActivity implements DBConnection {
                             polyarray = polyline.toArray(polyarray);
                             latLngList.add(polyarray);
                         }
-
-                        /*List<LatLng> polylist = PolyUtil.decode(parsed[7]);
-                        LatLng[] polyarray    = new LatLng[polylist.size()];
-                        polyarray = polylist.toArray(polyarray);
-                        latLngList.add(polyarray);
-                        System.out.println("LatLngList = "+latLngList.get(0));*/
-
 
                         index++;
                     } catch (Exception e) {
