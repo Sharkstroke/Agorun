@@ -1,5 +1,6 @@
 package com.unipd.fabio.agorun;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -15,6 +16,7 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.List;
 
@@ -111,8 +113,15 @@ public class MyFragment extends Fragment implements OnMapReadyCallback {
         myMap = googleMap;
         myMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(43.1, 23.2), 17));
 
-        //MapsActivity.getMapsData().drawLines(this.trackPoints);
+        // drawLines(trackPoints);
 
+    }
+
+    public void drawLines (List<LatLng[]> list) {
+        //Polyline line;
+        for (LatLng[] latLngs : list) {
+            myMap.addPolyline(new PolylineOptions().add(latLngs)).setColor(Color.RED);
+        }
     }
 
     private void setLikeTrackListener(final FloatingActionButton likeButton) {

@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -158,11 +159,21 @@ public class VotedTracks extends AppCompatActivity implements DBConnection {
                         map.put(index, address+"_"+destination+"_"+MapsActivity.getMapsData().getDifficultyRange(length)+"_"+parsed[8]);
 
                         // Parso il percorso.
-                        List<LatLng> polylist = PolyUtil.decode(parsed[7]);
+                        String[] encPolylines = parsed[7].split("!");
+
+                        // Uso corretto di decode
+                        for (String encPolyline : encPolylines) {
+                            List<LatLng> polyline = PolyUtil.decode(encPolyline);
+                            LatLng[] polyarray    = new LatLng[polyline.size()];
+                            polyarray = polyline.toArray(polyarray);
+                            latLngList.add(polyarray);
+                        }
+
+                        /*List<LatLng> polylist = PolyUtil.decode(parsed[7]);
                         LatLng[] polyarray    = new LatLng[polylist.size()];
                         polyarray = polylist.toArray(polyarray);
                         latLngList.add(polyarray);
-                        System.out.println("LatLngList = "+latLngList.get(0));
+                        System.out.println("LatLngList = "+latLngList.get(0));*/
 
 
                         index++;
