@@ -160,7 +160,7 @@ public class VotedTracks extends AppCompatActivity implements DBConnection {
                         // Parso la lunghezza del percorso.
                         length = parsed[5];
 
-                        // Aggiungo all'HashMap.
+                        // Aggiungo all'HashMap.   // prima erano _
                         map.put(index,
                                 parsed[0]+"_"+
                                 startLat+"_"+
@@ -170,19 +170,10 @@ public class VotedTracks extends AppCompatActivity implements DBConnection {
                                 address+"_"+
                                 destination+"_"+
                                 MapsActivity.getMapsData().getDifficultyRange(length)+"_"+
-                                parsed[8])
-                        ;
+                                parsed[8] + "_" +
+                                "$" +           // Inserito perché nel path possono esserci "_"
+                                parsed[7]);
 
-                        // Parso il percorso.
-                        String[] encPolylines = parsed[7].split("!");
-
-                        // Uso corretto di decode
-                        for (String encPolyline : encPolylines) {
-                            List<LatLng> polyline = PolyUtil.decode(encPolyline);
-                            LatLng[] polyarray    = new LatLng[polyline.size()];
-                            polyarray = polyline.toArray(polyarray);
-                            latLngList.add(polyarray);
-                        }
 
                         index++;
                     } catch (Exception e) {
