@@ -20,6 +20,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.maps.android.PolyUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +42,7 @@ public class MyFragment extends Fragment implements OnMapReadyCallback, DBConnec
     private String endLatToPass = "endLat";
     private String endLngToPass = "endLng";
     private String activitySid = "activitySid";
+    private String pathToPass = "Path";
 
     private String startLat;
     private String startLng;
@@ -52,6 +54,7 @@ public class MyFragment extends Fragment implements OnMapReadyCallback, DBConnec
 
     private boolean liked;
     private FloatingActionButton likeButton;
+    private List<LatLng[]> latLngList1 = new ArrayList<>();
 
     MapView m;
     GoogleMap map;
@@ -73,8 +76,10 @@ public class MyFragment extends Fragment implements OnMapReadyCallback, DBConnec
         MyFragment fragment = new MyFragment();
         Bundle args = new Bundle();
 
-        String[] parsed = allData.split("_");
+        String[] dataSplit = allData.split("\\$");  // divido dati dal path
+        String[] parsed = dataSplit[0].split("_");
 
+        String path = dataSplit[1]; // Percorso intero
         this.startLat = parsed[1];
         this.startLng = parsed[2];
         this.endLat = parsed[3];
@@ -101,7 +106,9 @@ public class MyFragment extends Fragment implements OnMapReadyCallback, DBConnec
         args.putString(destinationToShow, destination);
         args.putString(kmToShow, totKm);
 
-        trackPoints = latLngList;
+        args.putString(pathToPass,path);
+
+        // trackPoints = latLngList;
         //System.out.println("Trackpoints: "+trackPoints);
 
         fragment.setArguments(args);
@@ -139,6 +146,16 @@ public class MyFragment extends Fragment implements OnMapReadyCallback, DBConnec
             this.endLng = getArguments().getString(endLngToPass);
             this.sid = getArguments().getString(activitySid);
 
+            String[] encPolylines = getArguments().getString(pathToPass).split("!");
+            // Uso corretto di decode
+            for (String encPolyline : encPolylines) {
+                System.out.println("Path = " + encPolyline);
+                List<LatLng> polyline = PolyUtil.decode(encPolyline);
+                LatLng[] polyarray    = new LatLng[polyline.size()];
+                polyarray = polyline.toArray(polyarray);
+                this.latLngList1.add(polyarray);
+            }
+
         } catch (InflateException e) {
         /* map is already there, just return view as it is */
         }
@@ -161,7 +178,7 @@ public class MyFragment extends Fragment implements OnMapReadyCallback, DBConnec
         // Aggiungo un marker nel punto di destinazione, di colore rosso.
         myMap.addMarker(new MarkerOptions().position(new LatLng(Double.parseDouble(this.endLat), Double.parseDouble(this.endLng))).flat(false)).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
 
-        // drawLines(trackPoints);
+        drawLines(latLngList1);
 
     }
 
