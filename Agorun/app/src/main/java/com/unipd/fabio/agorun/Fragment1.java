@@ -163,25 +163,27 @@ public class Fragment1 extends Fragment {
         view.setOnTouchListener(new OnSwipeTouchListener(getContext()) {
 
             public void onSwipeTop() {
-                Toast.makeText(getContext(), "top", Toast.LENGTH_SHORT).show();
-                Log.d("top","top");
-                fragment3 = new Fragment3();
+                if (!MapsActivity.getMapsData().isSummarySwipedUp()) {
+                    MapsActivity.getMapsData().setSummarySwiped(true);
+                    Toast.makeText(getContext(), "top", Toast.LENGTH_SHORT).show();
+                    Log.d("top", "top");
+                    fragment3 = new Fragment3();
 
-                Bundle args = new Bundle();
-                args.putString("name" , name);
-                args.putString("start" , start);
-                args.putString("stop",stop);
-                args.putString("km", km);
-                args.putString("exp", exp);
-                args.putString("hour", hour);
-                args.putString("date", date);
-                args.putString("noj", getArguments().getString("noj"));
-                args.putString("medlevel",  getArguments().getString("medlevel"));
+                    Bundle args = new Bundle();
+                    args.putString("name", name);
+                    args.putString("start", start);
+                    args.putString("stop", stop);
+                    args.putString("km", km);
+                    args.putString("exp", exp);
+                    args.putString("hour", hour);
+                    args.putString("date", date);
+                    args.putString("noj", getArguments().getString("noj"));
+                    args.putString("medlevel", getArguments().getString("medlevel"));
 
 
-
-                fragment3.setArguments(args);
-                moveToFragment(fragment3);
+                    fragment3.setArguments(args);
+                    moveToFragment(fragment3);
+                }
 
 
             }

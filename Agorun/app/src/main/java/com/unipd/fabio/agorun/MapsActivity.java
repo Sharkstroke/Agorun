@@ -160,6 +160,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     PowerManager powerManager;
     PowerManager.WakeLock wl;
 
+    private boolean summaryOpened;
+    private boolean summarySwiped;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -786,30 +789,50 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    public boolean isSummarySwipedUp() {
+        return summarySwiped;
+    }
+
+    public void setSummarySwiped(boolean swiped) {
+        this.summarySwiped = swiped;
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if (summaryOpened) { summaryOpened = false; }
+        if (summarySwiped) { summarySwiped = false; }
+    }
 
     @Override
     public boolean onMarkerClick(Marker marker) {
         disableDestinationMarkers();
+
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
         LatLng newCameraPosition = new LatLng(marker.getPosition().latitude-0.001, marker.getPosition().longitude);
 
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(newCameraPosition, 17));
-        //     marker.showInfoWindow();//////////// Mod riccardo
-        connections = 0;
-        markerclicked = marker;
-        //Log.d("Marker clicked", "fadlk");
-        if (markersMap.containsKey(marker)) {
-            String details = markersMap.get(marker);
-            String[] strings = details.split("_");
-            sidclicked = strings[0];
-            Toast.makeText(getApplicationContext(),sidclicked,Toast.LENGTH_LONG).show();
-            if (isInternetAvailable()) {
-                connect("getinforun", sidclicked);
+        if (!summaryOpened) {
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(newCameraPosition, 17));
+            //     marker.showInfoWindow();//////////// Mod riccardo
+            connections = 0;
+
+
+            summaryOpened = true;
+            markerclicked = marker;
+            //Log.d("Marker clicked", "fadlk");
+            if (markersMap.containsKey(marker)) {
+                String details = markersMap.get(marker);
+                String[] strings = details.split("_");
+                sidclicked = strings[0];
+                Toast.makeText(getApplicationContext(), sidclicked, Toast.LENGTH_LONG).show();
+                if (isInternetAvailable()) {
+                    connect("getinforun", sidclicked);
+                }
+
+
             }
-
-
         }
         progressBar.setVisibility(View.VISIBLE);
 
@@ -873,7 +896,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             Address addS = list.get(0);
 
-            mMap.addMarker(new MarkerOptions().position(new LatLng(addS.getLatitude(), addS.getLongitude())).flat(false)).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
+            //mMap.addMarker(new MarkerOptions().position(new LatLng(addS.getLatitude(), addS.getLongitude())).flat(false)).setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE));
         } catch (Exception e) {
             System.out.println("ERRORACCIO");
             //Log.d("Error Localization", e.getMessage());
@@ -1530,7 +1553,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 // Traduco l'esperienza.
                                 exp = getDifficultyRange(difficulty);
 
-                                this.twoMarkersZoom(arg0);
+                                //this.twoMarkersZoom(arg0);
 
                             } else {
                                 Geocoder gc = new Geocoder(mact);
@@ -1562,7 +1585,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     exp = getDifficultyRange(difficulty);
 
                                     // Zoom sui due markers.
-                                    this.twoMarkersZoom(arg0);
+                                    //this.twoMarkersZoom(arg0);
 
                                 } catch (Exception e) {
                                     System.out.println("Geolocalizzazione fallita.");
