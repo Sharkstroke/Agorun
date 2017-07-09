@@ -544,6 +544,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if (newHour[0].equals(currentHour)) {
                 // Controllo se il minuto corrente è maggiore od uguale al minuto corrispondente all'inzio dell'attività joinata.
                 return (currentMinutes.equals(newHour[1]) || Integer.parseInt(currentMinutes) > Integer.parseInt(newHour[1]));
+            } else if (Integer.parseInt(currentHour) >= Integer.parseInt(newHour[0])+1) {
+                return true;
             }
             return false;
         }
