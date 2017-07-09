@@ -283,6 +283,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             m.setVisible(true);
                         }
 
+                        for (Marker m : destinationMarkersMap.values()) {
+                            m.setVisible(false);
+                        }
+
                         // Tolgo i cerchi colorati una volta arrivato.
 
 
