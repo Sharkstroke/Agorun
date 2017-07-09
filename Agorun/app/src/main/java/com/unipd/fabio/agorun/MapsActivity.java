@@ -23,7 +23,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.text.TextUtils;
 import android.util.Log;
@@ -257,9 +256,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     // TODO doppia conferma.
 
                     // startMonitoring.setText("START");
-                    hamburgerMenu.setClickable(true);
-                    hamburgerMenu.setEnabled(true);
-                    Toast.makeText(getApplicationContext(),"ismonitoring",Toast.LENGTH_SHORT);
+
+                    //Toast.makeText(getApplicationContext(),"ismonitoring",Toast.LENGTH_SHORT);
                     
                     if (checkIfPointReached(DESTINATION)) {
                         // TODO: Assegnazione punteggio.
@@ -286,8 +284,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         }
 
                         // Tolgo i cerchi colorati una volta arrivato.
-                        removeStartingCircled();
-                        removeDestinationCircle();
+
 
                     } else {
                         // TODO: mostra doppia conferma.
@@ -310,6 +307,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         MySharedPreferencesHandler.MyPreferencesKeys.joinActivityDate
                                 );
                                 startMonitoring.setVisibility(View.INVISIBLE);
+                                startMonitoring.setText("START");
+                                hamburgerMenu.setClickable(true);
+                                hamburgerMenu.setEnabled(true);
+                                removeStartingCircled();
+                                removeDestinationCircle();
 
                                 for (Marker m : markersMap.keySet()) {
                                     m.setVisible(true);
@@ -357,7 +359,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                         }
                     } else {
-                        Toast.makeText(getApplicationContext(), "Go closer to the starting point!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "Get closer to the starting point!", Toast.LENGTH_SHORT).show();
                     }
 
                     /*for (Marker m : markersMap.keySet()) {
@@ -834,6 +836,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if (startArea == null || l == null) {
                 return false;
             }
+
+            // Riaggiorno la posizione.
+            setLocalizationMethods();
+
             double distance = SphericalUtil.computeDistanceBetween(fromLocationToLatLng(l), startArea.getCenter());
             Toast.makeText(getApplicationContext(),(distance< startArea.getRadius())+"",Toast.LENGTH_SHORT).show();
             return distance < startArea.getRadius();
@@ -841,11 +847,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if (endArea == null || l == null) {
                 return false;
             }
-            double distance = SphericalUtil.computeDistanceBetween(fromLocationToLatLng(l), endArea.getCenter());
-            /*Toast.makeText(getApplicationContext(),fromLocationToLatLng(l)+","+endArea.getCenter(),Toast.LENGTH_LONG).show();
-            Toast.makeText(getApplicationContext(),(distance < endArea.getRadius())+"",Toast.LENGTH_SHORT).show();
 
-            Toast.makeText(getApplicationContext(),distance - endArea.getRadius()+"",Toast.LENGTH_SHORT).show();*/
+            // Riaggiorno la posizione.
+            setLocalizationMethods();
+
+            double distance = SphericalUtil.computeDistanceBetween(fromLocationToLatLng(l), endArea.getCenter());
             return distance < endArea.getRadius();
         }
 
@@ -1365,6 +1371,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if (allParsedStrings[0].equals(activitySid)) {
                     m.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
                     targetMarker = m;
+                    targetMarker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN));
                     //System.out.println("Il sid è: " + activitySid);
                     break;
                 }
@@ -1373,8 +1380,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if (targetMarker != null) {
                 startArea = mMap.addCircle(new CircleOptions()
                         .center(targetMarker.getPosition())
-                        .radius(50)
-                        .strokeColor(Color.RED));
+                        .radius(50));
+                        //.strokeColor(Color.RED));
             }
         }
     }
@@ -1463,8 +1470,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             String difficulty = session_info[4];
                             String datetime = session_info[5];
                             String name = session_info[6];
-                            int numOfJoins = Integer.parseInt(session_info[7]);
-                            int medlevel = Integer.parseInt(session_info[8]);
+                            //int numOfJoins = Integer.parseInt(session_info[7]);
+                            //int medlevel = Integer.parseInt(session_info[8]);
 
                             // Creo marker di destinazione e lo rendo invisibile.
                             Marker destinationMarkerToAdd = mMap.addMarker(new MarkerOptions()
@@ -1571,9 +1578,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         args.putString("date", date);
                         args.putString("name", session_info[6]);
                         args.putString("noj", session_info[7]);
-                        args.putString("medlevel", session_info[8]);
+                        //args.putString("medlevel", session_info[8]);
+                        args.putString("medlevel", "medium");
                         args.putString("markerId", markerclicked.getId());
-                        System.out.println("ID DEL MARKER PRIMA: "+markerclicked.getId());
 
                         // Parso la stringa corrispondente al marker cliccato.
                         String[] parsedString = markersMap.get(arg0).split("_");

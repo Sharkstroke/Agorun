@@ -126,10 +126,25 @@ public class Fragment1 extends Fragment {
         joinActivity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (MySharedPreferencesHandler.getMySharedPreferencesString(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivitySid, "") != "" &&
+                        MySharedPreferencesHandler.getMySharedPreferencesString(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinActivityDate, "") != "" &&
+                        MySharedPreferencesHandler.getMySharedPreferencesString(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivityHour, "") != "") {
+
+                    System.out.println("Sono DENTRO!!!!!");
+                    // Cancello
+                    MySharedPreferencesHandler.removeMySharedPreferences(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivitySid);
+                    MySharedPreferencesHandler.removeMySharedPreferences(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinActivityDate);
+                    MySharedPreferencesHandler.removeMySharedPreferences(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivityHour);
+                    System.out.println("Il sid rimasto è: "+MySharedPreferencesHandler.getMySharedPreferencesString(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivitySid, ""));
+                }
                 MySharedPreferencesHandler.putSharedPreferencesString(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivitySid, activitySid);
                 System.out.println("Just added: "+MySharedPreferencesHandler.getMySharedPreferencesString(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivitySid, ""));
                 MySharedPreferencesHandler.putSharedPreferencesString(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivityHour, hour);
                 MySharedPreferencesHandler.putSharedPreferencesString(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinActivityDate, date);
+
+                if (MapsActivity.getMapsData().isTimeForMonitoring()) {
+                    MapsActivity.getMapsData().setStartMonitoringVisibility(1);
+                }
 
                 boolean alarm = (PendingIntent.getBroadcast(MapsActivity.getMapsData(), 0, new Intent("ALARM"), PendingIntent.FLAG_NO_CREATE) == null);
 
