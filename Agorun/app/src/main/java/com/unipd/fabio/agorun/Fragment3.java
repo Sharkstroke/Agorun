@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * Created by Giulio on 06/06/2017.
@@ -28,6 +29,7 @@ public class Fragment3 extends Fragment implements View.OnClickListener {
     private  static String medlevel;
     private static String hour;
     private static String date;
+    private String emailCreator;
 
     public Fragment3() {
         // Required empty public constructor
@@ -48,6 +50,9 @@ public class Fragment3 extends Fragment implements View.OnClickListener {
         this.date = getArguments().getString("date");
         this.noj = getArguments().getString("noj");
         this.medlevel = getArguments().getString("medlevel");
+        emailCreator = getArguments().getString("email");
+
+        Toast.makeText(getContext(),emailCreator,Toast.LENGTH_SHORT).show();
 
 
 
@@ -124,6 +129,7 @@ public class Fragment3 extends Fragment implements View.OnClickListener {
                 Intent myIntent = new Intent(getActivity(), ProfileActivity.class);
                 //myIntent.putExtra("key", value); //Optional parameters
                 Bundle b = new Bundle();
+                b.putString("email",emailCreator);
                 b.putString("name", name); //Your id
                 b.putString("noj", noj); //Your id
                 b.putString("start", start); //Your id

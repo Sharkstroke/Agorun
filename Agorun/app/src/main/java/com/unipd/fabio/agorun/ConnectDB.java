@@ -288,10 +288,10 @@ public class ConnectDB extends AsyncTask<String, Void, ArrayList<String>> {
                     break;
 
                 case "getinfouser":
-                    if (param.length != 1) {
-                        output.add("Richiedere info sull'utente richiede 1 parametro");
+                    if (param.length != 2) {
+                        output.add("Richiedere info sull'utente richiede 2 parametro");
                     } else {
-                        url = new URL(urldb + "getinfouser.php?user=" + user);
+                        url = new URL(urldb + "getinfouser.php?user=" + param[1]);
                     }
                     break;
 

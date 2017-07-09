@@ -15,8 +15,12 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.vision.text.Text;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import static android.R.attr.bitmap;
 import static com.unipd.fabio.agorun.R.id.imageView;
@@ -25,7 +29,14 @@ import static com.unipd.fabio.agorun.R.id.imageView;
  * Created by root on 04/07/17.
  */
 
-public class ProfileActivity extends AppCompatActivity {
+public class ProfileActivity extends AppCompatActivity implements DBConnection {
+
+    private TextView name;
+    private TextView experience;
+    private TextView rank;
+    private TextView created;
+
+    private String email;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,12 +46,20 @@ public class ProfileActivity extends AppCompatActivity {
         RatingBar r = (RatingBar) findViewById(R.id.ratingBar);
         r.setEnabled(false);
 
-        Bundle b = getIntent().getExtras();
+        name = (TextView) findViewById(R.id.act_name);
+        experience = (TextView) findViewById(R.id.experience);
+        rank = (TextView) findViewById(R.id.rank);
+        created = (TextView) findViewById(R.id.created);
 
+        if (getIntent().getExtras() != null && getIntent().hasExtra("email")) {
+            email = getIntent().getStringExtra("email");
+        } else {
+            email = ConnectDB.getUser();
+        }
 
+        Toast.makeText(getApplicationContext(),email,Toast.LENGTH_SHORT).show();
 
-        TextView name = (TextView) findViewById(R.id.act_name);
-        name.setText(b.getString("name"));
+        new ConnectDB(this).execute("getinfouser",email);
 
 
 /*
@@ -56,4 +75,16 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onTaskCompleted(ArrayList<String> result) {
+        if (! result.get(0).equals("Problem getting informations") && ! result.get(0).equals("User not found")) {
+            String[] infos = result.get(0).split("\\|");
+            name.setText(infos[0]);
+            rank.setText(infos[2]);
+            experience.setText(MapsActivity.getDifficultyRange(infos[3]));
+            created.setText(infos[4]);
+        } else {
+            Toast.makeText(getApplicationContext(),"Problem getting infos",Toast.LENGTH_SHORT).show();
+        }
+    }
 }

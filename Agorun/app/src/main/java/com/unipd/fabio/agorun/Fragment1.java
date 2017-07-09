@@ -37,6 +37,7 @@ public class Fragment1 extends Fragment {
     private String hour;
     private String date;
     private String activitySid;
+    private String emailCreator;
 
 
     private View view;
@@ -101,6 +102,7 @@ public class Fragment1 extends Fragment {
         this.hour = getArguments().getString("hour");
         this.date = getArguments().getString("date");
         this.activitySid = getArguments().getString("activitySid");
+        this.emailCreator = getArguments().getString("email");
 
         view = inflater.inflate(R.layout.fragment_fragment_new1, container,  false);
 
@@ -177,6 +179,7 @@ public class Fragment1 extends Fragment {
                 args.putString("date", date);
                 args.putString("noj", getArguments().getString("noj"));
                 args.putString("medlevel",  getArguments().getString("medlevel"));
+                args.putString("email",emailCreator);
 
 
 

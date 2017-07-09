@@ -1321,7 +1321,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    public String getLengthRange(String length) {
+    public static String getLengthRange(String length) {
         if (length.equals("0")) {
             return "Short: 0-5 km";
         } else if (length.equals("1")) {
@@ -1335,7 +1335,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    public String getDifficultyRange(String difficulty) {
+    public static String getDifficultyRange(String difficulty) {
         if (difficulty.equals("0")) {
             return "Beginner";
         } else if (difficulty.equals("1")) {
@@ -1581,9 +1581,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         args.putString("hour", hour);
                         args.putString("date", date);
                         args.putString("name", session_info[6]);
-                        args.putString("noj", session_info[7]);
-                        //args.putString("medlevel", session_info[8]);
+                        args.putString("noj", session_info[8]);
+                        //args.putString("medlevel", session_info[9]);
                         args.putString("medlevel", "medium");
+                        args.putString("email",session_info[7]);
+                    //    Toast.makeText(getApplicationContext(),session_info[7],Toast.LENGTH_SHORT).show();
                         args.putString("markerId", markerclicked.getId());
 
                         // Parso la stringa corrispondente al marker cliccato.
