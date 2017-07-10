@@ -827,7 +827,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         display.getSize(size);
         LatLng newCameraPosition = new LatLng(marker.getPosition().latitude-0.001, marker.getPosition().longitude);
 
-        if (!summaryOpened) {
+
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(newCameraPosition, 17));
             //     marker.showInfoWindow();//////////// Mod riccardo
             connections = 0;
@@ -847,7 +847,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
             }
-        }
+
         progressBar.setVisibility(View.VISIBLE);
 
         ///////// mod riccardo
@@ -867,7 +867,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void moveToFragment(Fragment fragment) {
 
         getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_up, R.anim.slide_down)
-                .add(R.id.map, fragment, "first").addToBackStack(null).commit();
+                .replace(R.id.map, fragment, "first").addToBackStack(null).commit();
 
     }
 

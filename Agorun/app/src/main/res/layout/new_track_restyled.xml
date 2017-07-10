@@ -1,20 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimaryDark">
 
+    <TextView
+        android:id="@+id/Creator"
+        android:background="@color/colorPrimary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="none"
+        android:textAlignment="center"
+        android:text="Create a new acitvity"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#FFFFFF"
+        android:layout_gravity="center"
+        android:textSize="20dp" />
 
 
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/startAddress"
+        android:layout_marginTop="10dp"
+        android:textAlignment="center"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#FFFFFF"
+        android:textColorHint="#FFFFFF"
         android:hint="@string/startHint"/>
 
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/destinationAddress"
+        android:layout_marginTop="10dp"
+        android:textAlignment="center"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#FFFFFF"
+        android:textColorHint="#FFFFFF"
         android:hint="@string/destinationHint"/>
 
     <TextView
@@ -22,7 +46,10 @@
         android:layout_height="wrap_content"
         android:id="@+id/trackLengthChoice"
         android:clickable="false"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="15dp"
+        android:textAlignment="center"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#FFFFFF"
         android:text="@string/lengthChoice"/>
 
     <Spinner
@@ -32,7 +59,12 @@
         android:layout_width="fill_parent"
         android:padding="6dp"
         android:entries="@array/trackLength"
-        android:layout_marginBottom="10dp"/>
+        android:layout_marginTop="5dp"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#FFFFFF"
+
+        android:textAlignment="center"
+       />
 
 
     <TextView
@@ -40,7 +72,10 @@
         android:layout_height="wrap_content"
         android:id="@+id/chooseExperience"
         android:clickable="false"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="15dp"
+        android:textAlignment="center"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#FFFFFF"
         android:text="@string/difficultyLevel"/>
 
     <Spinner
@@ -50,14 +85,21 @@
         android:layout_width="fill_parent"
         android:padding="6dp"
         android:entries="@array/experience"
-        android:layout_marginBottom="10dp"/>
+        android:layout_marginTop="5dp"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#FFFFFF"
+
+        android:textAlignment="center"/>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/chooseDate"
         android:clickable="false"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="15dp"
+        android:textAlignment="center"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#FFFFFF"
         android:text="@string/choosedate"/>
 
     <TextView
@@ -68,14 +110,20 @@
         android:textSize="20dp"
         android:clickable="true"
         android:onClick="onClickDate"
-        android:layout_marginBottom="10dp" />
+        android:layout_marginTop="5dp"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#FFFFFF"
+        android:textAlignment="center" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/chooseTime"
         android:clickable="false"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="15dp"
+        android:textAlignment="center"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#FFFFFF"
         android:text="@string/choosetime"/>
 
     <TextView
@@ -86,16 +134,23 @@
         android:clickable="true"
         android:textSize="20dp"
         android:onClick="onClickTime"
-        android:layout_marginBottom="10dp" />
+        android:layout_marginTop="15dp"
+        android:layout_gravity="center"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#FFFFFF"
+        android:textAlignment="center" />
 
     <Button
+        android:id="@+id/createActivityButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/createActivityButton"
-        android:text="@string/createActivityText"
-        android:layout_marginTop="15dp"
-        android:onClick="geoLocate"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:background="@color/colorAccent"
         android:enabled="false"
-        />
+        android:onClick="geoLocate"
+        android:text="@string/createActivityText"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#FFFFFF" />
 
 </LinearLayout>

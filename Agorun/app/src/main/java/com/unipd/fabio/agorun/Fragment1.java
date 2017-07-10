@@ -173,7 +173,7 @@ public class Fragment1 extends Fragment implements DBConnection {
                 fragment3.setArguments(args);
                 moveToFragment(fragment3);
 =======*/
-                if (!MapsActivity.getMapsData().isSummarySwipedUp()) {
+
                     MapsActivity.getMapsData().setSummarySwiped(true);
                     Toast.makeText(getContext(), "top", Toast.LENGTH_SHORT).show();
                     Log.d("top", "top");
@@ -194,7 +194,7 @@ public class Fragment1 extends Fragment implements DBConnection {
 
                     fragment3.setArguments(args);
                     moveToFragment(fragment3);
-                }
+
 // >>>>>>> 078eafc03bd11c77602ecae4ea0020c487bebc22
 
 

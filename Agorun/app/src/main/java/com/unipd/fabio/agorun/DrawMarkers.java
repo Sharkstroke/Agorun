@@ -2,7 +2,7 @@ package com.unipd.fabio.agorun;
 
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.Toast;
+
 
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -54,7 +54,7 @@ public class DrawMarkers extends AsyncTask<ListIterator, Void, Void> {
                     session_points.add(session_point);
 
                     sids.add(session_point[0]);
-
+                    Log.d("info", session_point[0]);
                     //                Log.d("sid", sid);
 
                     lat = Double.parseDouble(session_point[1]);
