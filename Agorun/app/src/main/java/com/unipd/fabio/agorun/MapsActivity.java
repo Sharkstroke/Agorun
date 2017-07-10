@@ -291,6 +291,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         }
 
                         // Tolgo i cerchi colorati una volta arrivato.
+                        removeStartingCircled();
+                        removeDestinationCircle();
 
 
                     } else {
@@ -1048,7 +1050,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         );
 
 
-        setInfoFragmentListener();
+        // setInfoFragmentListener(); TODO: vedere se si può tenere commentato
 
         setCameraMover();
 

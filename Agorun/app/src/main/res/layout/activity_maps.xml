@@ -74,7 +74,8 @@
         android:textSize="19dp"
         android:background="@color/colorPrimary"
 
-        android:text="La tua posizione"
+        android:drawableLeft="@android:drawable/ic_menu_search"
+        android:text="Search Location"
 
         android:textColor="#FFFFFF"
         android:padding="15dp"

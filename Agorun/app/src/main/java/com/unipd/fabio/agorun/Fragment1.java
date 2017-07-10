@@ -19,15 +19,17 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class Fragment1 extends Fragment {
+public class Fragment1 extends Fragment implements DBConnection {
 
     private ImageButton joinActivity;
+    private ImageButton disjoinActivity;
 
     private  static String start;
     private  static String stop;
@@ -38,7 +40,6 @@ public class Fragment1 extends Fragment {
     private String date;
     private String activitySid;
     private String emailCreator;
-
 
     private View view;
     private Fragment3 fragment3;
@@ -116,6 +117,7 @@ public class Fragment1 extends Fragment {
 
 
         this.joinActivity = (ImageButton) view.findViewById(R.id.act_join);
+        this.disjoinActivity = (ImageButton) view.findViewById(R.id.act_disjoin);
 
         txtview1.setText(this.start);
         txtview2.setText(this.stop);
@@ -159,6 +161,8 @@ public class Fragment1 extends Fragment {
                     AlarmManager alarme = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
                     alarme.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),60000, pendingIntent);
                 }
+
+                new ConnectDB(Fragment1.this).execute("joinrun",activitySid);
             }
         });
 
@@ -246,5 +250,19 @@ public class Fragment1 extends Fragment {
         getFragmentManager().beginTransaction().setCustomAnimations(R.anim.slide_to_top, R.anim.slide_down)
                 .add(R.id.map, fragment, "second").addToBackStack(null).commit();
 
+    }
+
+    @Override
+    public void onTaskCompleted(ArrayList<String> result) {
+        switch (result.get(0)) {
+            case "Join Riuscito":
+                Toast.makeText(getContext(), "Joined!", Toast.LENGTH_SHORT).show();
+                break;
+            case "Disjoined from this session":
+                Toast.makeText(getContext(), "Disjoined!", Toast.LENGTH_SHORT).show();
+                break;
+            default:
+                Toast.makeText(getContext(), "Error in this operation", Toast.LENGTH_SHORT).show();
+        }
     }
 }
