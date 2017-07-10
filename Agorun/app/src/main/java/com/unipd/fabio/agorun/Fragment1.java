@@ -19,6 +19,9 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Marker;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -31,6 +34,8 @@ public class Fragment1 extends Fragment implements DBConnection {
     private ImageButton joinActivity;
     private ImageButton disjoinActivity;
 
+    private MapsActivity mapsActivity;
+
     private  static String start;
     private  static String stop;
     private  static String km;
@@ -40,6 +45,7 @@ public class Fragment1 extends Fragment implements DBConnection {
     private String date;
     private String activitySid;
     private String emailCreator;
+    private String markerId;
 
     private View view;
     private Fragment3 fragment3;
@@ -94,6 +100,7 @@ public class Fragment1 extends Fragment implements DBConnection {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        mapsActivity = MapsActivity.getMapsData();
 
         this.start =  getArguments().getString("start");
         this.stop =  getArguments().getString("stop");
@@ -104,6 +111,7 @@ public class Fragment1 extends Fragment implements DBConnection {
         this.date = getArguments().getString("date");
         this.activitySid = getArguments().getString("activitySid");
         this.emailCreator = getArguments().getString("email");
+        this.markerId = getArguments().getString("markerId");
 
         view = inflater.inflate(R.layout.fragment_fragment_new1, container,  false);
 
@@ -130,39 +138,14 @@ public class Fragment1 extends Fragment implements DBConnection {
         joinActivity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (MySharedPreferencesHandler.getMySharedPreferencesString(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivitySid, "") != "" &&
-                        MySharedPreferencesHandler.getMySharedPreferencesString(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinActivityDate, "") != "" &&
-                        MySharedPreferencesHandler.getMySharedPreferencesString(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivityHour, "") != "") {
-
-                    System.out.println("Sono DENTRO!!!!!");
-                    // Cancello
-                    MySharedPreferencesHandler.removeMySharedPreferences(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivitySid);
-                    MySharedPreferencesHandler.removeMySharedPreferences(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinActivityDate);
-                    MySharedPreferencesHandler.removeMySharedPreferences(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivityHour);
-                    System.out.println("Il sid rimasto è: "+MySharedPreferencesHandler.getMySharedPreferencesString(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivitySid, ""));
-                }
-                MySharedPreferencesHandler.putSharedPreferencesString(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivitySid, activitySid);
-                System.out.println("Just added: "+MySharedPreferencesHandler.getMySharedPreferencesString(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivitySid, ""));
-                MySharedPreferencesHandler.putSharedPreferencesString(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivityHour, hour);
-                MySharedPreferencesHandler.putSharedPreferencesString(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinActivityDate, date);
-
-                if (MapsActivity.getMapsData().isTimeForMonitoring()) {
-                    MapsActivity.getMapsData().setStartMonitoringVisibility(1);
-                }
-
-                boolean alarm = (PendingIntent.getBroadcast(MapsActivity.getMapsData(), 0, new Intent("ALARM"), PendingIntent.FLAG_NO_CREATE) == null);
-
-                if(alarm){
-                    Intent itAlarm = new Intent("ALARM");
-                    PendingIntent pendingIntent = PendingIntent.getBroadcast(MapsActivity.getMapsData(),0,itAlarm,0);
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.setTimeInMillis(System.currentTimeMillis());
-                    calendar.add(Calendar.SECOND, 3);
-                    AlarmManager alarme = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
-                    alarme.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),60000, pendingIntent);
-                }
-
                 new ConnectDB(Fragment1.this).execute("joinrun",activitySid);
+            }
+        });
+
+        disjoinActivity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new ConnectDB(Fragment1.this).execute("disjoinrun",activitySid);
             }
         });
 
@@ -256,9 +239,54 @@ public class Fragment1 extends Fragment implements DBConnection {
     public void onTaskCompleted(ArrayList<String> result) {
         switch (result.get(0)) {
             case "Join Riuscito":
+                if (MySharedPreferencesHandler.getMySharedPreferencesString(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivitySid, "") != "" &&
+                        MySharedPreferencesHandler.getMySharedPreferencesString(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinActivityDate, "") != "" &&
+                        MySharedPreferencesHandler.getMySharedPreferencesString(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivityHour, "") != "") {
+
+                    System.out.println("Sono DENTRO!!!!!");
+                    // Cancello
+                    MySharedPreferencesHandler.removeMySharedPreferences(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivitySid);
+                    MySharedPreferencesHandler.removeMySharedPreferences(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinActivityDate);
+                    MySharedPreferencesHandler.removeMySharedPreferences(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivityHour);
+                    System.out.println("Il sid rimasto è: "+MySharedPreferencesHandler.getMySharedPreferencesString(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivitySid, ""));
+                }
+                MySharedPreferencesHandler.putSharedPreferencesString(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivitySid, activitySid);
+                System.out.println("Just added: "+MySharedPreferencesHandler.getMySharedPreferencesString(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivitySid, ""));
+                MySharedPreferencesHandler.putSharedPreferencesString(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivityHour, hour);
+                MySharedPreferencesHandler.putSharedPreferencesString(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinActivityDate, date);
+
+                if (MapsActivity.getMapsData().isTimeForMonitoring()) {
+                    MapsActivity.getMapsData().setStartMonitoringVisibility(1);
+                }
+
+                boolean alarm = (PendingIntent.getBroadcast(MapsActivity.getMapsData(), 0, new Intent("ALARM"), PendingIntent.FLAG_NO_CREATE) == null);
+
+                if(alarm){
+                    Intent itAlarm = new Intent("ALARM");
+                    PendingIntent pendingIntent = PendingIntent.getBroadcast(MapsActivity.getMapsData(),0,itAlarm,0);
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTimeInMillis(System.currentTimeMillis());
+                    calendar.add(Calendar.SECOND, 3);
+                    AlarmManager alarme = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+                    alarme.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),60000, pendingIntent);
+                }
                 Toast.makeText(getContext(), "Joined!", Toast.LENGTH_SHORT).show();
+                for (Marker m : mapsActivity.getMarkersMap().keySet()) {
+                    if (m.getId().equals(markerId))
+                        m.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+                }
+
                 break;
             case "Disjoined from this session":
+                MySharedPreferencesHandler.removeMySharedPreferences(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivitySid);
+                MySharedPreferencesHandler.removeMySharedPreferences(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinActivityDate);
+                MySharedPreferencesHandler.removeMySharedPreferences(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivityHour);
+
+                mapsActivity.setStartMonitoringVisibility(false);
+                for (Marker m : mapsActivity.getMarkersMap().keySet()) {
+                    if (m.getId().equals(markerId))
+                        m.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                }
                 Toast.makeText(getContext(), "Disjoined!", Toast.LENGTH_SHORT).show();
                 break;
             default:

@@ -1,6 +1,8 @@
 package com.unipd.fabio.agorun;
 
 import android.os.AsyncTask;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -27,7 +29,7 @@ public class DrawMarkers extends AsyncTask<ListIterator, Void, Void> {
     String addrS;
 
     List<String> sids = new ArrayList<>();
-    List<LatLng> list = new ArrayList<>();
+    List<String[]> session_points = new ArrayList<>();
 
 
     @Override
@@ -49,6 +51,8 @@ public class DrawMarkers extends AsyncTask<ListIterator, Void, Void> {
                     mapsActivity.setConnections(0);
 
                     session_point = result.split(";");
+                    session_points.add(session_point);
+
                     sids.add(session_point[0]);
 
                     //                Log.d("sid", sid);
@@ -57,6 +61,10 @@ public class DrawMarkers extends AsyncTask<ListIterator, Void, Void> {
                     lng = Double.parseDouble(session_point[2]);
                     addrS = mapsActivity.geoLocateStart(lat, lng);
                     map.put(new LatLng(lat, lng), addrS);
+
+                    for (String info : session_point) {
+                        Log.d("info",info);
+                    }
 
                     result = "";
                 }
@@ -76,14 +84,14 @@ public class DrawMarkers extends AsyncTask<ListIterator, Void, Void> {
         for (LatLng latLng : map.keySet()) {
 
             Marker marker = mapsActivity.addMarkerToMap(false, sids.get(i), latLng.latitude, latLng.longitude, map.get(latLng), "");
-            i++;
 
             if (mapsActivity.getTempMarker() == null) {
 
-                if (session_point.length == 4) {
+                if (session_points.get(i).length == 4) {
                     marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
                 }
             }
+            i++;
         }
     }
 }

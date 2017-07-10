@@ -381,6 +381,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
     }
 
+    public void setStartMonitoringVisibility (boolean visible) {
+        if (visible) {
+            startMonitoring.setVisibility(View.VISIBLE);
+        } else {
+            startMonitoring.setVisibility(View.INVISIBLE);
+        }
+    }
+
     public void setStartMonitoringVisibility(int toTurn) {
         // 0 = false; 1 = true.
         if (isTimeForMonitoring()) {
@@ -656,6 +664,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void recordPosition(Location location) {
         positionsRecorded.put(location.getLatitude(), location.getLongitude());
         routePoints.add(new LatLng(location.getLatitude(), location.getLongitude()));
+    }
+
+    public Map<Marker,String> getMarkersMap() {
+        return markersMap;
     }
 
     /**
