@@ -30,6 +30,15 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+<<<<<<< HEAD
+=======
+
+
+
+
+
+    <!-- Giulio mod. -->
+>>>>>>> ffb5dd82cf88ec6b98d920e1ddf32ba86effad27
 
     <style name="CustomShowcaseTheme" parent="ShowcaseView.Light">
     <item name="sv_backgroundColor">#3300A621</item>

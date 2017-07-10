@@ -2,14 +2,20 @@ package com.unipd.fabio.agorun;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.res.Resources;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
+import android.text.SpannableString;
 import android.text.TextWatcher;
+import android.text.style.UnderlineSpan;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -67,10 +73,12 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo, DBCon
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.new_track);
+        setContentView(R.layout.new_track_restyled);
 
         calendar = Calendar.getInstance();
         setGraphicalObjects();
+
+
 
         if (getIntent().getExtras() != null) {
             String startAddressPassed = getIntent().getExtras().getString("StartingAddress");
@@ -136,7 +144,11 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo, DBCon
         startAddress = (EditText) findViewById(R.id.startAddress);
         destinationAddress = (EditText) findViewById(R.id.destinationAddress);
         trackLength = (Spinner) findViewById(R.id.trackLength);
+        ArrayAdapter adapter = ArrayAdapter.createFromResource(this, R.array.trackLength, R.layout.spinner_item);
+        trackLength.setAdapter(adapter);
         experienceSpinner = (Spinner) findViewById(R.id.ExperienceSpinner);
+        ArrayAdapter adapter2 = ArrayAdapter.createFromResource(this, R.array.experience, R.layout.spinner_item);
+        experienceSpinner.setAdapter(adapter2);
         createActivity = (Button) findViewById(R.id.createActivityButton);
         dateview = (TextView) findViewById(R.id.datetextview);
         dateview.setTypeface(null, Typeface.BOLD);
@@ -144,6 +156,29 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo, DBCon
         dateview.setText(df.format(calendar.getTime()));
         timeview = (TextView) findViewById(R.id.timetextview);
         timeview.setTypeface(null, Typeface.BOLD);
+
+        TextView textView = (TextView) findViewById(R.id.trackLengthChoice);
+        SpannableString content = new SpannableString("Select the length range of the track");
+        content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+        textView.setText(content);
+
+        TextView textView2 = (TextView) findViewById(R.id.chooseExperience);
+        SpannableString content2 = new SpannableString("Select the difficulty of the track");
+        content2.setSpan(new UnderlineSpan(), 0, content2.length(), 0);
+        textView2.setText(content2);
+
+        TextView textView3 = (TextView) findViewById(R.id.chooseDate);
+        SpannableString content3 = new SpannableString("Select the date of the activity");
+        content3.setSpan(new UnderlineSpan(), 0, content3.length(), 0);
+        textView3.setText(content3);
+
+
+        TextView textView4 = (TextView) findViewById(R.id.chooseTime);
+        SpannableString content4 = new SpannableString("Choose the starting time");
+        content4.setSpan(new UnderlineSpan(), 0, content4.length(), 0);
+        textView4.setText(content4);
+
+
     }
 
     private void setDestinationAddressListener() {
