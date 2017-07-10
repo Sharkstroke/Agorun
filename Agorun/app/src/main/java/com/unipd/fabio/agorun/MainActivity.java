@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements
         }
 
 
-
+        btnSignIn.setVisibility(View.INVISIBLE);
     }
 
 
