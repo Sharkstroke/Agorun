@@ -14,6 +14,7 @@ public class MySharedPreferencesHandler {
         public static final String joinedActivitySid = "joinedActivitySid";
         public static final String joinedActivityHour = "joinedActivityHour";
         public static final String joinActivityDate = "joinedActivityDate";
+        public static final String tutorialCompleted = "tutorialCompleted";
     }
 
     public static void putSharedPreferencesInt(Context context, String key, int value) {

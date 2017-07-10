@@ -110,6 +110,8 @@ public class MainActivity extends AppCompatActivity implements
             MainActivity.this.startActivity(myIntent);
         }
 
+
+
     }
 
 
@@ -192,6 +194,7 @@ public class MainActivity extends AppCompatActivity implements
 
         switch (id) {
             case R.id.btn_sign_in:
+                MySharedPreferencesHandler.putSharedPreferencesString(getApplicationContext(), MySharedPreferencesHandler.MyPreferencesKeys.tutorialCompleted, "toComplete");
                 signIn();
                 break;
 
@@ -204,9 +207,11 @@ public class MainActivity extends AppCompatActivity implements
                 break;
 
             case R.id.btn_login:
+                MySharedPreferencesHandler.putSharedPreferencesString(getApplicationContext(), MySharedPreferencesHandler.MyPreferencesKeys.tutorialCompleted, "toComplete");
                 login();
                 break;
             case R.id.btn_register:
+                MySharedPreferencesHandler.putSharedPreferencesString(getApplicationContext(), MySharedPreferencesHandler.MyPreferencesKeys.tutorialCompleted, "toComplete");
                 register();
                 break;
         }

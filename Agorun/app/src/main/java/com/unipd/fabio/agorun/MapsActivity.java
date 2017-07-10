@@ -15,6 +15,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
@@ -28,6 +29,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Display;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -37,6 +39,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.amlcurran.showcaseview.OnShowcaseEventListener;
+import com.github.amlcurran.showcaseview.ShowcaseView;
+import com.github.amlcurran.showcaseview.targets.ViewTarget;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.Status;
@@ -74,7 +79,7 @@ import java.util.TimerTask;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,
         GoogleMap.OnMapClickListener, GoogleMap.OnMapLongClickListener, GoogleMap.OnMarkerClickListener,
-        DBConnection {
+        DBConnection, OnShowcaseEventListener, View.OnClickListener {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     public Marker whereAmI;
@@ -393,6 +398,53 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // 0 = false; 1 = true.
         if (isTimeForMonitoring()) {
             startMonitoring.setVisibility(toTurn);
+        }
+    }
+
+    @Override
+    public void onShowcaseViewHide(ShowcaseView showcaseView) {
+
+    }
+
+    @Override
+    public void onShowcaseViewDidHide(ShowcaseView showcaseView) {
+
+    }
+
+    @Override
+    public void onShowcaseViewShow(ShowcaseView showcaseView) {
+
+    }
+
+    @Override
+    public void onShowcaseViewTouchBlocked(MotionEvent motionEvent) {
+
+    }
+
+    int counter = 0;
+
+    @Override
+    public void onClick(View v) {
+        switch (counter) {
+            case 0:
+                showCaseView.setShowcase(new ViewTarget(search_tw), true);
+                showCaseView.setContentTitle("This is the Search Bar");
+                showCaseView.setContentText("Use this to find the addresses you want to look for!");
+                showCaseView.setStyle(R.style.CustomShowcaseTheme3);
+                break;
+            case 1:
+                showCaseView.hide();
+                setAlpha(1.0f, hamburgerMenu, search_tw);
+                break;
+        }
+        counter++;
+    }
+
+    private void setAlpha(float alpha, View... views) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            for (View view : views) {
+                view.setAlpha(alpha);
+            }
         }
     }
 
@@ -991,6 +1043,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return networkInfo != null && networkInfo.isConnected();
     }
 
+    private ShowcaseView showCaseView;
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -1073,6 +1127,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //myTimer.scheduleAtFixedRate(myTimerTask, 0, 5000);
 
         callAsynchronousTask();
+
+        if (MySharedPreferencesHandler.getMySharedPreferencesString(
+                getApplicationContext(),
+                MySharedPreferencesHandler.MyPreferencesKeys.tutorialCompleted,
+                "").equals("toComplete")) {
+            MySharedPreferencesHandler.putSharedPreferencesString(getApplicationContext(), MySharedPreferencesHandler.MyPreferencesKeys.tutorialCompleted, "completed");
+            showCaseView = new ShowcaseView.Builder(this)
+                    .setTarget(new ViewTarget(findViewById(R.id.button1)))
+                    .setOnClickListener(this)
+                    .setStyle(R.style.CustomShowcaseTheme3)
+                    .setContentTitle("This is the Menu")
+                    .setContentText("Interact with it to access all the features offered by Agorun!")
+                    .build();
+            showCaseView.setButtonText("Got it");
+
+
+        }
 
         //createCircle();
     }
