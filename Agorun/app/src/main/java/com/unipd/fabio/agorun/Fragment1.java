@@ -11,6 +11,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -283,6 +285,7 @@ public class Fragment1 extends Fragment implements DBConnection {
                 MySharedPreferencesHandler.removeMySharedPreferences(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivityHour);
 
                 mapsActivity.setStartMonitoringVisibility(false);
+                mapsActivity.removeStartingCircled();
                 for (Marker m : mapsActivity.getMarkersMap().keySet()) {
                     if (m.getId().equals(markerId))
                         m.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));

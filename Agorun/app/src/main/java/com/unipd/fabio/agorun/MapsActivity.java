@@ -252,18 +252,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View v) {
                 final String joinedActivitySid = MySharedPreferencesHandler.getMySharedPreferencesString(getApplicationContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivitySid, "");
-                // TODO: inizio monitoraggio attività dell'utente.
+
                 if (IS_MONITORING) {
                     /** STO MONITORANDO: IL MONITORING STA PER ESSERE DISATTIVATO.*/
-
-                    // TODO doppia conferma.
 
                     // startMonitoring.setText("START");
 
                     //Toast.makeText(getApplicationContext(),"ismonitoring",Toast.LENGTH_SHORT);
                     
                     if (checkIfPointReached(DESTINATION)) {
-                        // TODO: Assegnazione punteggio.
 
                         IS_MONITORING = false;
 
@@ -319,8 +316,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 startMonitoring.setText("START");
                                 hamburgerMenu.setClickable(true);
                                 hamburgerMenu.setEnabled(true);
-                                removeStartingCircled();
-                                removeDestinationCircle();
 
                                 for (Marker m : markersMap.keySet()) {
                                     m.setVisible(true);
@@ -1429,11 +1424,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    private void createDestinationCircle(LatLng destLatLng) {
+    public void createDestinationCircle(LatLng destLatLng) {
         endArea = mMap.addCircle(new CircleOptions().center(destLatLng).radius(50).strokeColor(Color.GREEN));
     }
 
-    private void removeStartingCircled() {
+    public void removeStartingCircled() {
         if (startArea != null) {
             startArea.remove();
         }
@@ -1609,40 +1604,41 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         }
                         tag++;
 
+                        if (! IS_MONITORING) {
+                            fragment1 = new Fragment1();
 
-                        fragment1 = new Fragment1();
+                            Bundle args = new Bundle();
+                            args.putString("start", start);
+                            args.putString("stop", stop);
+                            args.putString("km", km);
+                            args.putString("exp", exp);
+                            args.putString("hour", hour);
+                            args.putString("date", date);
+                            args.putString("name", session_info[6]);
+                            args.putString("noj", session_info[8]);
+                            //args.putString("medlevel", session_info[9]);
+                            args.putString("medlevel", "medium");
+                            args.putString("email", session_info[7]);
+                            //    Toast.makeText(getApplicationContext(),session_info[7],Toast.LENGTH_SHORT).show();
+                            args.putString("markerId", markerclicked.getId());
 
-                        Bundle args = new Bundle();
-                        args.putString("start", start);
-                        args.putString("stop", stop);
-                        args.putString("km", km);
-                        args.putString("exp", exp);
-                        args.putString("hour", hour);
-                        args.putString("date", date);
-                        args.putString("name", session_info[6]);
-                        args.putString("noj", session_info[8]);
-                        //args.putString("medlevel", session_info[9]);
-                        args.putString("medlevel", "medium");
-                        args.putString("email",session_info[7]);
-                    //    Toast.makeText(getApplicationContext(),session_info[7],Toast.LENGTH_SHORT).show();
-                        args.putString("markerId", markerclicked.getId());
+                            // Parso la stringa corrispondente al marker cliccato.
+                            String[] parsedString = markersMap.get(arg0).split("_");
 
-                        // Parso la stringa corrispondente al marker cliccato.
-                        String[] parsedString = markersMap.get(arg0).split("_");
+                            // Salvo il sid dell'attività joinata.
+                            String activitySid = parsedString[0];
 
-                        // Salvo il sid dell'attività joinata.
-                        String activitySid = parsedString[0];
+                            //System.out.println("Dopo assegnamento: "+activitySid);
+                            // Passo il sid al Fragment.
+                            args.putString("activitySid", activitySid);
+                            //System.out.println("Ho salvato "+activitySid + "nel bundle");
 
-                        //System.out.println("Dopo assegnamento: "+activitySid);
-                        // Passo il sid al Fragment.
-                        args.putString("activitySid", activitySid);
-                        //System.out.println("Ho salvato "+activitySid + "nel bundle");
-
-                        // Disegno il cerchio trasparente attorno al punto di partenza.
+                            // Disegno il cerchio trasparente attorno al punto di partenza.
 
 
-                        fragment1.setArguments(args);
-                        moveToFragment(fragment1);
+                            fragment1.setArguments(args);
+                            moveToFragment(fragment1);
+                        }
 
                         progressBar.setVisibility(View.GONE);
                     } else {
