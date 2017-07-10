@@ -2,9 +2,6 @@ package com.unipd.fabio.agorun;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
-import android.content.res.Resources;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.location.Address;
 import android.location.Geocoder;
@@ -125,11 +122,18 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo, DBCon
         timeview.setText(checkHourMinute(hour,minute));
         timePar = checkHourMinute(hour,minute);
 
+        myHour = timePar;
+        myDate = datePar;
+
+
         dateTimePar = datePar + "%20" + timePar;
 
         Toast.makeText(getApplicationContext(),dateTimePar,Toast.LENGTH_LONG).show();
 
     }
+
+    private String myDate;
+    private String myHour;
 
     private void parseFullAddress(String[] addresses) {
         this.startAddress.setText(addresses[0]);
@@ -351,7 +355,7 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo, DBCon
             connect();
             //MapsActivity.getMapsData().setStartMonitoringVisibility(1);
             if (MapsActivity.getMapsData().isTimeForMonitoring()) {
-                MapsActivity.getMapsData().setStartMonitoringVisibility(1);
+                MapsActivity.getMapsData().setStartMonitoringVisibility(true);
             }
         } catch(Exception e) {
             System.out.println("Geolocalizzazione fallita.");
@@ -402,6 +406,15 @@ public class AddActivity extends AppCompatActivity implements GeoTask.Geo, DBCon
             mapsActivity.addMarkerToMap(IS_MY_ACTIVITY, ls.get(1),latStart, lngStart,
                     new String(add.getAddressLine(0)+", "+add.getLocality()),
                     new String(add2.getAddressLine(0)+ ", "+add2.getLocality()));
+
+            System.out.println("MY HOUR = "+myHour);
+            MySharedPreferencesHandler.putSharedPreferencesString(getApplicationContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivitySid, ls.get(1));
+            MySharedPreferencesHandler.putSharedPreferencesString(getApplicationContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivityHour, myHour+":00");
+            MySharedPreferencesHandler.putSharedPreferencesString(getApplicationContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinActivityDate, myDate);
+
+            if (MapsActivity.getMapsData().isTimeForMonitoring()) {
+                MapsActivity.getMapsData().setStartMonitoringVisibility(true);
+            }
         } else {
             Toast.makeText(this, "Creation of the activity failed", Toast.LENGTH_SHORT).show();
         }

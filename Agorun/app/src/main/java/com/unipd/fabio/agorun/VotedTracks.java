@@ -198,11 +198,11 @@ public class VotedTracks extends AppCompatActivity implements DBConnection {
                     getSupportFragmentManager().beginTransaction().add(myFragment, myFragment.getTag());
                     return myFragment;
                 case 1:
-                    Fragment fragment2 = new MyFragment().newInstance(1, map.get(0), latLngList);
+                    Fragment fragment2 = new MyFragment().newInstance(1, map.get(1), latLngList);
                     getSupportFragmentManager().beginTransaction().add(fragment2, fragment2.getTag());
                     return fragment2;
                 case 2:
-                    Fragment fragment3 = new MyFragment().newInstance(2, map.get(0), latLngList);
+                    Fragment fragment3 = new MyFragment().newInstance(2, map.get(1), latLngList);
                     getSupportFragmentManager().beginTransaction().add(fragment3, fragment3.getTag());
                     return fragment3;
                 default:

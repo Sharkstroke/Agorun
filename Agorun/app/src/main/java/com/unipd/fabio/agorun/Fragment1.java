@@ -11,8 +11,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -245,15 +243,12 @@ public class Fragment1 extends Fragment implements DBConnection {
                         MySharedPreferencesHandler.getMySharedPreferencesString(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinActivityDate, "") != "" &&
                         MySharedPreferencesHandler.getMySharedPreferencesString(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivityHour, "") != "") {
 
-                    System.out.println("Sono DENTRO!!!!!");
                     // Cancello
                     MySharedPreferencesHandler.removeMySharedPreferences(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivitySid);
                     MySharedPreferencesHandler.removeMySharedPreferences(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinActivityDate);
                     MySharedPreferencesHandler.removeMySharedPreferences(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivityHour);
-                    System.out.println("Il sid rimasto è: "+MySharedPreferencesHandler.getMySharedPreferencesString(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivitySid, ""));
                 }
                 MySharedPreferencesHandler.putSharedPreferencesString(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivitySid, activitySid);
-                System.out.println("Just added: "+MySharedPreferencesHandler.getMySharedPreferencesString(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivitySid, ""));
                 MySharedPreferencesHandler.putSharedPreferencesString(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivityHour, hour);
                 MySharedPreferencesHandler.putSharedPreferencesString(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinActivityDate, date);
 
