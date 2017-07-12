@@ -132,6 +132,15 @@
         android:layout_alignParentBottom="true"
         android:layout_centerInParent="true" />
 
+    <TextView
+        android:id="@+id/dummyView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        android:visibility="invisible"
+        android:layout_below="@+id/loading"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="85dp" />
 
 
 </RelativeLayout>

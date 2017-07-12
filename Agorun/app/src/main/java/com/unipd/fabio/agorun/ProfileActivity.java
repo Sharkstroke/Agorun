@@ -1,29 +1,12 @@
 package com.unipd.fabio.agorun;
 
-import android.app.Activity;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.BitmapShader;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Shader;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.vision.text.Text;
-
-import java.io.File;
 import java.util.ArrayList;
-
-import static android.R.attr.bitmap;
-import static com.unipd.fabio.agorun.R.id.imageView;
 
 /**
  * Created by root on 04/07/17.
@@ -57,7 +40,7 @@ public class ProfileActivity extends AppCompatActivity implements DBConnection {
             email = ConnectDB.getUser();
         }
 
-        Toast.makeText(getApplicationContext(),email,Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getApplicationContext(),email,Toast.LENGTH_SHORT).show();
 
         new ConnectDB(this).execute("getinfouser",email);
 

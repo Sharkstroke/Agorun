@@ -96,6 +96,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private TextView startingAddressTop;
     private TextView destinationAddressTop;
     private ProgressBar progressBar;
+    private TextView dummyView;
     private Button startMonitoring;
 
 
@@ -248,6 +249,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         this.destinationAddressTop = (TextView) findViewById(R.id.destinationPointInMain);
         this.startMonitoring = (Button) findViewById(R.id.startMonitorButton);
         this.hamburgerMenu = (ImageButton) findViewById(R.id.button1);
+        this.dummyView = (TextView) findViewById(R.id.dummyView);
         progressBar = (ProgressBar) findViewById(R.id.loading);
         progressBar.setVisibility(View.GONE);
     }
@@ -424,12 +426,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             case 0:
                 showCaseView.setShowcase(new ViewTarget(search_tw), true);
                 showCaseView.setContentTitle("This is the Search Bar");
-                showCaseView.setContentText("Use this to find the addresses you want to look for!");
+                showCaseView.setContentText("Use this tool to find the addresses you want to look for!");
                 showCaseView.setStyle(R.style.CustomShowcaseTheme3);
                 break;
             case 1:
+                showCaseView.setShowcase(new ViewTarget(dummyView), true);
+                showCaseView.setContentTitle("Create or Join Activities!");
+                showCaseView.setContentText("Create activities pressing on the display twice.\n" +
+                        "Join an activity clicking on a Marker and then on the green icon.");
+                showCaseView.setStyle(R.style.CustomShowcaseTheme3);
+                showCaseView.setButtonText("Got it");
+                break;
+            case 2:
                 showCaseView.hide();
-                setAlpha(1.0f, hamburgerMenu, search_tw);
+                setAlpha(1.0f, hamburgerMenu, search_tw, dummyView);
                 break;
         }
         counter++;
@@ -887,7 +897,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 String details = markersMap.get(marker);
                 String[] strings = details.split("_");
                 sidclicked = strings[0];
-                Toast.makeText(getApplicationContext(), sidclicked, Toast.LENGTH_LONG).show();
+                //Toast.makeText(getApplicationContext(), sidclicked, Toast.LENGTH_LONG).show();
                 if (isInternetAvailable()) {
                     connect("getinforun", sidclicked);
                 }
@@ -931,7 +941,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             setLocalizationMethods();
 
             double distance = SphericalUtil.computeDistanceBetween(fromLocationToLatLng(l), startArea.getCenter());
-            Toast.makeText(getApplicationContext(),(distance< startArea.getRadius())+"",Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(),(distance< startArea.getRadius())+"",Toast.LENGTH_SHORT).show();
             return distance < startArea.getRadius();
         } else {
             if (endArea == null || l == null) {
