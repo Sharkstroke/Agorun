@@ -933,7 +933,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public boolean checkIfPointReached(final int point) {
         if (point == START){
+            setLocalizationMethods();
             if (startArea == null || l == null) {
+                Toast.makeText(getApplicationContext(), ""+(l==null), Toast.LENGTH_LONG).show();
                 return false;
             }
 
@@ -944,6 +946,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             //Toast.makeText(getApplicationContext(),(distance< startArea.getRadius())+"",Toast.LENGTH_SHORT).show();
             return distance < startArea.getRadius();
         } else {
+            setLocalizationMethods();
             if (endArea == null || l == null) {
                 return false;
             }
