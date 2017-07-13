@@ -50,7 +50,7 @@ public class ProfileActivity extends AppCompatActivity implements DBConnection {
 
 
 
-        if (getIntent().getExtras() != null && getIntent().hasExtra("email")) {
+        if (getIntent().getExtras() != null && getIntent().hasExtra("email") && !getIntent().getExtras().get("email").equals(ConnectDB.getUser())) {
             IS_MY_PROFILE = false;
             email = getIntent().getStringExtra("email");
         } else {
