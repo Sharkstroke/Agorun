@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    android:gravity="end"
+    android:layout_gravity="end"
+    android:layoutDirection="rtl"
+    >
+
+
+    <item
+        android:id="@+id/one"
+        android:layoutDirection="rtl"
+        android:title="New Activity"/>
+
+    <item
+        android:id="@+id/profile"
+        android:layoutDirection="rtl"
+        android:title="Profile"/>
+
+    <item
+        android:id="@+id/popularTracks"
+        android:layoutDirection="rtl"
+        android:title="Popular Tracks"/>
+
+    <item
+        android:id="@+id/leaderboard"
+        android:layoutDirection="rtl"
+        android:title="Leader Board"/>
+
+
+</menu>

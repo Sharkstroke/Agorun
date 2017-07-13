@@ -10,6 +10,7 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import java.text.SimpleDateFormat;
@@ -26,6 +27,7 @@ public class MyNotificationManager extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         try {
+            System.out.println("SONO ANCORA QUI");
             String myFullHour = MySharedPreferencesHandler.getMySharedPreferencesString(context, MySharedPreferencesHandler.MyPreferencesKeys.joinedActivityHour, "");
             String myDate = MySharedPreferencesHandler.getMySharedPreferencesString(context, MySharedPreferencesHandler.MyPreferencesKeys.joinActivityDate, "");
 
@@ -35,11 +37,13 @@ public class MyNotificationManager extends BroadcastReceiver {
 
             setNotificationTime(newHour);
 
+
+
             Date d = new Date();
             SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
             SimpleDateFormat hour = new SimpleDateFormat("HH:mm");
             if (myDate.equals(date.format(d)) && timeForNotification.equals(hour.format(d))){
-                Intent it =  new Intent(context, MainActivity.class);
+                Intent it =  new Intent(context, Fragment1.class);
                 createNotification(context, it, "Agorun - Activity Reminder", "Agorun - Time to get ready!", "It's almost time! Get ready for your activity!");
             }
         }catch (Exception e){
@@ -69,6 +73,7 @@ public class MyNotificationManager extends BroadcastReceiver {
             Uri som = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
             Ringtone toque = RingtoneManager.getRingtone(context, som);
             toque.play();
+            LocalBroadcastManager.getInstance(context).unregisterReceiver(this);
         }
         catch(Exception e){}
     }

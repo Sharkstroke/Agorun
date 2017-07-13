@@ -1,0 +1,146 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="com.imaadv.leaynik.ClinicFragment"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:background="@color/colorPrimary">
+
+
+     <!--   <Button
+            android:id="@+id/findPlace"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:text="Search" />-->
+        <!--   Giulio mod.-->
+     <!--   <Button
+            android:id="@+id/newActivity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@+id/searched_address"
+            android:layout_alignParentTop="true"
+            android:text="New Activity" />-->
+
+
+
+        <!--
+                <TextView
+                    android:layout_margin="20dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textSize="25dp"
+                    android:layout_below="@+id/findPlace"
+                    android:id="@+id/searched_address"/>-->
+
+        <!-- Giulio mod.-->
+    </android.support.v7.widget.Toolbar>
+
+    <ImageButton
+        android:id="@+id/button1"
+        android:layout_width="80dp"
+        android:layout_height="50dp"
+        android:layout_alignParentRight="true"
+        android:layout_weight="0.30"
+        android:backgroundTint="@color/colorPippo"
+        android:src="@drawable/ic_btn_1"
+        android:layout_alignBottom="@+id/toolbar"
+        android:layout_marginRight="5dp"
+        android:layout_alignParentTop="true" />
+
+    <TextView
+        android:id="@+id/search_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:textSize="19dp"
+        android:background="@color/colorPrimary"
+
+        android:drawableLeft="@android:drawable/ic_menu_search"
+        android:text="Search Location"
+
+        android:textColor="#FFFFFF"
+        android:padding="15dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignBottom="@+id/toolbar"
+        android:layout_toLeftOf="@+id/button1"
+        android:maxLines="1"
+        android:layout_toStartOf="@+id/button1" />
+
+    <TextView
+        android:id="@+id/destinationPointInMain"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/startingPointInMain" />
+
+    <TextView
+        android:id="@+id/startingPointInMain"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/toolbar"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <ProgressBar
+        android:id="@+id/loading"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_below="@+id/search_bar" />
+
+    <LinearLayout
+        android:id="@+id/linlaHeaderProgress"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone" >
+
+        <ProgressBar
+            android:id="@+id/pbHeaderProgress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+        </ProgressBar>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/startMonitorButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/startMonitoring"
+        android:visibility="invisible"
+        android:layout_alignParentBottom="true"
+        android:layout_centerInParent="true" />
+
+    <TextView
+        android:id="@+id/dummyView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        android:visibility="invisible"
+        android:layout_below="@+id/loading"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="85dp" />
+
+
+</RelativeLayout>

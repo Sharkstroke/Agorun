@@ -204,8 +204,8 @@ public class ConnectDB extends AsyncTask<String, Void, ArrayList<String>> {
                 ////  TODO: da togliere forse!!!
                 case "uploadimage":
 
-                    if (param.length != 1) {
-                        output.add("La send dell'immagine richiede 1 parametro");
+                    if (param.length != 2) {
+                        output.add("La send dell'immagine richiede 2 parametris");
                     } else {
                         url = new URL(urldb + "uploadimage.php?user=" + user);
                         conn = (HttpsURLConnection) url.openConnection();
@@ -237,7 +237,13 @@ public class ConnectDB extends AsyncTask<String, Void, ArrayList<String>> {
                     break;
 
                 case "getimage":
-                    url = new URL(urldb + "getimage.php?user=" + user);
+                    if (param.length != 2) {
+                        output.add("Numero errato di parametri per la get immagine");
+                    } else {
+                        output.add("getimage");
+                        url = new URL(urldb + "getimage.php?user=" + param[1]);
+                    }
+
                     break;
 
                 case "settrack":

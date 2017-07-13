@@ -567,25 +567,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         float accuracy = 0.0f;
         if (mMap != null) {
             if (l == null) {
-                do{
-                    locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, locationListener, null);
-                    l = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                    if (l != null) {
-                        accuracy = l.getAccuracy();
-                    }
-                    i++;
-                } while (l == null && accuracy == 0.0 && accuracy > 20.0 && i < 3);
+                locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, locationListener, null);
+                l = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                if (l != null) {
+                    accuracy = l.getAccuracy();
+                }
+                i++;
             } else {
                 i = 0;
                 accuracy = 0.0f;
-                do {
-                    locationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, locationListener, null);
-                    l = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                    if (l != null) {
-                        accuracy = l.getAccuracy();
-                    }
-                    i++;
-                } while(l == null && accuracy == 0.0 && accuracy > 20.0 && i < 3);
+                locationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, locationListener, null);
+                l = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                if (l != null) {
+                    accuracy = l.getAccuracy();
+                }
+                i++;
             }
 
             //createCircle();
@@ -1079,6 +1075,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         rlp.setMargins(0, 180, 180, 0);
 
         setLocalizationMethods();
+        formerPos.setPosition(l);
 
         if (l != null) {
             updateWithNewLocation(l);
@@ -1087,41 +1084,84 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             createLocalizationErrorAlert();
         }
 
-        // Richiedo update di posizione continuamente
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 20,
-                new LocationListener() {
-                    public void onLocationChanged(Location location) {
+        l = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        if (l == null) {
+            // Richiedo update di posizione continuamente
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10,
+                    new LocationListener() {
+                        public void onLocationChanged(Location location) {
                             //recordPosition(location);
 
-                        l = location;
+                            System.out.println("GPS PROVIDER");
+                            l = location;
 
 
-                        if (IS_MONITORING) {
+                            if (IS_MONITORING) {
+                                drawTrack(location);
 
                                 updateWithNewLocation(location);
 
-                                drawTrack(location);
+
 
                                 double lat = location.getLatitude();
                                 double lng = location.getLongitude();
 
-                        //        Toast.makeText(getApplicationContext(),"dsfajkl",Toast.LENGTH_SHORT).show();
+                                //        Toast.makeText(getApplicationContext(),"dsfajkl",Toast.LENGTH_SHORT).show();
 
                                 points.add(lat + "," + lng);
                             }
-                    }
+                        }
 
-                    public void onProviderDisabled(String provider) {
-                    }
+                        public void onProviderDisabled(String provider) {
+                        }
 
-                    public void onProviderEnabled(String provider) {
-                    }
+                        public void onProviderEnabled(String provider) {
+                        }
 
-                    public void onStatusChanged(String provider, int status,
-                                                Bundle extras) {
+                        public void onStatusChanged(String provider, int status,
+                                                    Bundle extras) {
+                        }
                     }
-                }
-        );
+            );
+        } else {
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 10,
+                    new LocationListener() {
+                        public void onLocationChanged(Location location) {
+                            //recordPosition(location);
+
+                            System.out.println("NETWORK PROVIDER");
+                            l = location;
+
+
+                            if (IS_MONITORING) {
+
+                                drawTrack(location);
+
+                                updateWithNewLocation(location);
+
+
+
+                                double lat = location.getLatitude();
+                                double lng = location.getLongitude();
+
+                                //        Toast.makeText(getApplicationContext(),"dsfajkl",Toast.LENGTH_SHORT).show();
+
+                                points.add(lat + "," + lng);
+                            }
+                        }
+
+                        public void onProviderDisabled(String provider) {
+                        }
+
+                        public void onProviderEnabled(String provider) {
+                        }
+
+                        public void onStatusChanged(String provider, int status,
+                                                    Bundle extras) {
+                        }
+                    }
+            );
+        }
 
 
         // setInfoFragmentListener(); TODO: vedere se si può tenere commentato

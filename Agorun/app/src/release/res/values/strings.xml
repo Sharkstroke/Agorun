@@ -1,0 +1,50 @@
+<resources>
+    <string name="app_name">Agorun</string>
+    <string name="title_activity_maps">Agorun</string>
+    <string name="nameHint">Insert your name...</string>
+    <string name="surnameHint">Insert your surname...</string>
+    <string name="beginner">Beginner</string>
+    <string name="amateur">Amateur</string>
+    <string name="advanced">Advanced</string>
+    <string name="expert">Expert</string>
+    <string name="SelectCustom">select</string>
+    <string name="experienceChoice">Select your experience level:</string>
+    <string name="sexChoice">Select your sex...</string>
+    <string name="startHint">Select the starting address</string>
+    <string name="destinationHint">Select your destination address</string>
+    <string name="difficultyLevel">Select the difficulty of the track</string>
+    <string name="shortTrack">Short: 0-5 km</string>
+    <string name="mediumTrack">Medium: 6-10 km</string>
+    <string name="longTrack">Long: 11-15 km</string>
+    <string name="championTrack">Champion: 16-20 km</string>
+    <string name="godTrack">God: 21+ km</string>
+    <string name="lengthChoice">Select the length range of the track</string>
+    <string name="createActivityText">Create</string>
+
+    <!-- Giulio mod. -->
+    <string name="btn_logout_from_google">Logout from Google</string>
+    <string name="btn_login">Log In</string>
+    <string name="btn_Register">Sign Up</string>
+    <string name="btn_revoke_access">Revoke Access</string>
+    <string name="loading">Loading...</string>
+    <string name="title_activity_login">LoginActivity</string>
+
+    <string name="title_activity_fullscreen">FullscreenActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="title_activity_signi__in_activity">Signi_In_activity</string>
+    <string name="choosedate">Choose the date of the activity</string>
+    <string name="choosetime">Choose the starting time</string>
+    <string name="destinationPointInMain">Destination address:</string>
+    <string name="startingPointInMain">Starting address:</string>
+    <string name="hintemail">Email</string>
+    <string name="hintpassword">Password</string>
+    <string name="joinText">JOIN</string>
+    <string name="startMonitoring">START</string>
+    <string name="stopMonitorButton">STOP</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="popularTracks">Popular Tracks</string>
+    <!-- Giulio mod. -->
+</resources>
+

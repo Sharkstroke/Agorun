@@ -1,8 +1,11 @@
 package com.unipd.fabio.agorun;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,11 +14,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 /**
  * Created by Giulio on 06/06/2017.
  */
 
-public class Fragment3 extends Fragment implements View.OnClickListener {
+public class Fragment3 extends Fragment implements View.OnClickListener, DBConnection {
 
 
     private ImageView img;
@@ -100,16 +105,7 @@ public class Fragment3 extends Fragment implements View.OnClickListener {
         img = (ImageView) view.findViewById(R.id.toprofile);
         img.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.left_to_right));
 
-
-
-
-
-
-
-        img = (ImageView) view.findViewById(R.id.toprofile);
-        img.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.left_to_right));
-
-
+        new ConnectDB(this).execute("getimage", emailCreator);
 
 
         return view;
@@ -167,5 +163,18 @@ public class Fragment3 extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View v) {
 
+    }
+
+    @Override
+    public void onTaskCompleted(ArrayList<String> result) {
+        if (result.get(1).equals("Image not found")) {
+            Toast.makeText(getContext(), "Image not found", Toast.LENGTH_SHORT).show();
+        } else {
+            String encodedString = result.get(1);
+
+            byte[] b = Base64.decode(encodedString,Base64.DEFAULT);
+            Bitmap profImage = BitmapFactory.decodeByteArray(b, 0, b.length);
+            img.setImageBitmap(profImage);
+        }
     }
 }

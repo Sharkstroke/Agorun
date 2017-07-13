@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:id="@+id/user_activity_info"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="110dp"
+    android:layout_height="110dp"
+    android:orientation="vertical"
+    android:windowBackground="@android:color/transparent"
+    android:gravity="center"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:clickable="false"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FF0000"
+            android:padding="10dp"
+            android:layout_centerInParent="true"
+            android:background="#00000000"
+            android:id="@+id/tv_lat"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FF0000"
+            android:padding="10dp"
+            android:background="#00000000"
+            android:layout_below="@+id/tv_lat"
+            android:id="@+id/tv_lng"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FF0000"
+            android:padding="10dp"
+            android:background="#00000000"
+            android:layout_below="@+id/tv_lng"
+            android:id="@+id/km_length"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FF0000"
+            android:padding="10dp"
+            android:background="#00000000"
+            android:layout_below="@+id/tv_lng"
+            android:id="@+id/experienceLevel"
+            />
+    </LinearLayout>
+
+
+</LinearLayout>
