@@ -50,13 +50,13 @@ public class ProfileActivity extends AppCompatActivity implements DBConnection {
 
 
 
-        if (getIntent().getExtras() != null && getIntent().hasExtra("email") && !getIntent().getExtras().get("email").equals(ConnectDB.getUser())) {
-            IS_MY_PROFILE = false;
+        if (getIntent().getExtras() != null && getIntent().hasExtra("email")) {
             email = getIntent().getStringExtra("email");
         } else {
-            IS_MY_PROFILE = true;
             email = ConnectDB.getUser();
         }
+
+        IS_MY_PROFILE = email.equals(ConnectDB.getUser());
 
         new ConnectDB(this).execute("getimage", email);
 
@@ -122,30 +122,28 @@ public class ProfileActivity extends AppCompatActivity implements DBConnection {
 
     @Override
     public void onTaskCompleted(ArrayList<String> result) {
-        if (result.get(0).equals("getimage")) {
+        if (result.isEmpty()) {      // Immagine del profilo mandata al DB
+            Toast.makeText(getApplicationContext(), "Image Sent", Toast.LENGTH_SHORT).show();
+        } else if (result.get(0).equals("getimage")) {    // Ho cercato di ottenere l'immagine
             // Get immagine.
-            if (result.get(1).equals("Image not found")) {
+            if (result.get(1).equals("Image not found")) { // L'immagine non c'era
                 Toast.makeText(getApplicationContext(), "Image not found", Toast.LENGTH_SHORT).show();
-            } else {
+            } else {                                       // L'immagine c'era
                 String encodedString = result.get(1);
 
-                byte[] b = Base64.decode(encodedString,Base64.DEFAULT);
+                byte[] b = Base64.decode(encodedString, Base64.DEFAULT);
                 Bitmap profImage = BitmapFactory.decodeByteArray(b, 0, b.length);
                 profileImage.setImageBitmap(profImage);
             }
+            // Ho cercato di ottenere info sul profilo
+        } else if (!result.get(0).equals("Problem getting informations") && !result.get(0).equals("User not found")) {
+            String[] infos = result.get(0).split("\\|");
+            name.setText(infos[0]);
+            rank.setText(infos[2]);
+            experience.setText(MapsActivity.getDifficultyRange(infos[3]));
+            created.setText(infos[4]);
         } else {
-            if (result.isEmpty()) {
-                Toast.makeText(getApplicationContext(), "Image Sent", Toast.LENGTH_SHORT).show();
-            } else if (!result.get(0).equals("Problem getting informations") && !result.get(0).equals("User not found")) {
-                String[] infos = result.get(0).split("\\|");
-                name.setText(infos[0]);
-                rank.setText(infos[2]);
-                experience.setText(MapsActivity.getDifficultyRange(infos[3]));
-                created.setText(infos[4]);
-            } else {
-                Toast.makeText(getApplicationContext(), "Problem getting infos", Toast.LENGTH_SHORT).show();
-            }
+            Toast.makeText(getApplicationContext(), "Problem getting infos", Toast.LENGTH_SHORT).show();
         }
-
     }
 }
