@@ -295,7 +295,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         }
 
                         // Tolgo i cerchi colorati una volta arrivato.
-                        removeStartingCircled();
+                        removeStartingCircle();
                         removeDestinationCircle();
 
 
@@ -311,7 +311,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             public void onClick(DialogInterface dialog, int which) {
                                 new ConnectDB(MapsActivity.this).execute("disjoinrun",joinedActivitySid);
                                 IS_MONITORING = false;
-                                removeStartingCircled();
+                                removeStartingCircle();
                                 removeDestinationCircle();
 
                                 MySharedPreferencesHandler.removeMySharedPreferences(getApplicationContext(),
@@ -370,6 +370,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                         }
                     } else {
+                        removeStartingCircle();
                         Toast.makeText(getApplicationContext(), "Get closer to the starting point!", Toast.LENGTH_SHORT).show();
                     }
 
@@ -1552,7 +1553,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         endArea = mMap.addCircle(new CircleOptions().center(destLatLng).radius(50).strokeColor(Color.GREEN));
     }
 
-    public void removeStartingCircled() {
+    public void removeStartingCircle() {
         if (startArea != null) {
             startArea.remove();
         }

@@ -59,7 +59,9 @@ public class VotedTracks extends AppCompatActivity implements DBConnection {
 
     @Override
     public void onTaskCompleted(ArrayList<String> result) {
-        if (result.get(0).equals("Error")) {
+        if (result.isEmpty()) {      // Immagine del profilo mandata al DB
+            Toast.makeText(getApplicationContext(), "Image Sent", Toast.LENGTH_SHORT).show();
+        } else if (result.get(0).equals("Error")) {
             Toast.makeText(getApplicationContext(),"Error getting tracks",Toast.LENGTH_SHORT).show();
         } else {
             mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(),result);

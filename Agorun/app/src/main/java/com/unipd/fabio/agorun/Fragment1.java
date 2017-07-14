@@ -280,7 +280,7 @@ public class Fragment1 extends Fragment implements DBConnection {
                 MySharedPreferencesHandler.removeMySharedPreferences(getContext(), MySharedPreferencesHandler.MyPreferencesKeys.joinedActivityHour);
 
                 mapsActivity.setStartMonitoringVisibility(false);
-                mapsActivity.removeStartingCircled();
+                mapsActivity.removeStartingCircle();
                 for (Marker m : mapsActivity.getMarkersMap().keySet()) {
                     if (m.getId().equals(markerId))
                         m.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
