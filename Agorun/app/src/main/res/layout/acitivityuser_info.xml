@@ -92,8 +92,8 @@
             <ImageView
                 android:id="@+id/act_showmore"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                app:srcCompat="@drawable/ic_expand_00000" />
+                android:layout_height="50dp"/>
+                <!--app:srcCompat="@drawable/ic_expand_00000" />-->
 
 
         </LinearLayout>
