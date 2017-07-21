@@ -298,6 +298,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         removeStartingCircle();
                         removeDestinationCircle();
 
+                        takeASelfie();
 
                     } else {
                         // TODO: mostra doppia conferma.
@@ -382,6 +383,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             }
         });
+    }
+
+    private void takeASelfie() {
+        Intent facebookIntent = new Intent(MapsActivity.this,SelfieActivity.class);
+        startActivity(facebookIntent);
     }
 
     public void setStartMonitoringVisibility (boolean visible) {

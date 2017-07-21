@@ -15,12 +15,12 @@
          Google Maps Android API v2, but are recommended.
     -->
     <application
+        android:name="android.support.multidex.MultiDexApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:name="android.support.multidex.MultiDexApplication"
         android:theme="@style/AppTheme">
 
         <!--
@@ -43,64 +43,67 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyCW_gvTeNeb_Gzxv8kphisyTr-PZX58djQ" />
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
 
         <activity
             android:name=".MainActivity"
-            android:screenOrientation="portrait"
-            android:label="@string/title_activity_maps">
+            android:label="@string/title_activity_maps"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".AddActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".ActivitySummary"
-            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".AddActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ActivitySummary"
+            android:screenOrientation="portrait" />
 
         <!-- Giulio mod. -->
         <activity
             android:name=".Account_Activity"
             android:label="@string/app_name"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".LoginActivity"
             android:label="@string/title_activity_login"
-            android:theme="@style/AppTheme"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".MapsActivity"
             android:label="@string/title_activity_login"
-            android:theme="@style/AppTheme"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".Signi_In_activity"
             android:label="@string/title_activity_signi__in_activity"
-            android:theme="@style/AppTheme"
-            android:screenOrientation="portrait"/>
-
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".VotedTracks"
             android:label="@string/popularTracks"
-            android:theme="@style/AppTheme"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".ProfileActivity"
             android:label="Profile Activity"
-            android:theme="@style/AppTheme"
-            android:screenOrientation="portrait"/>
-
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".LeaderboardActivity"
             android:label="Profile Activity"
-            android:theme="@style/AppTheme"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
 
         <!-- Giulio mod. -->
-        <activity android:name=".ImageProva"
-            android:screenOrientation="portrait"/>
-
+        <activity
+            android:name=".ImageProva"
+            android:screenOrientation="portrait" />
 
         <receiver
             android:name=".MyNotificationManager"
@@ -111,6 +114,13 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
+
+        <provider
+            android:name="com.facebook.FacebookContentProvider"
+            android:authorities="com.facebook.app.FacebookContentProvider120913288516000"
+            android:exported="true" />
+
+        <activity android:name=".SelfieActivity"></activity>
     </application>
 
 </manifest>

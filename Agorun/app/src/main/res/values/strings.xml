@@ -46,5 +46,11 @@
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="popularTracks">Popular Tracks</string>
     <!-- Giulio mod. -->
+
+    <string name="facebook_app_id">120913288516000</string>
+    <string name="success">Success</string>
+    <string name="error">Error</string>
+    <string name="ok">OK</string>
+    <string name="successpost">PostedPost</string>
 </resources>
 

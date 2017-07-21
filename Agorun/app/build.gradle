@@ -27,6 +27,19 @@ repositories {
     mavenCentral()
 }
 
+allprojects {
+    repositories {
+        jcenter()
+        maven {
+            url "https://maven.google.com"
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     //compile 'com.google.android.gms:play-services:6.5.87'
@@ -42,9 +55,10 @@ dependencies {
     compile 'com.jakewharton.rxbinding:rxbinding:0.4.0'
     compile 'com.github.bumptech.glide:glide:3.7.0'
     compile 'com.android.support.constraint:constraint-layout:1.0.0'
-    compile 'com.google.maps.android:android-maps-utils:0.5+'
-    compile 'com.android.support:design:26.0.0-alpha1'
+    compile 'com.google.maps.android:android-maps-utils:0.5'
+    compile 'com.android.support:design:25.4.0'
     compile 'com.github.amlcurran.showcaseview:library:5.4.3'
+    compile 'com.android.support:appcompat-v7:25.4.0'
+    compile 'com.facebook.android:facebook-android-sdk:4.24.0'
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:26.0.0-alpha1'
 }

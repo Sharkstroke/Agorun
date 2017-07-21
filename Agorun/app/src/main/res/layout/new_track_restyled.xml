@@ -12,7 +12,7 @@
         android:ems="10"
         android:inputType="none"
         android:textAlignment="center"
-        android:text="Create a new acitvity"
+        android:text="Create a new activity"
         android:textColor="#FFFFFF"
         android:textColorHint="#FFFFFF"
         android:layout_gravity="center"
